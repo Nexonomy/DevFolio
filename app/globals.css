@@ -12,19 +12,6 @@
   --tan: #C4A265;
 }
 
-/* ===== Dark Knight Theme ===== */
-[data-theme="dark"] {
-  --cream: #0D0D0F;
-  --parchment: #141418;
-  --brown: #E0DCCC;
-  --green: #4A90D9;
-  --green-light: #5BA0E8;
-  --red: #D4A528;
-  --gold: #F5C518;
-  --gold-light: #FFD740;
-  --tan: #2A2A32;
-}
-
 /* ===== Reset & Base ===== */
 *, *::before, *::after {
   margin: 0;
@@ -191,8 +178,9 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.55;
+  opacity: 1;
   z-index: 0;
+  transition: opacity 0.8s ease;
 }
 
 .hero-content {
@@ -202,6 +190,15 @@ body::before {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  padding: 30px 40px;
+  border-radius: 8px;
+  background: rgba(245, 240, 228, 0.65);
+  backdrop-filter: blur(4px);
+  transition: background 0.5s ease;
+}
+
+[data-theme="dark"] .hero-content {
+  background: rgba(12, 15, 26, 0.6);
 }
 
 .hero-eyebrow {
@@ -596,54 +593,237 @@ body::before {
   50% { opacity: 0; }
 }
 
-/* ===== Dark Theme Overrides ===== */
+/* ===== Dark Theme — Soothing Night ===== */
+[data-theme="dark"] {
+  --cream: #0C0F1A;
+  --parchment: #111525;
+  --brown: #E8E4D8;
+  --green: #88AAC8;
+  --green-light: #9CBBD8;
+  --red: #E8B840;
+  --gold: #E8B840;
+  --gold-light: #F0CC60;
+  --tan: #1A1E2E;
+}
+
+/* ===== Dark Theme — Full Override System ===== */
+
+/* --- Navbar --- */
 [data-theme="dark"] .navbar {
+  background: rgba(12, 14, 24, 0.95);
+  border-bottom: 3px solid #1E2030;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
   transition: background 0.5s ease, border-color 0.5s ease;
 }
 
-[data-theme="dark"] .contact-section {
-  background: #0A0A0C;
+[data-theme="dark"] .navbar-logo {
+  color: #E8B840;
+  text-shadow: 0 0 12px rgba(245, 197, 24, 0.3);
 }
 
-[data-theme="dark"] .contact-icon-box {
-  background: #1A1A22;
-  border-color: #333;
+[data-theme="dark"] .navbar-links a {
+  color: #A0A0B0;
 }
 
-[data-theme="dark"] .contact-icon-label {
-  color: #888;
+[data-theme="dark"] .navbar-links a:hover {
+  color: #E8B840;
+  border-color: #E8B840;
+}
+
+[data-theme="dark"] .navbar-links a::before {
+  color: #E8B840;
+}
+
+[data-theme="dark"] .theme-toggle {
+  border-color: #E8B840;
+  box-shadow: 2px 2px 0 rgba(245, 197, 24, 0.2);
+}
+
+/* --- Hero --- */
+[data-theme="dark"] .hero-eyebrow {
+  color: #E8B840;
+  text-shadow: 0 0 10px rgba(245, 197, 24, 0.2);
 }
 
 [data-theme="dark"] .hero-name {
-  text-shadow: 4px 4px 0 #1A1A22, 8px 8px 0 rgba(245, 197, 24, 0.1);
+  color: #F0ECE0;
+  text-shadow: 4px 4px 0 #0A0C15, 8px 8px 0 rgba(245, 197, 24, 0.1);
+}
+
+[data-theme="dark"] .hero-subtitle {
+  color: #8AAED0;
+}
+
+[data-theme="dark"] .hero-cta {
+  background: #E8B840;
+  color: #0C0E18;
+  box-shadow: 4px 4px 0 #0A0C15;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .hero-cta:hover {
+  box-shadow: 2px 2px 0 #0A0C15;
+  background: #FFD740;
+}
+
+[data-theme="dark"] .pixel-deco {
+  opacity: 0.15;
+}
+
+/* --- Section Headers --- */
+[data-theme="dark"] .section-label {
+  color: #E8B840;
+}
+
+[data-theme="dark"] .section-label::before,
+[data-theme="dark"] .section-label::after {
+  background: #2A2C3A;
 }
 
 [data-theme="dark"] .section-title {
-  text-shadow: 3px 3px 0 #1A1A22;
+  color: #F0ECE0;
+  text-shadow: 3px 3px 0 #0A0C15;
+}
+
+/* --- Work Section --- */
+[data-theme="dark"] .work-section {
+  background: #12141F;
+}
+
+[data-theme="dark"] .project-card {
+  background: #181A28;
+  border: 2px solid #252838;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .project-card:hover {
+  border-color: #E8B840;
+  box-shadow: 10px 10px 0 rgba(245, 197, 24, 0.08);
+}
+
+[data-theme="dark"] .card-title {
+  color: #F0ECE0;
+}
+
+[data-theme="dark"] .card-description {
+  color: #A0A0B0;
+  opacity: 1;
+}
+
+[data-theme="dark"] .card-tech {
+  color: #8AAED0;
+  opacity: 1;
+}
+
+[data-theme="dark"] .card-tag {
+  background: #E8B840;
+  color: #0C0E18;
+  border-color: #0C0E18;
+}
+
+[data-theme="dark"] .card-button {
+  background: #E8B840;
+  color: #0C0E18;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .coin-pop {
+  color: #E8B840;
+  text-shadow: 1px 1px 0 #0A0C15;
+}
+
+/* --- About Section --- */
+[data-theme="dark"] .about-section {
+  background: #0C0E18;
+}
+
+[data-theme="dark"] .avatar-box {
+  background: #181A28;
+  border: 2px solid #252838;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .avatar-icon {
+  background: #1E2035;
+  border-color: #E8B840;
+}
+
+[data-theme="dark"] .avatar-name {
+  color: #F0ECE0;
+}
+
+[data-theme="dark"] .avatar-role {
+  color: #8AAED0;
+}
+
+[data-theme="dark"] .about-text p {
+  color: #B8B8C8;
+}
+
+[data-theme="dark"] .stat-bar-label {
+  color: #D0CCC0;
+}
+
+[data-theme="dark"] .stat-bar-track {
+  background: #1A1C28;
+  border-color: #2A2C3A;
 }
 
 [data-theme="dark"] .stat-bar-fill {
   background: repeating-linear-gradient(
     90deg,
-    #4A90D9 0px, #4A90D9 8px,
-    #5BA0E8 8px, #5BA0E8 10px
+    #E8B840 0px, #E8B840 8px,
+    #E8A020 8px, #E8A020 10px
   );
 }
 
+/* --- Contact Section --- */
+[data-theme="dark"] .contact-section {
+  background: #08090F;
+}
+
+[data-theme="dark"] .contact-section .section-label {
+  color: #E8B840;
+}
+
+[data-theme="dark"] .contact-section .section-title {
+  color: #F0ECE0;
+  text-shadow: 3px 3px 0 rgba(245, 197, 24, 0.1);
+}
+
+[data-theme="dark"] .contact-icon-box {
+  background: #141620;
+  border: 2px solid #E8B840;
+  box-shadow: 3px 3px 0 rgba(245, 197, 24, 0.2);
+}
+
+[data-theme="dark"] .contact-icon-label {
+  color: #D0C8A8;
+}
+
+[data-theme="dark"] .footer-tagline {
+  color: #E8B840;
+  text-shadow: 0 0 8px rgba(245, 197, 24, 0.2);
+}
+
+/* --- Pixel Divider --- */
 [data-theme="dark"] .pixel-divider {
   background: repeating-linear-gradient(
     90deg,
-    #1A1A22 0px, #1A1A22 12px,
-    #F5C518 12px, #F5C518 24px,
+    #0C0E18 0px, #0C0E18 12px,
+    #E8B840 12px, #E8B840 24px,
     #D4A528 24px, #D4A528 36px,
-    #4A90D9 36px, #4A90D9 48px
+    #8AAED0 36px, #8AAED0 48px
   );
 }
 
+/* --- Noise overlay --- */
 [data-theme="dark"] body::before {
-  opacity: 0.06;
+  opacity: 0.03;
 }
 
+/* ===== Smooth Transitions ===== */
 .navbar,
 .project-card,
 .avatar-box,

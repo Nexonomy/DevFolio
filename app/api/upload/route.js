@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { requireAuth } from '@/lib/api-auth';
+import { getBlobDeliveryUrl } from '@/lib/blob';
 
 export async function POST(request) {
   try {
@@ -25,7 +26,7 @@ export async function POST(request) {
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
-    return NextResponse.json({ url: blob.url });
+    return NextResponse.json({ url: getBlobDeliveryUrl(blob.pathname) });
   } catch (error) {
     console.error('POST /api/upload error:', error);
     return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });

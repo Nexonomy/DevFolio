@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { animate, stagger } from 'animejs';
+import { getBlobDeliveryUrl } from '@/lib/blob';
 
 export default function Work({ games = [] }) {
   const sectionRef = useRef(null);
@@ -69,7 +70,7 @@ export default function Work({ games = [] }) {
               <div className="card-thumbnail" style={{ background: project.bgColor }}>
                 {project.coverImageUrl ? (
                   <Image
-                    src={project.coverImageUrl}
+                    src={getBlobDeliveryUrl(project.coverImageUrl)}
                     alt={project.title}
                     fill
                     className="card-cover-image"

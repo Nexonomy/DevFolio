@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { slugify } from '@/lib/slug';
+import { getBlobDeliveryUrl } from '@/lib/blob';
 
 const emptyVideo = () => ({ youtubeUrl: '', title: '' });
 
@@ -304,7 +305,7 @@ export default function GameForm({ game }) {
           {form.coverImageUrl && (
             <div className="admin-preview">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={form.coverImageUrl} alt="Cover preview" />
+              <img src={getBlobDeliveryUrl(form.coverImageUrl)} alt="Cover preview" />
               <button
                 type="button"
                 className="admin-button admin-button-small admin-button-danger"
@@ -332,7 +333,7 @@ export default function GameForm({ game }) {
           {form.screenshots.map((screenshot, index) => (
             <div key={`${screenshot.url}-${index}`} className="admin-screenshot-item">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={screenshot.url} alt={screenshot.alt || `Screenshot ${index + 1}`} />
+              <img src={getBlobDeliveryUrl(screenshot.url)} alt={screenshot.alt || `Screenshot ${index + 1}`} />
               <input
                 className="admin-input"
                 value={screenshot.alt}

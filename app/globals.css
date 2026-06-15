@@ -353,6 +353,21 @@ body::before {
   justify-content: center;
   font-size: 64px;
   position: relative;
+  overflow: hidden;
+}
+
+.card-cover-image {
+  object-fit: cover;
+}
+
+.work-empty {
+  text-align: center;
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  color: var(--brown);
+  opacity: 0.8;
+  max-width: 520px;
+  margin: 0 auto;
 }
 
 .card-tag {
@@ -407,6 +422,8 @@ body::before {
   cursor: pointer;
   box-shadow: 3px 3px 0 var(--brown);
   transition: transform 0.1s, box-shadow 0.1s;
+  display: inline-block;
+  text-decoration: none;
 }
 
 .card-button:hover {
@@ -917,5 +934,495 @@ body::before {
 
   .hero-name {
     font-size: clamp(18px, 5vw, 30px);
+  }
+}
+
+/* ===== Admin Dashboard ===== */
+.admin-shell {
+  min-height: 100vh;
+  background: var(--cream);
+}
+
+.admin-nav {
+  background: var(--parchment);
+  border-bottom: 3px solid var(--brown);
+  box-shadow: 0 4px 0 var(--tan);
+}
+
+.admin-nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-nav-logo {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  color: var(--green);
+  text-decoration: none;
+}
+
+.admin-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-nav-links a,
+.admin-link-button {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 7px;
+  color: var(--brown);
+  text-decoration: none;
+  background: transparent;
+  border: 2px solid transparent;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.admin-nav-links a.active {
+  border-color: var(--brown);
+  background: var(--gold);
+}
+
+.admin-main,
+.admin-login-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.admin-login-page {
+  min-height: calc(100vh - 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-page,
+.admin-form {
+  background: var(--parchment);
+  border: 3px solid var(--brown);
+  box-shadow: 6px 6px 0 var(--tan);
+  padding: 28px;
+}
+
+.admin-login-form {
+  width: 100%;
+  max-width: 420px;
+}
+
+.admin-page-header,
+.admin-section-header,
+.admin-form-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.admin-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: clamp(12px, 2vw, 18px);
+  color: var(--brown);
+  margin-bottom: 8px;
+}
+
+.admin-subtitle,
+.admin-hint {
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  color: var(--brown);
+  opacity: 0.85;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 7px;
+  color: var(--brown);
+}
+
+.admin-label-full {
+  grid-column: 1 / -1;
+}
+
+.admin-checkbox-label {
+  flex-direction: row;
+  align-items: center;
+  font-family: 'Lora', serif;
+  font-size: 14px;
+}
+
+.admin-input,
+.admin-textarea {
+  font-family: 'Lora', serif;
+  font-size: 14px;
+  color: var(--brown);
+  background: var(--cream);
+  border: 2px solid var(--brown);
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.admin-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.admin-color-input {
+  height: 44px;
+  padding: 4px;
+}
+
+.admin-button {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 8px;
+  color: var(--brown);
+  background: var(--cream);
+  border: 2px solid var(--brown);
+  padding: 10px 14px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--tan);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.admin-button-primary {
+  background: var(--red);
+  color: var(--cream);
+}
+
+.admin-button-danger {
+  background: #5a1a1a;
+  color: var(--cream);
+}
+
+.admin-button-small {
+  font-size: 6px;
+  padding: 8px 10px;
+}
+
+.admin-button:hover,
+.admin-nav-links a:hover {
+  transform: translate(1px, 1px);
+}
+
+.admin-error {
+  color: var(--red);
+  font-family: 'Lora', serif;
+  margin: 12px 0;
+}
+
+.admin-section {
+  margin-bottom: 28px;
+  padding-top: 8px;
+  border-top: 2px dashed var(--tan);
+}
+
+.admin-section-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  color: var(--green);
+  margin-bottom: 12px;
+}
+
+.admin-upload-row,
+.admin-video-row,
+.admin-form-actions,
+.admin-screenshot-actions,
+.admin-table-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.admin-video-row {
+  margin-bottom: 12px;
+}
+
+.admin-preview img,
+.admin-screenshot-item img {
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  border: 2px solid var(--brown);
+  display: block;
+}
+
+.admin-screenshot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.admin-screenshot-item {
+  background: var(--cream);
+  border: 2px solid var(--brown);
+  padding: 12px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Lora', serif;
+  font-size: 14px;
+}
+
+.admin-table th,
+.admin-table td {
+  border: 2px solid var(--brown);
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-table th {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 7px;
+  background: var(--gold);
+}
+
+.admin-table-slug {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.admin-badge {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 6px;
+  padding: 6px 8px;
+  border: 2px solid var(--brown);
+}
+
+.admin-badge.published {
+  background: var(--green-light);
+  color: var(--cream);
+}
+
+.admin-badge.draft {
+  background: var(--tan);
+  color: var(--brown);
+}
+
+.admin-empty {
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.admin-form-actions {
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* ===== Game Detail Page ===== */
+.game-detail-page {
+  min-height: 100vh;
+  background: var(--cream);
+  padding: 32px 24px 64px;
+}
+
+.game-detail-hero {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+}
+
+.game-detail-back {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 8px;
+  color: var(--green);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 24px;
+}
+
+.game-detail-hero-content {
+  display: grid;
+  grid-template-columns: minmax(240px, 420px) 1fr;
+  gap: 32px;
+  background: var(--parchment);
+  border: 3px solid var(--brown);
+  box-shadow: 6px 6px 0 var(--tan);
+  padding: 24px;
+}
+
+.game-detail-cover {
+  position: relative;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--brown);
+  overflow: hidden;
+}
+
+.game-detail-cover-image {
+  object-fit: cover;
+}
+
+.game-detail-emoji {
+  font-size: 96px;
+}
+
+.game-detail-tag {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 7px;
+  background: var(--gold);
+  color: var(--brown);
+  padding: 6px 10px;
+  border: 2px solid var(--brown);
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.game-detail-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: clamp(14px, 3vw, 22px);
+  color: var(--brown);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.game-detail-year,
+.game-detail-tech {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 7px;
+  color: var(--green);
+  margin-bottom: 12px;
+}
+
+.game-detail-description {
+  font-family: 'Lora', serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--brown);
+}
+
+.game-detail-section {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+}
+
+.game-detail-section-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  color: var(--brown);
+  margin-bottom: 20px;
+}
+
+.game-detail-screenshots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.game-detail-screenshot {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: 3px solid var(--brown);
+  box-shadow: 4px 4px 0 var(--tan);
+  padding: 0;
+  background: var(--parchment);
+  cursor: pointer;
+}
+
+.game-detail-screenshot-image {
+  object-fit: cover;
+}
+
+.game-detail-videos {
+  display: grid;
+  gap: 24px;
+}
+
+.game-detail-video-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 8px;
+  margin-bottom: 10px;
+  color: var(--brown);
+}
+
+.game-detail-video-embed {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border: 3px solid var(--brown);
+  box-shadow: 4px 4px 0 var(--tan);
+}
+
+.game-detail-video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.game-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(59, 42, 26, 0.92);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.game-lightbox-image {
+  max-width: min(1100px, 100%);
+  max-height: 90vh;
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 0 6px var(--brown);
+}
+
+.game-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  font-size: 32px;
+  color: var(--cream);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width: 680px) {
+  .admin-form-grid,
+  .game-detail-hero-content {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-main,
+  .admin-login-page,
+  .game-detail-page {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }

@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id            String       @id @default(cuid())
+  slug          String       @unique
+  title         String
+  description   String
+  tag           String
+  tech          String
+  year          String?
+  emoji         String?
+  bgColor       String       @default("#4A7C2F")
+  coverImageUrl String?
+  published     Boolean      @default(false)
+  sortOrder     Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  screenshots   Screenshot[]
+  videos        Video[]
+}
+
+model Screenshot {
+  id        String @id @default(cuid())
+  url       String
+  alt       String?
+  sortOrder Int    @default(0)
+  gameId    String
+  game      Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}
+
+model Video {
+  id         String @id @default(cuid())
+  youtubeUrl String
+  title      String?
+  sortOrder  Int    @default(0)
+  gameId     String
+  game       Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}

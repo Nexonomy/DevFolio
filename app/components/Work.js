@@ -1,48 +1,11 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { animate, stagger } from 'animejs';
 
-const projects = [
-  {
-    emoji: '🏃',
-    bg: '#4A7C2F',
-    tag: 'PLATFORMER',
-    title: 'Realm Runners',
-    description: 'A fast-paced pixel platformer with procedurally generated levels, wall-jumping mechanics, and a retro synthwave soundtrack. Race through crumbling castles and ancient forests.',
-    tech: 'Unity · C# · Pixel Art',
-    year: '2025',
-  },
-  {
-    emoji: '⚔️',
-    bg: '#8B2E1A',
-    tag: 'RPG',
-    title: 'Chronicle of Embers',
-    description: 'A top-down action RPG featuring a branching narrative, hand-drawn pixel art, and a dynamic weather system that affects gameplay and story outcomes.',
-    tech: 'Unreal Engine · C++ · Blueprints',
-    year: '2024',
-  },
-  {
-    emoji: '🧩',
-    bg: '#C8860A',
-    tag: 'PUZZLE',
-    title: 'Glyph Garden',
-    description: 'A meditative puzzle game where players arrange ancient runes to restore magical gardens. Features 120 hand-crafted levels with increasing complexity.',
-    tech: 'Unity · C# · Shader Graph',
-    year: '2024',
-  },
-  {
-    emoji: '🏰',
-    bg: '#3B2A1A',
-    tag: 'STRATEGY',
-    title: 'Bastion Command',
-    description: 'A real-time strategy game set in a medieval fantasy world. Build fortresses, command armies, and defend your realm against waves of darkness.',
-    tech: 'Godot · GDScript · Multiplayer',
-    year: '2023',
-  },
-];
-
-export default function Work() {
+export default function Work({ games = [] }) {
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
 
@@ -70,7 +33,7 @@ export default function Work() {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [games.length]);
 
   const handleCardHover = (index) => {
     const coinEl = cardsRef.current[index]?.querySelector('.coin-pop');
@@ -89,28 +52,46 @@ export default function Work() {
       <p className="section-label">★ QUEST LOG ★</p>
       <h2 className="section-title">MY GAMES</h2>
 
-      <div className="work-grid">
-        {projects.map((project, i) => (
-          <div
-            key={i}
-            className="project-card"
-            ref={(el) => (cardsRef.current[i] = el)}
-            onMouseEnter={() => handleCardHover(i)}
-          >
-            <div className="coin-pop">+100 ☆</div>
-            <div className="card-thumbnail" style={{ background: project.bg }}>
-              <span>{project.emoji}</span>
-              <span className="card-tag">{project.tag}</span>
-            </div>
-            <div className="card-body">
-              <h3 className="card-title">{project.title}</h3>
-              <p className="card-description">{project.description}</p>
-              <p className="card-tech">{project.tech}</p>
-              <button className="card-button">▶ VIEW</button>
-            </div>
-          </div>
-        ))}
-      </div>
+      {games.length === 0 ? (
+        <p className="work-empty">New adventures are being forged. Check back soon!</p>
+      ) : (
+        <div className="work-grid">
+          {games.map((project, i) => (
+            <article
+              key={project.id}
+              className="project-card"
+              ref={(el) => {
+                cardsRef.current[i] = el;
+              }}
+              onMouseEnter={() => handleCardHover(i)}
+            >
+              <div className="coin-pop">+100 ☆</div>
+              <div className="card-thumbnail" style={{ background: project.bgColor }}>
+                {project.coverImageUrl ? (
+                  <Image
+                    src={project.coverImageUrl}
+                    alt={project.title}
+                    fill
+                    className="card-cover-image"
+                    sizes="(max-width: 680px) 100vw, 280px"
+                  />
+                ) : (
+                  <span>{project.emoji}</span>
+                )}
+                <span className="card-tag">{project.tag}</span>
+              </div>
+              <div className="card-body">
+                <h3 className="card-title">{project.title}</h3>
+                <p className="card-description">{project.description}</p>
+                <p className="card-tech">{project.tech}</p>
+                <Link href={`/games/${project.slug}`} className="card-button">
+                  ▶ VIEW
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

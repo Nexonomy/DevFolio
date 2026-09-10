@@ -50,6 +50,8 @@ export async function POST(request) {
         coverImageUrl: data.coverImageUrl,
         published: data.published,
         sortOrder: data.sortOrder,
+        portfolioSection: data.portfolioSection,
+        projectContext: data.projectContext,
         screenshots: {
           create: data.screenshots.filter((s) => s.url),
         },

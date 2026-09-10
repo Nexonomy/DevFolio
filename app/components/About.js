@@ -3,85 +3,87 @@
 import { useEffect, useRef } from 'react';
 import { animate, stagger } from 'animejs';
 
-const stats = [
-  { name: 'Unity / C#', value: 92 },
-  { name: 'Pixel Art', value: 85 },
-  { name: 'Game Design', value: 88 },
-  { name: 'Unreal / C++', value: 72 },
-  { name: 'UI/UX Design', value: 78 },
+const tools = [
+  { name: 'Unity', icon: '◈' },
+  { name: 'Unreal Engine', icon: 'U' },
+  { name: 'Godot', icon: '♙' },
+  { name: 'C#', icon: '#C' },
+  { name: 'C++', icon: '++' },
+  { name: 'GDScript', icon: 'Gd' },
+  { name: 'Blender', icon: '◒' },
+  { name: 'Pixel Art', icon: '▦' },
+  { name: 'Shader Graph', icon: '⌁' },
+  { name: 'UI / UX', icon: '◎' },
+  { name: 'Game Design', icon: '♟' },
+  { name: 'After Effects', icon: 'Ae' },
+  { name: 'TouchDesigner', icon: '✣' },
+  { name: 'Motion Design', icon: '↝' },
+  { name: 'Sound Design', icon: '♫' },
+  { name: 'WebSockets', icon: '⇄' },
 ];
+
+const values = ['Player-first thinking', 'Curious systems', 'Visual storytelling'];
 
 export default function About() {
   const sectionRef = useRef(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            animate('.stat-bar-fill', {
-              width: (el) => el.getAttribute('data-width') + '%',
-              duration: 1200,
-              easing: 'outCubic',
-              delay: stagger(100),
-            });
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
+    const section = sectionRef.current;
+    if (!section || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      animate(section.querySelectorAll('.about-reveal'), {
+        opacity: [0, 1],
+        y: [28, 0],
+        delay: stagger(95),
+        duration: 720,
+        ease: 'out(3)',
+      });
+      animate(section.querySelectorAll('.tool-icon-card'), {
+        opacity: [0, 1],
+        scale: [0.78, 1],
+        rotate: [3, 0],
+        delay: stagger(34, { start: 300, from: 'center' }),
+        duration: 560,
+        ease: 'out(4)',
+      });
+      observer.disconnect();
+    }, { threshold: 0.1 });
 
+    observer.observe(section);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section id="about" className="section about-section" ref={sectionRef}>
-      <p className="section-label">♦ CHARACTER SHEET ♦</p>
-      <h2 className="section-title">ABOUT ME</h2>
-
+    <section ref={sectionRef} id="about" className="section about-section human-about-section" aria-labelledby="about-title">
+      <p className="section-label about-reveal">The human bit</p>
       <div className="about-grid">
-        <div className="avatar-box">
-          <div className="avatar-icon">🎮</div>
-          <p className="avatar-name">AHSAN TARIQ</p>
-          <p className="avatar-role">Game Developer &amp; Designer</p>
+        <div className="about-reveal">
+          <h2 id="about-title" className="section-title">Equal parts<br /><em>player & maker.</em></h2>
+          <p className="about-signature">Ahsan Tariq <span aria-hidden="true">↗</span></p>
         </div>
+        <div className="about-text about-reveal">
+          <p>My love for games started with 8-bit classics. Today, I bring design, programming, and pixel artistry together to build experiences with tight mechanics, compelling stories, and visual charm.</p>
+          <p>From prototyping core loops in Unity to polishing the final frames, I care about how every detail feels in the player’s hands. Every jump, puzzle, and line of dialogue should serve the journey.</p>
+          <ul className="about-values" aria-label="Creative values">{values.map(value => <li key={value}>{value}</li>)}</ul>
+        </div>
+      </div>
 
-        <div className="about-text">
-          <p>
-            With a passion forged in the fires of 8-bit classics, I bring together 
-            game design, programming, and pixel artistry to create memorable interactive 
-            experiences. Every game I craft is a carefully balanced blend of tight mechanics, 
-            compelling narrative, and visual charm.
-          </p>
-          <p>
-            From prototyping core loops in Unity to polishing final pixel art frames, 
-            I handle the full stack of game development. I believe the best games feel 
-            handcrafted — where every jump, every puzzle, every line of dialogue serves 
-            the player&apos;s journey.
-          </p>
-
-          <div className="stat-bars">
-            {stats.map((stat, i) => (
-              <div key={i} className="stat-bar-item">
-                <div className="stat-bar-label">
-                  <span>{stat.name}</span>
-                  <span>{stat.value}</span>
-                </div>
-                <div className="stat-bar-track">
-                  <div
-                    className="stat-bar-fill"
-                    data-width={stat.value}
-                    style={{ width: 0 }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+      <div id="tools" className="human-toolkit ungrouped-toolkit" aria-labelledby="human-toolkit-title">
+        <header className="human-toolkit-intro about-reveal">
+          <p>Creative inventory</p>
+          <h3 id="human-toolkit-title">What I make with.</h3>
+          <span>No strict lanes. I mix code, art, interaction, and motion around whatever the idea needs.</span>
+          <div className="toolkit-stamp" aria-hidden="true"><strong>{tools.length}</strong><small>tools<br />in rotation</small></div>
+        </header>
+        <div className="tool-icon-grid" aria-label="Tools and creative software">
+          {tools.map((tool, index) => (
+            <div key={tool.name} className="tool-icon-card" style={{ '--tool-order': index }}>
+              <span className="tool-glyph" aria-hidden="true">{tool.icon}</span>
+              <strong>{tool.name}</strong>
+            </div>
+          ))}
         </div>
       </div>
     </section>

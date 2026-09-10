@@ -1,41 +1,15 @@
 import { notFound } from 'next/navigation';
 import GameDetail from '@/app/components/GameDetail';
-import { prisma } from '@/lib/prisma';
-import { gameInclude } from '@/lib/games';
-import { resolveGameMediaUrls } from '@/lib/blob';
-
+import { getPublishedGame, isDemo } from '@/lib/portfolio';
 export const dynamic = 'force-dynamic';
-
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-
-  const game = await prisma.game.findFirst({
-    where: { slug, published: true },
-  });
-
-  if (!game) {
-    return { title: 'Game Not Found' };
-  }
-
-  return {
-    title: `${game.title} — Game Developer Portfolio`,
-    description: game.description,
-  };
+  const game = await getPublishedGame(slug);
+  return game ? { title: `${game.title} — Ahsan Tariq`, description: game.description } : { title: 'Game Not Found' };
 }
-
 export default async function GamePage({ params }) {
   const { slug } = await params;
-
-  const game = await prisma.game.findFirst({
-    where: { slug, published: true },
-    include: gameInclude,
-  });
-
-  if (!game) {
-    notFound();
-  }
-
-  const resolvedGame = await resolveGameMediaUrls(game);
-
-  return <GameDetail game={resolvedGame} />;
+  const game = await getPublishedGame(slug);
+  if (!game || game.portfolioSection === 'OTHER') notFound();
+  return <main id="main">{isDemo && <p className="detail-demo-notice">Design preview · Sample project from the original repository.</p>}<GameDetail game={game} /></main>;
 }

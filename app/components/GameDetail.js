@@ -1,19 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { extractYouTubeId } from '@/lib/youtube';
 import { getBlobDeliveryUrl } from '@/lib/blob';
 
 export default function GameDetail({ game }) {
+  const contextLabels = { PERSONAL:'Personal project', COMPANY:'Company project', ACADEMIC:'Academic project', HACKATHON:'Hackathon' };
   const [lightboxUrl, setLightboxUrl] = useState(null);
+  const dialogRef = useRef(null);
+  useEffect(() => {
+    if (lightboxUrl) dialogRef.current?.showModal();
+  }, [lightboxUrl]);
 
   return (
     <div className="game-detail-page">
       <header className="game-detail-hero">
-        <Link href="/#work" className="game-detail-back">
-          ← Back to Quest Log
+        <Link href={game.portfolioSection === 'OTHER' ? '/#other-projects' : '/#work'} className="game-detail-back">
+          ← Back to selected work
         </Link>
 
         <div className="game-detail-hero-content">
@@ -28,12 +33,12 @@ export default function GameDetail({ game }) {
                 sizes="(max-width: 680px) 100vw, 480px"
               />
             ) : (
-              <span className="game-detail-emoji">{game.emoji}</span>
+              <div className="project-art" aria-hidden="true"><span className="art-orbit" /><span className="art-symbol">{game.emoji || '✳'}</span><span className="art-caption">{game.tag} / {game.year}</span></div>
             )}
           </div>
 
           <div className="game-detail-meta">
-            <span className="game-detail-tag">{game.tag}</span>
+            <div className="game-detail-badges"><span className="game-detail-tag">{game.tag}</span><span className="project-context-badge">{contextLabels[game.projectContext] || 'Personal project'}</span></div>
             <h1 className="game-detail-title">{game.title}</h1>
             {game.year && <p className="game-detail-year">{game.year}</p>}
             <p className="game-detail-tech">{game.tech}</p>
@@ -54,6 +59,7 @@ export default function GameDetail({ game }) {
                 key={screenshot.id}
                 type="button"
                 className="game-detail-screenshot"
+                aria-label={`Enlarge ${screenshot.alt || `${game.title} screenshot`}`}
                 onClick={() => setLightboxUrl(imageUrl)}
               >
                 <Image
@@ -97,13 +103,13 @@ export default function GameDetail({ game }) {
       )}
 
       {lightboxUrl && (
-        <div className="game-lightbox" onClick={() => setLightboxUrl(null)} role="presentation">
-          <button type="button" className="game-lightbox-close" onClick={() => setLightboxUrl(null)}>
+        <dialog ref={dialogRef} className="game-lightbox" onClose={() => setLightboxUrl(null)} aria-label="Project screenshot">
+          <button type="button" className="game-lightbox-close" aria-label="Close screenshot" onClick={() => dialogRef.current?.close()}>
             ×
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={lightboxUrl} alt="" className="game-lightbox-image" onClick={(event) => event.stopPropagation()} />
-        </div>
+          <img src={lightboxUrl} alt={`${game.title} enlarged screenshot`} className="game-lightbox-image" />
+        </dialog>
       )}
     </div>
   );

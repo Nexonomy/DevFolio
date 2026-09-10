@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
+    "build:local": "prisma generate && next build",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:seed": "node prisma/seed.js",
@@ -32,3 +33,4 @@
     "prisma": "^6.19.3"
   }
 }
+

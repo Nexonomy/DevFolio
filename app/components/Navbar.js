@@ -1,42 +1,30 @@
 'use client';
+import { useRef, useSyncExternalStore } from 'react';
 
-import { useEffect, useState } from 'react';
+const links = [['work', 'Work'], ['experience', 'Experience'], ['about', 'About'], ['contact', 'Say hello']];
+
+function subscribeTheme(notify) {
+  const observer = new MutationObserver(notify);
+  observer.observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
+  return () => observer.disconnect();
+}
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [dark, setDark] = useState(false);
+  const dark = useSyncExternalStore(subscribeTheme, () => document.documentElement.getAttribute('data-theme') !== 'light', () => true);
+  const menu = useRef(null);
+  const closeMenu = () => menu.current?.removeAttribute('open');
+  const toggleTheme = () => document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  }, [dark]);
-
-  return (
-    <nav className="navbar" style={{ opacity: scrolled ? 0.97 : 1 }}>
-      <a href="#hero" className="navbar-logo">
-        DEVFOLIO
-      </a>
-      <div className="navbar-right">
-        <ul className="navbar-links">
-          <li><a href="#hero">HOME</a></li>
-          <li><a href="#work">WORK</a></li>
-          <li><a href="#about">ABOUT</a></li>
-          <li><a href="#contact">CONTACT</a></li>
-        </ul>
-        <button
-          className="theme-toggle"
-          onClick={() => setDark(!dark)}
-          aria-label="Toggle dark mode"
-          title={dark ? 'Switch to Classic Mode' : 'Switch to Dark Knight Mode'}
-        >
-          {dark ? '☀️' : '🦇'}
-        </button>
-      </div>
-    </nav>
-  );
+  return <header className="navbar">
+    <a className="skip-link" href="#main">Skip to content</a>
+    <a href="#hero" className="navbar-logo" aria-label="Ahsan Tariq home"><span className="logo-mark" aria-hidden="true">AT</span><span>Ahsan Tariq<span className="logo-caption">GAMES, WORLDS & ODD IDEAS</span></span></a>
+    <div className="navbar-right">
+      <nav aria-label="Main navigation" className="desktop-nav"><ul className="navbar-links">{links.map(([id, label]) => <li key={id}><a href={'#' + id}>{label}</a></li>)}</ul></nav>
+      <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'} aria-pressed={dark}><span aria-hidden="true">{dark ? '☀' : '☾'}</span></button>
+      <details ref={menu} className="mobile-menu" onKeyDown={event => { if (event.key === 'Escape') { closeMenu(); menu.current?.querySelector('summary')?.focus(); } }}>
+        <summary>Menu <span aria-hidden="true">＋</span></summary>
+        <nav aria-label="Mobile navigation">{links.map(([id, label]) => <a key={id} href={'#' + id} onClick={closeMenu}>{label} <span aria-hidden="true">↗</span></a>)}</nav>
+      </details>
+    </div>
+  </header>;
 }

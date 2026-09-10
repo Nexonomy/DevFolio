@@ -2,27 +2,76 @@ import Link from 'next/link';
 import GameList from '@/app/components/admin/GameList';
 import { prisma } from '@/lib/prisma';
 import { gameInclude } from '@/lib/games';
+import { demoGames, demoOtherProjects } from '@/lib/demo-games';
+import { isDemo } from '@/lib/portfolio';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  const games = await prisma.game.findMany({
-    include: gameInclude,
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-  });
+  let games = [];
+  let databaseUnavailable = false;
+
+  if (isDemo) {
+    games = [...demoGames, ...demoOtherProjects].map(game => ({ ...game, id:game.slug, portfolioSection:game.portfolioSection || 'GAME', projectContext:game.projectContext || 'PERSONAL', screenshots:[], videos:[] }));
+  } else if (!process.env.DATABASE_URL) {
+    databaseUnavailable = true;
+  } else {
+    try {
+      games = await prisma.game.findMany({
+        include: gameInclude,
+        orderBy: [{ sortOrder:'asc' }, { createdAt:'desc' }],
+      });
+    } catch (error) {
+      console.error('Failed to load admin games:', error);
+      databaseUnavailable = true;
+    }
+  }
+
+  const readOnly = isDemo || databaseUnavailable;
+  const gameCount = games.filter(game => game.portfolioSection !== 'OTHER').length;
+  const otherCount = games.length - gameCount;
+  const publishedCount = games.filter(game => game.published).length;
 
   return (
-    <div className="admin-page">
-      <div className="admin-page-header">
+    <div className="admin-page admin-dashboard">
+      <section className="admin-dashboard-hero">
         <div>
-          <h1 className="admin-title">Game Projects</h1>
-          <p className="admin-subtitle">Manage your portfolio games from one place.</p>
+          <p className="admin-kicker">Portfolio control room</p>
+          <h1 className="admin-title">Project library.</h1>
+          <p className="admin-subtitle">Keep the worlds, experiments, and stories on your portfolio organized in one place.</p>
         </div>
-        <Link href="/admin/games/new" className="admin-button admin-button-primary">
-          + New Game
-        </Link>
+        {readOnly ? (
+          <span className="admin-button admin-button-disabled">New project unavailable</span>
+        ) : (
+          <Link href="/admin/games/new" className="admin-button admin-button-primary"><span aria-hidden="true">＋</span> New Project</Link>
+        )}
+      </section>
+
+      <div className="admin-stats" aria-label="Portfolio project summary">
+        <article><span>All projects</span><strong>{String(games.length).padStart(2, '0')}</strong><i>Complete library</i></article>
+        <article><span>Game worlds</span><strong>{String(gameCount).padStart(2, '0')}</strong><i>Main portfolio</i></article>
+        <article><span>Side quests</span><strong>{String(otherCount).padStart(2, '0')}</strong><i>Other things</i></article>
+        <article><span>Live now</span><strong>{String(publishedCount).padStart(2, '0')}</strong><i>Published</i></article>
       </div>
-      <GameList games={games} />
+
+      {isDemo && (
+        <div className="admin-preview-notice">
+          <strong>Preview mode</strong>
+          <span>Sample projects are read-only. Connect the production database when you are ready to create, edit, and publish.</span>
+        </div>
+      )}
+      {databaseUnavailable && (
+        <div className="admin-preview-notice admin-preview-error">
+          <strong>Database unavailable</strong>
+          <span>Set DATABASE_URL to enable project management. The dashboard remains safely viewable.</span>
+        </div>
+      )}
+
+      <div className="admin-library-heading">
+        <div><p className="admin-kicker">Content shelf</p><h2>Everything on display</h2></div>
+        <span>{games.length} entries</span>
+      </div>
+      <GameList games={games} readOnly={readOnly} />
     </div>
   );
 }

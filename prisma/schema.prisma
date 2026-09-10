@@ -20,6 +20,8 @@ model Game {
   coverImageUrl String?
   published     Boolean      @default(false)
   sortOrder     Int          @default(0)
+  portfolioSection String     @default("GAME")
+  projectContext  String      @default("PERSONAL")
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   screenshots   Screenshot[]

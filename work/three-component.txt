@@ -1,0 +1,121 @@
+export default function ThreeBackground() {
+  const ref = useRef(null);
+  const controller = useRef(null);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let disposed = false;
+    let cleanup = () => {};
+
+    const init = async () => {
+      // Keep the CSS landscape when animation is unwanted or data saving is on.
+      if (motion.matches || navigator.connection?.saveData) return;
+      const T = await import('three');
+      if (disposed) return;
+      const parent = canvas.parentElement;
+      let W = parent.clientWidth, H = parent.clientHeight;
+      const isMobile = W < 680;
+      const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: !isMobile });
+      const scenes = {};
+      let frame = null, visible = true, userPaused = false, lost = false;
+      let elapsed = 0, lastTS = 0;
+      const noise = buildNoise();
+      const camera = new T.PerspectiveCamera(52, W / Math.max(H, 1), 0.1, 400);
+      camera.position.set(0, 4, 22);
+      camera.lookAt(0, 1, 0);
+      let theme = document.documentElement.getAttribute('data-theme') || 'light';
+      const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+      const getScene = (dark) => {
+        const key = dark ? 'dark' : 'light';
+        if (!scenes[key]) scenes[key] = buildScene(T, noise, dark, isMobile);
+        return scenes[key];
+      };
+      function stop() { if (frame !== null) cancelAnimationFrame(frame); frame = null; lastTS = 0; }
+      function tick(ts) {
+        frame = null;
+        if (disposed || lost) return;
+        // Existing scene movement includes frame-based updates; cap at 30fps.
+        if (lastTS && ts - lastTS < 1000 / 30) { frame = requestAnimationFrame(tick); return; }
+        elapsed += lastTS ? Math.min((ts - lastTS) / 1000, 0.05) : 0;
+        lastTS = ts;
+        mouse.x += (mouse.tx - mouse.x) * 0.055;
+        mouse.y += (mouse.ty - mouse.y) * 0.055;
+        camera.position.x += (mouse.x * 3 - camera.position.x) * 0.014;
+        camera.position.y += (4 + mouse.y * 1.6 - camera.position.y) * 0.014;
+        camera.lookAt(0, 1, 0);
+        const dark = theme === 'dark';
+        const dayNight = dark ? 1 : ss(Math.max(0, Math.min(1, (1 - Math.sin(elapsed * 0.001 + Math.PI / 2)) * 0.5)));
+        const current = getScene(dark);
+        animateScene(T, current, elapsed, dark, dayNight, renderer);
+        renderer.render(current.scene, camera);
+        if (!userPaused && visible && !document.hidden && !motion.matches) frame = requestAnimationFrame(tick);
+      }
+      function sync() {
+        stop();
+        canvas.hidden = lost || motion.matches;
+        if (!disposed && !lost && !motion.matches && visible && !document.hidden) {
+          frame = requestAnimationFrame(tick);
+        }
+      }
+      const onPointer = event => {
+        const bounds = parent.getBoundingClientRect();
+        mouse.tx = ((event.clientX - bounds.left) / W - 0.5) * 2;
+        mouse.ty = -((event.clientY - bounds.top) / H - 0.5) * 2;
+      };
+      const onLeave = () => { mouse.tx = 0; mouse.ty = 0; };
+      const onLost = event => { event.preventDefault(); lost = true; stop(); canvas.hidden = true; };
+      const resize = new ResizeObserver(() => {
+        W = parent.clientWidth; H = parent.clientHeight;
+        camera.aspect = W / Math.max(H, 1); camera.updateProjectionMatrix();
+        renderer.setSize(W, H); sync();
+      });
+      const intersection = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; sync(); });
+      const themeObserver = new MutationObserver(() => { theme = document.documentElement.getAttribute('data-theme') || 'light'; sync(); });
+      cleanup = () => {
+        stop();
+        resize.disconnect(); intersection.disconnect(); themeObserver.disconnect();
+        parent.removeEventListener('pointermove', onPointer); parent.removeEventListener('pointerleave', onLeave);
+        canvas.removeEventListener('webglcontextlost', onLost);
+        document.removeEventListener('visibilitychange', sync); motion.removeEventListener('change', sync);
+        controller.current = null;
+        const resources = new Set();
+        Object.values(scenes).forEach(({ scene }) => scene.traverse(object => {
+          if (object.geometry) resources.add(object.geometry);
+          const materials = Array.isArray(object.material) ? object.material : [object.material];
+          materials.filter(Boolean).forEach(material => {
+            Object.values(material).forEach(value => { if (value?.isTexture) resources.add(value); });
+            resources.add(material);
+          });
+          object.shadow?.dispose();
+        }));
+        resources.forEach(resource => resource.dispose());
+        renderer.dispose();
+      };
+      renderer.setSize(W, H);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.5));
+      renderer.shadowMap.enabled = !isMobile;
+      renderer.shadowMap.type = T.PCFShadowMap;
+      renderer.toneMapping = T.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+      parent.addEventListener('pointermove', onPointer, { passive: true });
+      parent.addEventListener('pointerleave', onLeave);
+      canvas.addEventListener('webglcontextlost', onLost);
+      document.addEventListener('visibilitychange', sync);
+      motion.addEventListener('change', sync);
+      resize.observe(parent); intersection.observe(parent);
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      controller.current = value => { userPaused = value; sync(); };
+      sync();
+    };
+    init().catch(() => { cleanup(); canvas.hidden = true; });
+    return () => { disposed = true; cleanup(); };
+  }, []);
+
+  return <><canvas ref={ref} className="hero-canvas" id="three-canvas" aria-hidden="true" />
+    <button className="scene-toggle" aria-pressed={paused} onClick={() => {
+      controller.current?.(!paused); setPaused(!paused);
+    }}>{paused ? 'Resume scene' : 'Pause scene'}</button></>;
+}

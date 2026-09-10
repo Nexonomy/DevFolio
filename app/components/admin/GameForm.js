@@ -20,6 +20,8 @@ function mapGameToForm(game) {
     coverImageUrl: game?.coverImageUrl || '',
     published: game?.published ?? false,
     sortOrder: game?.sortOrder ?? 0,
+    portfolioSection: game?.portfolioSection || 'GAME',
+    projectContext: game?.projectContext || 'PERSONAL',
     screenshots: game?.screenshots?.map((item) => ({
       url: item.url,
       alt: item.alt || '',
@@ -187,7 +189,7 @@ export default function GameForm({ game }) {
   return (
     <form className="admin-form admin-game-form" onSubmit={handleSubmit}>
       <div className="admin-form-header">
-        <h1 className="admin-title">{isEditing ? 'Edit Game' : 'New Game Project'}</h1>
+        <h1 className="admin-title">{isEditing ? 'Edit Project' : 'New Portfolio Project'}</h1>
         <p className="admin-subtitle">Manage project details, media, and publish status.</p>
       </div>
 
@@ -216,12 +218,30 @@ export default function GameForm({ game }) {
         </label>
 
         <label className="admin-label">
-          Genre Tag *
+          Portfolio Section *
+          <select className="admin-input" value={form.portfolioSection} onChange={(event) => updateField('portfolioSection', event.target.value)} required>
+            <option value="GAME">Game Development &amp; Design</option>
+            <option value="OTHER">Other Projects</option>
+          </select>
+        </label>
+
+        <label className="admin-label">
+          Project Context *
+          <select className="admin-input" value={form.projectContext} onChange={(event) => updateField('projectContext', event.target.value)} required>
+            <option value="PERSONAL">Personal project</option>
+            <option value="COMPANY">Company project</option>
+            <option value="ACADEMIC">Academic project</option>
+            <option value="HACKATHON">Hackathon</option>
+          </select>
+        </label>
+
+        <label className="admin-label">
+          Genre / Discipline *
           <input
             className="admin-input"
             value={form.tag}
             onChange={(event) => updateField('tag', event.target.value)}
-            placeholder="PLATFORMER"
+            placeholder="PLATFORMER, SHORT FILM, WEB APP..."
             required
           />
         </label>

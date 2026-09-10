@@ -11,21 +11,14 @@ export default function AdminNav() {
     <header className="admin-nav">
       <div className="admin-nav-inner">
         <Link href="/admin" className="admin-nav-logo">
-          QUEST LOG CMS
+          <span aria-hidden="true">AT</span>
+          <div><strong>Portfolio Studio</strong><small>Project control room</small></div>
         </Link>
-        <nav className="admin-nav-links">
-          <Link href="/admin" className={pathname === '/admin' ? 'active' : ''}>
-            Dashboard
-          </Link>
-          <Link href="/admin/games/new" className={pathname === '/admin/games/new' ? 'active' : ''}>
-            New Game
-          </Link>
-          <Link href="/" target="_blank">
-            View Site
-          </Link>
-          <button type="button" className="admin-link-button" onClick={() => signOut({ callbackUrl: '/admin/login' })}>
-            Sign Out
-          </button>
+        <nav className="admin-nav-links" aria-label="Administration">
+          <Link href="/admin" className={pathname === '/admin' ? 'active' : ''}>Library</Link>
+          <Link href="/admin/games/new" className={pathname === '/admin/games/new' ? 'active' : ''}>New Project</Link>
+          <Link href="/" target="_blank">View Portfolio <span aria-hidden="true">↗</span></Link>
+          <button type="button" className="admin-link-button" onClick={() => signOut({ callbackUrl: '/admin/login' })}>Sign Out</button>
         </nav>
       </div>
     </header>

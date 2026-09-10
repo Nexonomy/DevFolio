@@ -1,22 +1,21 @@
 import './globals.css';
+import './portfolio.css';
+import localFont from 'next/font/local';
+const space = localFont({ src: './fonts/SpaceGrotesk.ttf', variable: '--font-space', display: 'swap', weight: '300 700' });
 
 export const metadata = {
-  title: "Game Developer Portfolio — Crafting Worlds, One Pixel at a Time",
+  title: "Ahsan Tariq — Game Developer & Designer",
   description: "Portfolio of a passionate game developer and designer. Explore my games, skills, and creative journey through handcrafted worlds.",
   keywords: "game developer, game designer, pixel art, Unity, Unreal Engine, indie games, portfolio",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" data-theme="dark" data-scroll-behavior="smooth" className={space.variable}>
+
       <body>{children}</body>
     </html>
   );
 }
+
+

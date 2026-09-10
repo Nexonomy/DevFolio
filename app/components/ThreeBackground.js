@@ -37,139 +37,245 @@ export default function ThreeBackground() {
   const ref = useRef(null);
 
   useEffect(() => {
-    let animId;
-    const noise = buildNoise();
+    const canvas = ref.current;
+    if (!canvas) return;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let disposed = false;
+    let cleanup = () => {};
 
     const init = async () => {
       const T = await import('three');
-      const canvas = ref.current;
-      if (!canvas) return;
-
+      if (disposed) return;
       const parent = canvas.parentElement;
       let W = parent.clientWidth, H = parent.clientHeight;
-      const isMobile = W < 680;
-
-      // ── Renderer ──────────────────────────────────────────────────────────
+      const isMobile = W < 680 || navigator.connection?.saveData;
       const renderer = new T.WebGLRenderer({ canvas, alpha: true, antialias: !isMobile });
-      renderer.setSize(W, H);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = T.PCFShadowMap;
-      renderer.toneMapping = T.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.15;
-
-      // ── Camera ────────────────────────────────────────────────────────────
-      const camera = new T.PerspectiveCamera(52, W / H, 0.1, 400);
-      camera.position.set(0, 4, 22);
-      camera.lookAt(0, 1, 0);
-
-      // ── Theme ─────────────────────────────────────────────────────────────
-      let theme = document.documentElement.getAttribute('data-theme') || 'light';
-      const themeObserver = new MutationObserver(() => { theme = document.documentElement.getAttribute('data-theme') || 'light'; });
-      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-
-      // ── Mouse parallax ────────────────────────────────────────────────────
-      const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-      const onMouseMove = e => { mouse.tx = (e.clientX / W - 0.5) * 2; mouse.ty = -(e.clientY / H - 0.5) * 2; };
-      window.addEventListener('mousemove', onMouseMove);
-
-      // ── Resize ────────────────────────────────────────────────────────────
-      const onResize = () => { W = parent.clientWidth; H = parent.clientHeight; camera.aspect = W / H; camera.updateProjectionMatrix(); renderer.setSize(W, H); };
-      window.addEventListener('resize', onResize);
-
-      // ── Lazy scene registry — build on first use ───────────────────────────
       const scenes = {};
-      const getScene = (dark) => {
-        const k = dark ? 'dark' : 'light';
-        if (!scenes[k]) scenes[k] = buildScene(T, noise, dark, isMobile);
-        return scenes[k];
-      };
-
-      // Build the initial theme scene immediately, defer the other scene
-      getScene(theme === 'dark');
-      const timerId = setTimeout(() => getScene(theme !== 'dark'), 600);
-
-      // ── Animation tick ────────────────────────────────────────────────────
+      let frame = null, visible = true, lost = false;
       let elapsed = 0, lastTS = 0;
-      const tick = (ts = 0) => {
-        animId = requestAnimationFrame(tick);
-        const dt = Math.min((ts - lastTS) / 1000, 0.05); // capped delta, seconds
+      const noise = buildNoise();
+      const camera = new T.PerspectiveCamera(49, W / Math.max(H, 1), 0.1, 400);
+      camera.position.set(0, 4.2, 18.5);
+      camera.lookAt(0, 1, 0);
+      let theme = document.documentElement.getAttribute('data-theme') || 'light';
+      const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+      const getScene = (dark) => {
+        const key = dark ? 'dark' : 'light';
+        if (!scenes[key]) scenes[key] = buildScene(T, noise, dark, isMobile);
+        return scenes[key];
+      };
+      function stop() { if (frame !== null) cancelAnimationFrame(frame); frame = null; lastTS = 0; }
+      function tick(ts) {
+        frame = null;
+        if (disposed || lost) return;
+        // Existing scene movement includes frame-based updates; cap at 30fps.
+        if (lastTS && ts - lastTS < 1000 / 30) { frame = requestAnimationFrame(tick); return; }
+        elapsed += lastTS ? Math.min((ts - lastTS) / 1000, 0.05) : 0;
         lastTS = ts;
-        elapsed += dt;
-
         mouse.x += (mouse.tx - mouse.x) * 0.055;
         mouse.y += (mouse.ty - mouse.y) * 0.055;
-        camera.position.x += (mouse.x * 3.0 - camera.position.x) * 0.014;
-        camera.position.y += (4 + mouse.y * 1.6 - camera.position.y) * 0.014;
+        const scrollProgress = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--scroll-progress')) || 0;
+        camera.position.x += (mouse.x * 2.6 + Math.sin(elapsed * .18) * .75 - camera.position.x) * 0.018;
+        camera.position.y += (4.2 + mouse.y * 1.35 + Math.sin(elapsed * .31) * .28 + scrollProgress * 1.4 - camera.position.y) * 0.018;
+        camera.position.z += (18.5 + Math.cos(elapsed * .22) * .45 - scrollProgress * 1.2 - camera.position.z) * 0.018;
         camera.lookAt(0, 1, 0);
-
-        const isDark = theme === 'dark';
-        const dayNight = isDark ? 1.0 : ss(Math.max(0, Math.min(1, (1 - Math.sin(elapsed * 0.001 + Math.PI / 2)) * 0.5)));
-        const current = getScene(isDark);
-        animateScene(T, current, elapsed, isDark, dayNight, renderer);
+        const dark = theme === 'dark';
+        const dayNight = dark ? 1 : ss(Math.max(0, Math.min(1, (1 - Math.sin(elapsed * 0.001 + Math.PI / 2)) * 0.5)));
+        const current = getScene(dark);
+        if (current.refs.compilation) {
+          current.refs.compilation.userData.active = Math.floor(elapsed / 5.8) % current.refs.compilation.userData.positions.length;
+        }
+        current.scene.rotation.y = mouse.x * 0.018 + scrollProgress * 0.035;
+        animateScene(T, current, elapsed, dark, dayNight, renderer);
+        renderer.setRenderTarget(null);
         renderer.render(current.scene, camera);
+        if (visible && !document.hidden && !motion.matches) frame = requestAnimationFrame(tick);
+      }
+      function sync() {
+        stop();
+        canvas.hidden = lost;
+        if (!disposed && !lost && visible && !document.hidden) {
+          frame = requestAnimationFrame(tick);
+        }
+      }
+      const onPointer = event => {
+        const bounds = parent.getBoundingClientRect();
+        mouse.tx = ((event.clientX - bounds.left) / W - 0.5) * 2;
+        mouse.ty = -((event.clientY - bounds.top) / H - 0.5) * 2;
       };
-      tick();
-
-      // ── Visibility API — pause rendering when tab is hidden ───────────────
-      const onVis = () => {
-        if (document.hidden) cancelAnimationFrame(animId);
-        else { lastTS = 0; tick(); }
-      };
-      document.addEventListener('visibilitychange', onVis);
-
-      // ── Cleanup ───────────────────────────────────────────────────────────
-      canvas._cleanup = () => {
-        clearTimeout(timerId);
-        cancelAnimationFrame(animId);
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('resize', onResize);
-        document.removeEventListener('visibilitychange', onVis);
-        themeObserver.disconnect();
+      const onLeave = () => { mouse.tx = 0; mouse.ty = 0; };
+      const onLost = event => { event.preventDefault(); lost = true; stop(); canvas.hidden = true; };
+      const resize = new ResizeObserver(() => {
+        W = parent.clientWidth; H = parent.clientHeight;
+        camera.aspect = W / Math.max(H, 1); camera.updateProjectionMatrix();
+        renderer.setSize(W, H);
+        sync();
+      });
+      const intersection = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; sync(); });
+      const themeObserver = new MutationObserver(() => { theme = document.documentElement.getAttribute('data-theme') || 'light'; sync(); });
+      cleanup = () => {
+        stop();
+        resize.disconnect(); intersection.disconnect(); themeObserver.disconnect();
+        parent.removeEventListener('pointermove', onPointer); parent.removeEventListener('pointerleave', onLeave);
+        canvas.removeEventListener('webglcontextlost', onLost);
+        document.removeEventListener('visibilitychange', sync); motion.removeEventListener('change', sync);
+        const resources = new Set();
+        Object.values(scenes).forEach(({ scene }) => scene.traverse(object => {
+          if (object.geometry) resources.add(object.geometry);
+          const materials = Array.isArray(object.material) ? object.material : [object.material];
+          materials.filter(Boolean).forEach(material => {
+            Object.values(material).forEach(value => { if (value?.isTexture) resources.add(value); });
+            resources.add(material);
+          });
+          object.shadow?.dispose();
+        }));
+        resources.forEach(resource => resource.dispose());
         renderer.dispose();
       };
+      renderer.setSize(W, H);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 1.3));
+      renderer.shadowMap.enabled = !isMobile;
+      renderer.shadowMap.type = T.PCFShadowMap;
+      renderer.toneMapping = T.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.42;
+      parent.addEventListener('pointermove', onPointer, { passive: true });
+      parent.addEventListener('pointerleave', onLeave);
+      canvas.addEventListener('webglcontextlost', onLost);
+      document.addEventListener('visibilitychange', sync);
+      motion.addEventListener('change', sync);
+      resize.observe(parent); intersection.observe(parent);
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      sync();
     };
-
-    init();
-    return () => { if (ref.current?._cleanup) ref.current._cleanup(); };
+    init().catch(() => { cleanup(); canvas.hidden = true; });
+    return () => { disposed = true; cleanup(); };
   }, []);
 
-  return <canvas ref={ref} className="hero-canvas" id="three-canvas" />;
+  return <canvas ref={ref} className="hero-canvas" id="three-canvas" aria-hidden="true" />;
 }
 
 // ===========================================================================
 // SCENE BUILDER
 // ===========================================================================
-function buildScene(T, noise, dk, mobile) {
+function buildScene(T, _noise, dk, mobile) {
   const scene = new T.Scene();
-  // Warmer, slightly denser fog for atmosphere and depth
-  scene.fog = new T.FogExp2(dk ? 0x060c1a : 0xa8d4f0, dk ? 0.014 : 0.0095);
+  scene.fog = new T.FogExp2(dk ? 0x111020 : 0x8dcad0, dk ? 0.018 : 0.012);
   const refs = {};
 
   setupSky(T, scene, dk, refs);
   setupLighting(T, scene, dk, refs, mobile);
-
-  setupGround(T, scene, noise, dk, mobile, refs);
-  createGroundMist(T, scene, dk, refs);
-
-  createRocks(T, scene, dk, mobile);
-  createHills(T, scene, noise, dk, mobile, refs);
-  createMountains(T, scene, noise, dk, mobile, refs);
-  createTrees(T, scene, dk, mobile, refs);
-  createFlowers(T, scene, dk, mobile);
-  createGrass(T, scene, dk, mobile, refs);
-  createForegroundDetails(T, scene, dk, mobile);
-  createCelestialBody(T, scene, dk, refs);
-  createStars(T, scene, dk, mobile, refs);
-  createAurora(T, scene, dk, mobile, refs);
-  createShootingStars(T, scene, dk, mobile, refs);
-  createClouds(T, scene, dk, mobile, refs);
-  createFireflies(T, scene, dk, mobile, refs);
-  createBirds(T, scene, dk, mobile, refs);
-  createButterflies(T, scene, dk, mobile, refs);
-  createBalloon(T, scene, dk, refs);
+  createGameCompilation(T, scene, dk, mobile, refs);
 
   return { scene, refs };
+}
+
+function createGameCompilation(T, scene, dk, mobile, refs) {
+  const root = new T.Group();
+  const positions = [0, 1, 2, 3];
+  const palettes = [
+    [0x89d45d, 0x31543e, 0xffd66b],
+    [0xff54ca, 0x34206c, 0x55eaff],
+    [0xef9b52, 0x7a3f38, 0xffe3a0],
+    [0x796cff, 0x1d2757, 0x80f7e5],
+  ];
+  const worlds = [];
+  const mat = (color, emissive = 0x000000) => new T.MeshStandardMaterial({ color, emissive, emissiveIntensity: .32, roughness: .72, flatShading: true });
+
+  positions.forEach((_, index) => {
+    const group = new T.Group();
+    const worldAngle = index / positions.length * Math.PI * 2;
+    group.position.set(Math.sin(worldAngle) * 8.2, index % 2 ? -.15 : .35, Math.cos(worldAngle) * 5.4 - 2.4);
+    group.scale.setScalar(.56);
+    group.userData.baseY = group.position.y;
+    const [top, side, glow] = palettes[index];
+    const island = new T.Mesh(new T.CylinderGeometry(5.2, 2.2, 2.1, index === 1 ? 8 : 12), mat(top));
+    island.position.y = -2.2;
+    island.castShadow = true;
+    island.receiveShadow = true;
+    group.add(island);
+    const underside = new T.Mesh(new T.ConeGeometry(3.9, 4.8, 10), mat(side));
+    underside.position.y = -5.3;
+    underside.rotation.y = index * .4;
+    group.add(underside);
+    const halo = new T.Mesh(new T.TorusGeometry(5.45, .075, 6, 48), new T.MeshBasicMaterial({ color:glow, transparent:true, opacity:.52 }));
+    halo.rotation.x = Math.PI / 2;
+    halo.position.y = -1.3;
+    group.add(halo);
+    group.userData.halo = halo;
+    const motes = new T.Group();
+    for (let moteIndex = 0; moteIndex < (mobile ? 7 : 12); moteIndex++) {
+      const mote = new T.Mesh(new T.IcosahedronGeometry(.07 + (moteIndex % 3) * .035, 0), new T.MeshBasicMaterial({ color:moteIndex % 2 ? glow : 0xffeee2 }));
+      const moteAngle = moteIndex / (mobile ? 7 : 12) * Math.PI * 2;
+      mote.position.set(Math.cos(moteAngle) * (5.4 + moteIndex % 2), Math.sin(moteAngle * 2) * 2.2 + .8, Math.sin(moteAngle) * 4.3);
+      motes.add(mote);
+    }
+    group.add(motes);
+    group.userData.motes = motes;
+
+    if (index === 0) {
+      const trunk = mat(0x5d3826); const leaf = mat(0x7ddf72, 0x172f16);
+      for (let i = 0; i < 7; i++) {
+        const tree = new T.Group();
+        const stem = new T.Mesh(new T.CylinderGeometry(.15, .23, 2.4, 6), trunk); stem.position.y = .2; tree.add(stem);
+        const crown = new T.Mesh(new T.SphereGeometry(1.05, 7, 6), leaf); crown.scale.set(1, 1.25, 1); crown.position.y = 1.8; tree.add(crown);
+        const angle = i / 7 * Math.PI * 2; tree.position.set(Math.cos(angle) * (2.2 + i % 2), 0, Math.sin(angle) * (2.2 + i % 2)); group.add(tree);
+      }
+      const shrine = new T.Mesh(new T.TorusGeometry(1.45, .22, 8, 24), mat(glow, glow)); shrine.position.y = 2.1; group.add(shrine);
+    } else if (index === 1) {
+      const road = new T.Mesh(new T.PlaneGeometry(5, 10), mat(0x171827)); road.rotation.x = -Math.PI / 2; road.position.y = -.74; group.add(road);
+      for (let i = 0; i < 10; i++) {
+        const tower = new T.Mesh(new T.BoxGeometry(.65 + (i % 3) * .3, 1.8 + (i % 4), .8), mat(i % 2 ? top : glow, i % 2 ? top : glow));
+        tower.position.set(i % 2 ? -3.2 : 3.2, tower.geometry.parameters.height / 2 - .7, -4 + i * .88); group.add(tower);
+      }
+      const racer = new T.Mesh(new T.BoxGeometry(1.1, .35, 1.9), mat(0xf5ff78, 0x98a629)); racer.position.set(0, -.35, 1); racer.rotation.x = -.08; group.add(racer); group.userData.hero = racer;
+    } else if (index === 2) {
+      for (let i = 0; i < 5; i++) {
+        const pillar = new T.Mesh(new T.CylinderGeometry(.36, .48, 2.8 + (i % 3), 7), mat(0xd88c58));
+        pillar.position.set(-3.5 + i * 1.75, .3 + (i % 3) * .45, -1.2 + Math.sin(i) * 1.2); pillar.rotation.z = (i - 2) * .035; group.add(pillar);
+      }
+      const temple = new T.Mesh(new T.ConeGeometry(2.5, 4.2, 4), mat(glow)); temple.position.set(0, 1.35, -4.2); temple.rotation.y = Math.PI / 4; group.add(temple);
+      const crystal = new T.Mesh(new T.OctahedronGeometry(.65), mat(0x65e6e0, 0x43b9c0)); crystal.position.set(0, 1.5, 1.8); group.add(crystal); group.userData.hero = crystal;
+    } else {
+      const planet = new T.Mesh(new T.SphereGeometry(2.25, 18, 12), mat(0x7d78e8, 0x211b6f)); planet.position.y = 1.1; group.add(planet);
+      const ring = new T.Mesh(new T.TorusGeometry(3.2, .14, 8, 36), mat(glow, glow)); ring.position.y = 1.1; ring.rotation.x = 1.18; group.add(ring); group.userData.hero = ring;
+      for (let i = 0; i < 12; i++) {
+        const satellite = new T.Mesh(new T.IcosahedronGeometry(.15 + Math.random() * .18, 0), mat(i % 2 ? 0xf4eaff : 0x6fffe4));
+        const angle = i / 12 * Math.PI * 2; satellite.position.set(Math.cos(angle) * 5, Math.sin(angle * 2) * 1.4 + 1, Math.sin(angle) * 4); group.add(satellite);
+      }
+    }
+    root.add(group); worlds.push(group);
+  });
+
+  root.userData = { positions, worlds, active: 0 };
+  scene.add(root);
+  const nexus = new T.Group();
+  nexus.position.set(0, 1.3, -2.2);
+  const portalMat = new T.MeshStandardMaterial({ color:0xff7968, emissive:0xff304f, emissiveIntensity:1.8, metalness:.22, roughness:.28 });
+  const aquaMat = new T.MeshBasicMaterial({ color:0x66f2dc, transparent:true, opacity:.86 });
+  const portalOuter = new T.Mesh(new T.TorusGeometry(2.65,.18,10,64),portalMat);
+  const portalInner = new T.Mesh(new T.TorusGeometry(2.23,.055,7,56),aquaMat);
+  const portalCore = new T.Mesh(new T.IcosahedronGeometry(1.05,2),new T.MeshStandardMaterial({ color:0x7c66e9, emissive:0x3e2aa8, emissiveIntensity:1.2, transparent:true, opacity:.72, metalness:.35, roughness:.2 }));
+  portalCore.scale.set(.7,1.25,.7);
+  nexus.add(portalOuter,portalInner,portalCore);
+  scene.add(nexus);
+  const ribbon = new T.Mesh(new T.TorusKnotGeometry(5.7,.065,96,7,2,5),new T.MeshBasicMaterial({ color:0x72ecd9, transparent:true, opacity:.2 }));
+  ribbon.position.set(0,2,-8); ribbon.scale.set(1.5,.72,.5); scene.add(ribbon);
+  refs.nexus = { group:nexus, outer:portalOuter, inner:portalInner, core:portalCore, ribbon };
+  const starCount = mobile ? 90 : 180;
+  const starPositions = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    starPositions[i * 3] = (Math.random() - .5) * 120;
+    starPositions[i * 3 + 1] = Math.random() * 38 - 4;
+    starPositions[i * 3 + 2] = -12 - Math.random() * 42;
+  }
+  const stars = new T.Points(new T.BufferGeometry(), new T.PointsMaterial({ color:0xf6edff, size:.12, transparent:true, opacity:.72 }));
+  stars.geometry.setAttribute('position', new T.BufferAttribute(starPositions, 3));
+  scene.add(stars);
+  refs.compilation = root;
+  refs.compilationStars = stars;
+  refs.compilationFogColors = [0x15251f, 0x1c1231, 0x3a201c, 0x111631].map(color => new T.Color(color));
+  refs.dayFogColor = new T.Color(0x8dcad0);
+  refs.nightFogColor = new T.Color(0x111020);
 }
 
 // ===========================================================================
@@ -179,11 +285,11 @@ function setupSky(T, scene, dk, refs) {
   const cv = document.createElement('canvas'); cv.width = 2; cv.height = 512;
   const ctx = cv.getContext('2d'), gr = ctx.createLinearGradient(0, 0, 0, 512);
   if (dk) {
-    gr.addColorStop(0,    '#000208');
-    gr.addColorStop(0.20, '#060d1c');
-    gr.addColorStop(0.50, '#0a1124');
-    gr.addColorStop(0.80, '#0d1528');
-    gr.addColorStop(1,    '#111e38');
+    gr.addColorStop(0,    '#111027');
+    gr.addColorStop(0.24, '#1e1740');
+    gr.addColorStop(0.55, '#192b46');
+    gr.addColorStop(0.82, '#263953');
+    gr.addColorStop(1,    '#182638');
   } else {
     gr.addColorStop(0,    '#0d4db5'); // deep blue zenith
     gr.addColorStop(0.14, '#2272d8'); // rich sky
@@ -205,17 +311,17 @@ function setupSky(T, scene, dk, refs) {
 // ===========================================================================
 function setupLighting(T, scene, dk, refs, mobile) {
   const hemi = new T.HemisphereLight(
-    dk ? 0x1c2a50 : 0xc8e0ff,   // sky colour
-    dk ? 0x050a0a : 0x4a7a18,   // ground bounce
-    dk ? 0.55 : 1.1
+    dk ? 0x929fe0 : 0xc8e0ff,   // sky colour
+    dk ? 0x253b39 : 0x4a7a18,   // ground bounce
+    dk ? 0.95 : 1.1
   );
   scene.add(hemi); refs.hemiLight = hemi;
 
-  const ambient = new T.AmbientLight(dk ? 0x0d1525 : 0xfff0d0, dk ? 0.4 : 0.60);
+  const ambient = new T.AmbientLight(dk ? 0x8791c6 : 0xfff0d0, dk ? 0.75 : 0.60);
   scene.add(ambient); refs.ambientLight = ambient;
 
   // Main sun — high angle, warm gold
-  const sun = new T.DirectionalLight(dk ? 0x6688bb : 0xffe090, dk ? 0.7 : 1.8);
+  const sun = new T.DirectionalLight(dk ? 0xb6c7ef : 0xffe090, dk ? 1.2 : 1.8);
   sun.position.set(dk ? 12 : -18, 22, 4);
   sun.castShadow = true;
   sun.shadow.mapSize.set(mobile ? 512 : 1024, mobile ? 512 : 1024);
@@ -257,10 +363,10 @@ function setupGround(T, scene, noise, dk, mobile, refs) {
   const cols = new Float32Array(count * 3);
 
   // 5-tone day / night palettes
-  const shadowC = new T.Color(dk ? 0x040e06 : 0x246010);
-  const baseC   = new T.Color(dk ? 0x091408 : 0x3a8c18);
-  const midC    = new T.Color(dk ? 0x112010 : 0x54b022);
-  const brightC = new T.Color(dk ? 0x1e3418 : 0x7cd832);
+  const shadowC = new T.Color(dk ? 0x152927 : 0x246010);
+  const baseC   = new T.Color(dk ? 0x244039 : 0x3a8c18);
+  const midC    = new T.Color(dk ? 0x345447 : 0x54b022);
+  const brightC = new T.Color(dk ? 0x526b55 : 0x7cd832);
   const earthC  = new T.Color(dk ? 0x0c0c08 : 0x7a5a2a);
   const tmp = new T.Color();
 
@@ -701,6 +807,33 @@ function createBalloon(T,scene,dk,refs){
 // ===========================================================================
 function animateScene(T, { scene, refs }, t, dk, dayNight, renderer) {
 
+  if (refs.compilation) {
+    refs.compilation.rotation.y = t * .105;
+    refs.compilation.userData.worlds.forEach((world, index) => {
+      world.position.y = world.userData.baseY + Math.sin(t * .7 + index * 1.7) * .32;
+      world.rotation.y = -refs.compilation.rotation.y + Math.sin(t * .22 + index) * .06;
+      if (world.userData.hero) world.userData.hero.rotation.y += .012;
+      if (world.userData.halo) world.userData.halo.rotation.z += .003 + index * .0005;
+      if (world.userData.motes) world.userData.motes.rotation.y -= .0025 + index * .0003;
+      const selected = index === refs.compilation.userData.active;
+      const targetScale = selected ? .68 : .54;
+      const nextScale = world.scale.x + (targetScale - world.scale.x) * .045;
+      world.scale.setScalar(nextScale);
+    });
+    if (refs.nexus) {
+      refs.nexus.outer.rotation.z = t * .18;
+      refs.nexus.inner.rotation.z = -t * .26;
+      refs.nexus.core.rotation.x = t * .16;
+      refs.nexus.core.rotation.y = t * .24;
+      refs.nexus.core.scale.y = 1.2 + Math.sin(t * 1.3) * .12;
+      refs.nexus.ribbon.rotation.z = t * .025;
+    }
+    scene.fog.color.lerp(refs.compilationFogColors[refs.compilation.userData.active], .018);
+    renderer.setClearColor(scene.fog.color, 0);
+    refs.compilationStars.rotation.y += .00025;
+    return;
+  }
+
   // ── Day/Night — throttled: only update when value shifts by >1% ─────────
   if (!dk && Math.abs(dayNight - (refs._lastDN ?? -1)) > 0.01) {
     refs._lastDN = dayNight;
@@ -786,3 +919,5 @@ function animateScene(T, { scene, refs }, t, dk, dayNight, renderer) {
     refs.fireflies.material.opacity = dk ? 0.42+Math.sin(t*1.35+Math.cos(t*0.5))*0.38 : 0.42+Math.sin(t*0.55)*0.20;
   }
 }
+
+

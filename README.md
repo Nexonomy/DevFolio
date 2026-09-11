@@ -47,3 +47,15 @@ With no database configured and demo mode off, the home page renders a deliberat
 The original folder on E: is unchanged. This directory is a standalone working copy; no commits were created because the supplied folder had no Git repository. No remote service was modified, no database migration was executed, and nothing was published.
 
 See `CODEX_PROGRESS.md` for baseline failures, milestones, exact validation results and remaining configuration. Preserve any real environment files when transferring source changes to another checkout.
+
+
+## Admin login and game categories
+
+Set `ADMIN_PASSWORD` and `NEXTAUTH_SECRET` in production. Local sample mode (`PORTFOLIO_DEMO=true`) shows the preview password `preview` on the login screen.
+
+Each game has a primary Genre / Discipline plus comma-separated Game Categories in the Admin editor. Categories are stored with the project and automatically become filter buttons in the public game-development section. Deployments apply the included `Game.categories` migration through the existing build command.
+
+
+### Editable local studio mode
+
+With `PORTFOLIO_DEMO=true`, Admin changes are written only to `.demo-data/projects.json`, and uploaded preview images go to `public/demo-uploads`. Both paths are ignored by Git. This lets you test create, edit, publish, filtering, and delete without configuring PostgreSQL or Vercel Blob.

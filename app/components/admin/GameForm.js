@@ -13,6 +13,7 @@ function mapGameToForm(game) {
     slug: game?.slug || '',
     description: game?.description || '',
     tag: game?.tag || '',
+    categories: game?.categories?.join(', ') || game?.tag || '',
     tech: game?.tech || '',
     year: game?.year || '',
     emoji: game?.emoji || '',
@@ -165,6 +166,7 @@ export default function GameForm({ game }) {
 
     const payload = {
       ...form,
+      categories: form.categories.split(',').map((category) => category.trim()).filter(Boolean),
       videos: form.videos.filter((video) => video.youtubeUrl.trim()),
     };
 
@@ -244,6 +246,17 @@ export default function GameForm({ game }) {
             placeholder="PLATFORMER, SHORT FILM, WEB APP..."
             required
           />
+        </label>
+
+        <label className="admin-label">
+          Game Categories
+          <input
+            className="admin-input"
+            value={form.categories}
+            onChange={(event) => updateField('categories', event.target.value)}
+            placeholder="2D, Platformer, Puzzle..."
+          />
+          <small className="admin-field-help">Separate categories with commas. Each one becomes a filter on the game shelf.</small>
         </label>
 
         <label className="admin-label">

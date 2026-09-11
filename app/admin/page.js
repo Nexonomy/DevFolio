@@ -2,7 +2,7 @@ import Link from 'next/link';
 import GameList from '@/app/components/admin/GameList';
 import { prisma } from '@/lib/prisma';
 import { gameInclude } from '@/lib/games';
-import { demoGames, demoOtherProjects } from '@/lib/demo-games';
+import { readDemoProjects } from '@/lib/demo-store';
 import { isDemo } from '@/lib/portfolio';
 
 export const dynamic = 'force-dynamic';
@@ -12,7 +12,7 @@ export default async function AdminDashboardPage() {
   let databaseUnavailable = false;
 
   if (isDemo) {
-    games = [...demoGames, ...demoOtherProjects].map(game => ({ ...game, id:game.slug, portfolioSection:game.portfolioSection || 'GAME', projectContext:game.projectContext || 'PERSONAL', screenshots:[], videos:[] }));
+    games = await readDemoProjects();
   } else if (!process.env.DATABASE_URL) {
     databaseUnavailable = true;
   } else {
@@ -27,10 +27,10 @@ export default async function AdminDashboardPage() {
     }
   }
 
-  const readOnly = isDemo || databaseUnavailable;
-  const gameCount = games.filter(game => game.portfolioSection !== 'OTHER').length;
+  const readOnly = databaseUnavailable;
+  const gameCount = games.filter((game) => game.portfolioSection !== 'OTHER').length;
   const otherCount = games.length - gameCount;
-  const publishedCount = games.filter(game => game.published).length;
+  const publishedCount = games.filter((game) => game.published).length;
 
   return (
     <div className="admin-page admin-dashboard">
@@ -38,13 +38,9 @@ export default async function AdminDashboardPage() {
         <div>
           <p className="admin-kicker">Portfolio control room</p>
           <h1 className="admin-title">Project library.</h1>
-          <p className="admin-subtitle">Keep the worlds, experiments, and stories on your portfolio organized in one place.</p>
+          <p className="admin-subtitle">Search, sort, edit, and publish every game world and side quest from one clear workspace.</p>
         </div>
-        {readOnly ? (
-          <span className="admin-button admin-button-disabled">New project unavailable</span>
-        ) : (
-          <Link href="/admin/games/new" className="admin-button admin-button-primary"><span aria-hidden="true">＋</span> New Project</Link>
-        )}
+        {!readOnly && <Link href="/admin/games/new" className="admin-button admin-button-primary"><span aria-hidden="true">+</span> New Project</Link>}
       </section>
 
       <div className="admin-stats" aria-label="Portfolio project summary">
@@ -56,14 +52,14 @@ export default async function AdminDashboardPage() {
 
       {isDemo && (
         <div className="admin-preview-notice">
-          <strong>Preview mode</strong>
-          <span>Sample projects are read-only. Connect the production database when you are ready to create, edit, and publish.</span>
+          <strong>Local studio mode</strong>
+          <span>Create, edit, publish, and delete freely. Changes stay on this computer in <code>.demo-data/projects.json</code>.</span>
         </div>
       )}
       {databaseUnavailable && (
         <div className="admin-preview-notice admin-preview-error">
           <strong>Database unavailable</strong>
-          <span>Set DATABASE_URL to enable project management. The dashboard remains safely viewable.</span>
+          <span>Set DATABASE_URL to enable project management.</span>
         </div>
       )}
 

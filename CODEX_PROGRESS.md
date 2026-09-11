@@ -74,3 +74,10 @@ Deploy with `DATABASE_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, and `ADMIN_PASSWO
 - Created public/Ahsan-Tariq-Resume.pdf and output/pdf/Ahsan-Tariq-Resume.pdf using verified portfolio identity, profile, practice areas, toolkit, and contact details.
 - Verified the one-page A4 PDF visually and through text extraction.
 - Verified the public PDF returns HTTP 200 with application/pdf, the form fits desktop and mobile layouts, and the production build passes.
+
+## 2026-09-11 - Hosted admin authentication diagnostics
+- Diagnosed the Vercel-only successful-password stall as the session creation stage, most likely a missing NEXTAUTH_SECRET or a NEXTAUTH_URL still pointing to localhost.
+- Added server-rendered configuration diagnostics for missing ADMIN_PASSWORD, missing NEXTAUTH_SECRET/AUTH_SECRET, and localhost NEXTAUTH_URL on Vercel.
+- Added a 15-second sign-in timeout, exception handling, safe local callback validation, and a full-page redirect after successful cookie creation.
+- Updated .env.example with Vercel-specific NEXTAUTH_URL and secret guidance.
+- Verified ESLint, the production build, and an end-to-end successful login that reached /admin.

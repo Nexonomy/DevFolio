@@ -46,3 +46,22 @@ model Video {
   gameId     String
   game       Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
 }
+
+model Profile {
+  id           String   @id @default("primary")
+  name         String
+  heroEyebrow  String
+  heroLead     String
+  heroAccent   String
+  heroSubtitle String
+  bioTitle     String
+  bioParagraphs Json
+  values       Json
+  tools        Json
+  experiences  Json
+  email        String
+  githubUrl    String?
+  linkedinUrl  String?
+  resumeUrl    String?
+  updatedAt    DateTime @updatedAt
+}

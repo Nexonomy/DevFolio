@@ -3,17 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { animate, stagger } from 'animejs';
 
-// Replace these sample entries with your real roles, organizations, dates, and icons.
-const experience = [
-  { period: 'Now', role: 'Independent game developer', organization: 'Personal studio & prototypes', type: 'Independent', icon: '🎮', description: 'Taking ideas from the first playable loop through systems, level feel, visual direction, and the final polish pass.', current: true },
-  { period: '2024 — 25', role: 'Game design lead', organization: 'Student game society', type: 'Society', icon: '♟', description: 'Guided small teams through concept decisions, playable milestones, feedback sessions, and presentation builds.' },
-  { period: '2024 — 25', role: 'Technical art contributor', organization: 'Academic project team', type: 'Academic', icon: '✦', description: 'Connected code and art through shaders, interfaces, animation systems, and player feedback.' },
-  { period: 'Summer 2024', role: 'Gameplay programmer intern', organization: 'Northstar Interactive', type: 'Company', icon: '⌁', description: 'Built interaction systems, tuned controls, and turned design feedback into stable playable features.' },
-  { period: 'Spring 2024', role: 'Game jam team lead', organization: '48-hour campus game jam', type: 'Hackathon', icon: '⚡', description: 'Scoped an experimental game and guided the team from a rough pitch to a complete submission.' },
-  { period: '2023 — 24', role: 'Creative media coordinator', organization: 'University computing society', type: 'Society', icon: '◉', description: 'Designed event visuals, organized showcase material, and shaped a consistent creative voice across student-led technical events.' },
-];
-
-export default function ExperienceToolkit() {
+export default function ExperienceToolkit({ experiences = [] }) {
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -51,7 +41,7 @@ export default function ExperienceToolkit() {
       </header>
 
       <ol className="experience-path">
-        {experience.map((item, index) => (
+        {experiences.map((item, index) => (
           <li key={item.role} className={'experience-path-item' + (item.current ? ' is-current' : '')}>
             <time>{item.period}</time>
             <div className="experience-path-marker"><span aria-hidden="true">{item.icon}</span><i /></div>

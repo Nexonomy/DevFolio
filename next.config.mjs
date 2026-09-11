@@ -13,6 +13,9 @@ const nextConfig = {
         pathname: '/api/blob',
         search: 'pathname=*',
       },
+      {
+        pathname: '/demo-uploads/**',
+      },
     ],
   },
 };

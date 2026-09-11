@@ -23,6 +23,7 @@ export default function LoginForm({ demo = false, configurationIssue = '' }) {
     setError('');
     const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
     let timeoutId;
+    let navigationStarted = false;
 
     try {
       const timeout = new Promise((resolve) => {
@@ -44,18 +45,26 @@ export default function LoginForm({ demo = false, configurationIssue = '' }) {
         return;
       }
 
+      navigationStarted = true;
       window.location.assign(callbackUrl);
     } catch (signInError) {
       console.error('Admin sign-in failed:', signInError);
       setError('Sign-in could not finish. Please try again.');
     } finally {
       if (timeoutId) window.clearTimeout(timeoutId);
-      setLoading(false);
+      if (!navigationStarted) setLoading(false);
     }
   };
 
   return (
     <section className="admin-login-stage">
+      {loading && <div className="admin-auth-transition" role="status" aria-live="polite">
+        <div className="admin-auth-portal" aria-hidden="true"><i /><i /><i /><span>AT</span></div>
+        <p>Access granted</p>
+        <h2>Preparing your studio…</h2>
+        <div className="admin-auth-progress" aria-hidden="true"><span /></div>
+        <small>Loading projects and creative tools</small>
+      </div>}
       <div className="admin-login-art" aria-hidden="true">
         <div className="admin-login-orbit admin-login-orbit-one" />
         <div className="admin-login-orbit admin-login-orbit-two" />

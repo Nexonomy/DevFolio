@@ -1,0 +1,145 @@
+{
+  "id": "primary",
+  "name": "Ahsan Tariq",
+  "heroEyebrow": "WELCOME TO MY LITTLE CORNER.",
+  "heroLead": "Code. Play.",
+  "heroAccent": "A little magic.",
+  "heroSubtitle": "Game developer. Pixel enthusiast. Player at heart. I turn curious ideas into worlds you can jump into.",
+  "bioTitle": "Equal parts player & maker.",
+  "bioParagraphs": [
+    "My love for games started with 8-bit classics. Today, I bring design, programming, and pixel artistry together to build experiences with tight mechanics, compelling stories, and visual charm.",
+    "From prototyping core loops in Unity to polishing the final frames, I care about how every detail feels in the player’s hands. Every jump, puzzle, and line of dialogue should serve the journey."
+  ],
+  "values": [
+    "Player-first thinking",
+    "Curious systems",
+    "Visual storytelling"
+  ],
+  "tools": [
+    {
+      "name": "Unity",
+      "icon": "◈"
+    },
+    {
+      "name": "Unreal Engine",
+      "icon": "U"
+    },
+    {
+      "name": "Godot",
+      "icon": "♙"
+    },
+    {
+      "name": "C#",
+      "icon": "#C"
+    },
+    {
+      "name": "C++",
+      "icon": "++"
+    },
+    {
+      "name": "GDScript",
+      "icon": "Gd"
+    },
+    {
+      "name": "Blender",
+      "icon": "◒"
+    },
+    {
+      "name": "Pixel Art",
+      "icon": "▦"
+    },
+    {
+      "name": "Shader Graph",
+      "icon": "⌁"
+    },
+    {
+      "name": "UI / UX",
+      "icon": "◎"
+    },
+    {
+      "name": "Game Design",
+      "icon": "♟"
+    },
+    {
+      "name": "After Effects",
+      "icon": "Ae"
+    },
+    {
+      "name": "TouchDesigner",
+      "icon": "✣"
+    },
+    {
+      "name": "Motion Design",
+      "icon": "↝"
+    },
+    {
+      "name": "Sound Design",
+      "icon": "♫"
+    },
+    {
+      "name": "WebSockets",
+      "icon": "⇄"
+    }
+  ],
+  "experiences": [
+    {
+      "period": "Now",
+      "role": "Independent game developer",
+      "organization": "Personal studio & prototypes",
+      "type": "Independent",
+      "icon": "🎮",
+      "description": "Taking ideas from the first playable loop through systems, level feel, visual direction, and the final polish pass.",
+      "current": true
+    },
+    {
+      "period": "2024 — 25",
+      "role": "Game design lead",
+      "organization": "Student game society",
+      "type": "Society",
+      "icon": "♟",
+      "description": "Guided small teams through concept decisions, playable milestones, feedback sessions, and presentation builds.",
+      "current": false
+    },
+    {
+      "period": "2024 — 25",
+      "role": "Technical art contributor",
+      "organization": "Academic project team",
+      "type": "Academic",
+      "icon": "✦",
+      "description": "Connected code and art through shaders, interfaces, animation systems, and player feedback.",
+      "current": false
+    },
+    {
+      "period": "Summer 2024",
+      "role": "Gameplay programmer intern",
+      "organization": "Northstar Interactive",
+      "type": "Company",
+      "icon": "⌁",
+      "description": "Built interaction systems, tuned controls, and turned design feedback into stable playable features.",
+      "current": false
+    },
+    {
+      "period": "Spring 2024",
+      "role": "Game jam team lead",
+      "organization": "48-hour campus game jam",
+      "type": "Hackathon",
+      "icon": "⚡",
+      "description": "Scoped an experimental game and guided the team from a rough pitch to a complete submission.",
+      "current": false
+    },
+    {
+      "period": "2023 — 24",
+      "role": "Creative media coordinator",
+      "organization": "University computing society",
+      "type": "Society",
+      "icon": "◉",
+      "description": "Designed event visuals, organized showcase material, and shaped a consistent creative voice across student-led technical events.",
+      "current": false
+    }
+  ],
+  "email": "ahsan02tariq@gmail.com",
+  "githubUrl": "https://github.com/Nexonomy",
+  "linkedinUrl": "https://www.linkedin.com/in/ahsantariq02",
+  "resumeUrl": "/Ahsan-Tariq-Resume.pdf",
+  "profileImageUrl": "/demo-uploads/1789137694201-PassportSizePhoto.png"
+}

@@ -63,5 +63,6 @@ model Profile {
   githubUrl    String?
   linkedinUrl  String?
   resumeUrl    String?
+  profileImageUrl String?
   updatedAt    DateTime @updatedAt
 }

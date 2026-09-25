@@ -57,6 +57,7 @@ model Profile {
   bioTitle     String
   bioParagraphs Json
   values       Json
+  sectionCopy  Json         @default("{}")
   tools        Json
   experiences  Json
   email        String

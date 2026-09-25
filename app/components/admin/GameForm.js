@@ -222,8 +222,8 @@ export default function GameForm({ game }) {
         <label className="admin-label">
           Portfolio Section *
           <select className="admin-input" value={form.portfolioSection} onChange={(event) => updateField('portfolioSection', event.target.value)} required>
-            <option value="GAME">Game Development &amp; Design</option>
-            <option value="OTHER">Other Projects</option>
+            <option value="GAME">Game development portfolio</option>
+            <option value="OTHER">Additional projects</option>
           </select>
         </label>
 
@@ -238,7 +238,7 @@ export default function GameForm({ game }) {
         </label>
 
         <label className="admin-label">
-          Genre / Discipline *
+          {form.portfolioSection === 'GAME' ? 'Genre *' : 'Project type / discipline *'}
           <input
             className="admin-input"
             value={form.tag}
@@ -246,17 +246,18 @@ export default function GameForm({ game }) {
             placeholder="PLATFORMER, SHORT FILM, WEB APP..."
             required
           />
+          <small className="admin-field-help">This value appears in the public filter navigation.</small>
         </label>
 
         <label className="admin-label">
-          Game Categories
+          Project Categories
           <input
             className="admin-input"
             value={form.categories}
             onChange={(event) => updateField('categories', event.target.value)}
             placeholder="2D, Platformer, Puzzle..."
           />
-          <small className="admin-field-help">Separate categories with commas. Each one becomes a filter on the game shelf.</small>
+          <small className="admin-field-help">Separate descriptive labels with commas. These appear on the project card and case study.</small>
         </label>
 
         <label className="admin-label">
@@ -435,7 +436,7 @@ export default function GameForm({ game }) {
           Cancel
         </button>
         <button type="submit" className="admin-button admin-button-primary" disabled={loading || uploading}>
-          {loading ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Game'}
+          {loading ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Project'}
         </button>
       </div>
     </form>

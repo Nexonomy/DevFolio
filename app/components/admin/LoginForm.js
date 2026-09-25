@@ -27,7 +27,7 @@ export default function LoginForm({ demo = false, configurationIssue = '' }) {
 
     try {
       const timeout = new Promise((resolve) => {
-        timeoutId = window.setTimeout(() => resolve({ error: 'Timeout', ok: false }), 15000);
+        timeoutId = window.setTimeout(() => resolve({ error: 'Timeout', ok: false }), 30000);
       });
       const result = await Promise.race([
         signIn('credentials', { password, redirect: false, callbackUrl }),

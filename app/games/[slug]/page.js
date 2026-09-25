@@ -11,5 +11,5 @@ export default async function GamePage({ params }) {
   const { slug } = await params;
   const game = await getPublishedGame(slug);
   if (!game || game.portfolioSection === 'OTHER') notFound();
-  return <main id="main">{isDemo && <p className="detail-demo-notice">Design preview · Sample project from the original repository.</p>}<GameDetail game={game} /></main>;
+  return <main id="main">{isDemo && <p className="detail-demo-notice">Game development case study · Ahsan Tariq</p>}<GameDetail game={game} /></main>;
 }

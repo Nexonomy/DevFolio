@@ -32,7 +32,14 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 env
+
+# Local-only editable demo data and uploads. Keep the public profile portrait
+# available to production because the default profile references it.
+/.demo-data/
+/public/demo-uploads/*
+!/public/demo-uploads/1789137694201-PassportSizePhoto.png
 
 # vercel
 .vercel

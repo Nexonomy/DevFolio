@@ -16,6 +16,9 @@ const nextConfig = {
       {
         pathname: '/demo-uploads/**',
       },
+      {
+        pathname: '/project-placeholders/**',
+      },
     ],
   },
 };

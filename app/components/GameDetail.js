@@ -17,8 +17,8 @@ export default function GameDetail({ game }) {
   return (
     <div className="game-detail-page">
       <header className="game-detail-hero">
-        <Link href={game.portfolioSection === 'OTHER' ? '/#other-projects' : '/#work'} className="game-detail-back">
-          ← Back to selected work
+        <Link href="/#portfolio" className="game-detail-back">
+          ← Back to portfolio
         </Link>
 
         <div className="game-detail-hero-content">
@@ -47,7 +47,21 @@ export default function GameDetail({ game }) {
         </div>
       </header>
 
-      {game.screenshots.length > 0 && (
+      {(game.overview || game.challenge || game.role || game.contributions?.length > 0) && (
+        <section className="game-detail-section game-design-breakdown">
+          <p className="game-detail-section-kicker">Development breakdown</p>
+          <h2 className="game-detail-section-title">What I built</h2>
+          <div className="game-design-grid">
+            {game.overview && <article><span>01 / Overview</span><p>{game.overview}</p></article>}
+            {game.challenge && <article><span>02 / Development challenge</span><p>{game.challenge}</p></article>}
+            {game.role && <article><span>03 / My role</span><p>{game.role}</p></article>}
+            {game.contributions?.length > 0 && <article><span>04 / Contributions</span><ul>{game.contributions.map((item) => <li key={item}>{item}</li>)}</ul></article>}
+          </div>
+          {game.sourceUrl && <a className="game-source-link" href={game.sourceUrl} target="_blank" rel="noreferrer">View original project notes ↗</a>}
+        </section>
+      )}
+
+      {(game.screenshots || []).length > 0 && (
         <section className="game-detail-section">
           <h2 className="game-detail-section-title">Screenshots</h2>
           <div className="game-detail-screenshots">
@@ -76,7 +90,7 @@ export default function GameDetail({ game }) {
         </section>
       )}
 
-      {game.videos.length > 0 && (
+      {(game.videos || []).length > 0 && (
         <section className="game-detail-section">
           <h2 className="game-detail-section-title">Videos</h2>
           <div className="game-detail-videos">

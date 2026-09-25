@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-const blankExperience = () => ({ period: '', role: '', organization: '', type: 'Company', icon: '✦', description: '', current: false });
+const blankExperience = () => ({ period: '', role: '', organization: '', type: 'Company', track: 'PROFESSIONAL', icon: '✦', description: '', current: false });
 const blankTool = () => ({ name: '', icon: '◇' });
 
 export default function ProfileForm({ initialProfile }) {
@@ -50,7 +50,7 @@ export default function ProfileForm({ initialProfile }) {
 
   return <form className="admin-form admin-profile-form" onSubmit={save}>
     <header className="admin-form-header admin-profile-heading">
-      <div><p className="admin-kicker">Personal data</p><h1 className="admin-title">Your story,<br />in one place.</h1><p className="admin-subtitle">Edit the identity, bio, timeline, toolkit and contact details shown across the portfolio.</p></div>
+      <div><p className="admin-kicker">Profile and content</p><h1 className="admin-title">Portfolio content,<br />in one place.</h1><p className="admin-subtitle">Manage the introduction, section headings, experience, toolkit, and contact details shown on the portfolio.</p></div>
       <button className="admin-button admin-button-primary admin-profile-save" type="submit" disabled={saving}>{saving ? <><span className="admin-login-loader"><i /><i /><i /></span> Saving…</> : 'Save profile ↗'}</button>
     </header>
 
@@ -60,24 +60,29 @@ export default function ProfileForm({ initialProfile }) {
       <div className="admin-profile-panel-title"><span>01</span><div><h2>Identity & opening</h2><p>The first words visitors see.</p></div></div>
       <div className="admin-form-grid">
         <label className="admin-label">Your name<input className="admin-input" value={form.name} onChange={(e) => setField('name', e.target.value)} required /></label>
-        <label className="admin-label">Small introduction<input className="admin-input" value={form.heroEyebrow} onChange={(e) => setField('heroEyebrow', e.target.value)} required /></label>
-        <label className="admin-label">Hero headline<input className="admin-input" value={form.heroLead} onChange={(e) => setField('heroLead', e.target.value)} required /></label>
-        <label className="admin-label">Hero accent line<input className="admin-input" value={form.heroAccent} onChange={(e) => setField('heroAccent', e.target.value)} required /></label>
-        <label className="admin-label admin-label-full">Hero introduction<textarea className="admin-textarea" rows="3" value={form.heroSubtitle} onChange={(e) => setField('heroSubtitle', e.target.value)} required /></label>
+        <label className="admin-label admin-label-full">Introduction<textarea className="admin-textarea" rows="3" value={form.heroSubtitle} onChange={(e) => setField('heroSubtitle', e.target.value)} required /></label>
       </div>
       <div className="admin-portrait-editor">
         <div className="admin-portrait-preview">
           {form.profileImageUrl ? <img src={form.profileImageUrl} alt="Current profile portrait" /> : <span aria-hidden="true">{form.name.split(/\s+/).map((part) => part[0]).join('').slice(0, 2)}</span>}
         </div>
-        <div><strong>Profile portrait</strong><p>Use a clear square or vertical image. It will appear in the Human Bit section.</p><div className="admin-portrait-actions"><label className="admin-button admin-button-small">{uploadingPortrait ? 'Uploading…' : form.profileImageUrl ? 'Replace image' : 'Upload image'}<input type="file" accept="image/*" onChange={uploadPortrait} disabled={uploadingPortrait} /></label>{form.profileImageUrl && <button type="button" className="admin-button admin-button-small admin-button-danger" onClick={() => setField('profileImageUrl', null)}>Remove</button>}</div></div>
+        <div><strong>Profile portrait</strong><p>Use a clear square or vertical image. It appears beside the introduction.</p><div className="admin-portrait-actions"><label className="admin-button admin-button-small">{uploadingPortrait ? 'Uploading…' : form.profileImageUrl ? 'Replace image' : 'Upload image'}<input type="file" accept="image/*" onChange={uploadPortrait} disabled={uploadingPortrait} /></label>{form.profileImageUrl && <button type="button" className="admin-button admin-button-small admin-button-danger" onClick={() => setField('profileImageUrl', null)}>Remove</button>}</div></div>
       </div>
     </section>
 
     <section className="admin-profile-panel">
-      <div className="admin-profile-panel-title"><span>02</span><div><h2>Bio & values</h2><p>The human part behind your work.</p></div></div>
-      <label className="admin-label">About headline<input className="admin-input" value={form.bioTitle} onChange={(e) => setField('bioTitle', e.target.value)} required /></label>
-      <label className="admin-label">Bio paragraphs<textarea className="admin-textarea" rows="7" value={form.bioParagraphs.join('\n\n')} onChange={(e) => setField('bioParagraphs', e.target.value.split(/\n\s*\n/))} /><small className="admin-field-help">Separate paragraphs with a blank line.</small></label>
-      <label className="admin-label">Creative values<input className="admin-input" value={form.values.join(', ')} onChange={(e) => setField('values', e.target.value.split(',').map((value) => value.trim()))} /><small className="admin-field-help">Separate values with commas.</small></label>
+      <div className="admin-profile-panel-title"><span>02</span><div><h2>Section copy</h2><p>Edit the headings and descriptions used on the public portfolio.</p></div></div>
+      <div className="admin-form-grid">
+        <label className="admin-label admin-label-full">Introduction label<input className="admin-input" value={form.sectionCopy.introKicker} onChange={(e) => setField('sectionCopy', { ...form.sectionCopy, introKicker: e.target.value })} required /></label>
+        <label className="admin-label">Portfolio heading<input className="admin-input" value={form.sectionCopy.workTitle} onChange={(e) => setField('sectionCopy', { ...form.sectionCopy, workTitle: e.target.value })} required /></label>
+        <label className="admin-label">Additional projects heading<input className="admin-input" value={form.sectionCopy.otherTitle} onChange={(e) => setField('sectionCopy', { ...form.sectionCopy, otherTitle: e.target.value })} required /></label>
+        <label className="admin-label admin-label-full">Portfolio description<textarea className="admin-textarea" rows="3" value={form.sectionCopy.workDescription} onChange={(e) => setField('sectionCopy', { ...form.sectionCopy, workDescription: e.target.value })} required /></label>
+        <label className="admin-label admin-label-full">Additional projects description<textarea className="admin-textarea" rows="3" value={form.sectionCopy.otherDescription} onChange={(e) => setField('sectionCopy', { ...form.sectionCopy, otherDescription: e.target.value })} required /></label>
+        <label className="admin-label">Experience heading<input className="admin-input" value={form.sectionCopy.experienceTitle} onChange={(e) => setField('sectionCopy', { ...form.sectionCopy, experienceTitle: e.target.value })} required /></label>
+        <label className="admin-label">Contact heading<input className="admin-input" value={form.sectionCopy.contactTitle} onChange={(e) => setField('sectionCopy', { ...form.sectionCopy, contactTitle: e.target.value })} required /></label>
+        <label className="admin-label admin-label-full">Experience description<textarea className="admin-textarea" rows="3" value={form.sectionCopy.experienceDescription} onChange={(e) => setField('sectionCopy', { ...form.sectionCopy, experienceDescription: e.target.value })} required /></label>
+        <label className="admin-label admin-label-full">Contact prompt<input className="admin-input" value={form.sectionCopy.contactPrompt} onChange={(e) => setField('sectionCopy', { ...form.sectionCopy, contactPrompt: e.target.value })} required /></label>
+      </div>
     </section>
 
     <section className="admin-profile-panel">
@@ -90,6 +95,7 @@ export default function ProfileForm({ initialProfile }) {
             <label className="admin-label">Role<input className="admin-input" value={item.role} onChange={(e) => updateItem('experiences', index, { role: e.target.value })} required /></label>
             <label className="admin-label">Organization<input className="admin-input" value={item.organization} onChange={(e) => updateItem('experiences', index, { organization: e.target.value })} /></label>
             <label className="admin-label">Type<input className="admin-input" value={item.type} onChange={(e) => updateItem('experiences', index, { type: e.target.value })} /></label>
+            <label className="admin-label">Experience section<select className="admin-input" value={item.track || 'ACADEMIC'} onChange={(e) => updateItem('experiences', index, { track: e.target.value })}><option value="PROFESSIONAL">Professional experience</option><option value="ACADEMIC">Academic experience</option></select></label>
             <label className="admin-label">Icon<input className="admin-input" value={item.icon} onChange={(e) => updateItem('experiences', index, { icon: e.target.value })} /></label>
             <label className="admin-label admin-checkbox-label"><input type="checkbox" checked={item.current} onChange={(e) => updateItem('experiences', index, { current: e.target.checked })} /> Current role</label>
             <label className="admin-label admin-label-full">Description<textarea className="admin-textarea" rows="3" value={item.description} onChange={(e) => updateItem('experiences', index, { description: e.target.value })} /></label>

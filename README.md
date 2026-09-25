@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-The working copy has `.env.local` with `PORTFOLIO_DEMO=true`, displaying the four original seed games with an explicit sample-content notice. The source ZIP omits `.env.local`; copy `.env.example` to `.env.local` and set `PORTFOLIO_DEMO=true` to see the same preview. Demo mode never reads or writes a database.
+Copy `.env.example` to `.env.local` to preview the site without a database. `PORTFOLIO_DEMO=true` loads sample entries and labels them as preview content; demo mode never reads or writes a database. Do not publish those sample entries as your own work. For production, use your real database-backed projects and configure the variables listed below.
 
 ## Safe production compilation
 
@@ -31,7 +31,7 @@ npm start
 3. Add real contact values from `.env.example`. Only configured HTTPS profile URLs and a valid email are shown; no generic or fake destinations are used.
 4. Review the existing seed data before running any seed command. The four seed games are unverified sample content, not newly claimed portfolio work.
 
-With no database configured and demo mode off, the home page renders a deliberate empty project state, and missing project pages return 404. A database error on a project page has a retry/back navigation fallback.
+With no database configured and demo mode off, the home page renders a clear project-connection message rather than an empty blank area, and missing project pages return 404. A database error on a project page has a retry/back navigation fallback.
 
 ## Design and accessibility
 

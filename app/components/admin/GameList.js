@@ -7,8 +7,8 @@ import { useMemo, useState } from 'react';
 const contextLabels = { PERSONAL:'Personal', COMPANY:'Company', ACADEMIC:'Academic', HACKATHON:'Hackathon' };
 const filters = [
   ['ALL', 'All'],
-  ['GAME', 'Game worlds'],
-  ['OTHER', 'Side quests'],
+  ['GAME', 'Game projects'],
+  ['OTHER', 'Additional work'],
   ['LIVE', 'Published'],
   ['DRAFT', 'Drafts'],
 ];
@@ -54,7 +54,7 @@ export default function GameList({ games, readOnly = false }) {
       </div>
 
       {visibleGames.length === 0 ? (
-        <div className="admin-empty"><span aria-hidden="true">{'�'}</span><h2>No projects match.</h2><p>Try another filter or search phrase.</p>{!readOnly && games.length === 0 && <Link href="/admin/games/new" className="admin-button admin-button-primary">Add Your First Project</Link>}</div>
+        <div className="admin-empty"><span aria-hidden="true">◇</span><h2>No projects match.</h2><p>Try another filter or search phrase.</p>{!readOnly && games.length === 0 && <Link href="/admin/games/new" className="admin-button admin-button-primary">Add Your First Project</Link>}</div>
       ) : (
         <div className="admin-project-grid">
           {visibleGames.map((game, index) => {
@@ -62,12 +62,12 @@ export default function GameList({ games, readOnly = false }) {
             return <article key={game.id} className="admin-project-card" style={{ '--admin-accent': game.bgColor || '#61e6d1' }}>
               <div className="admin-project-visual"><span className="admin-project-number">{String(index + 1).padStart(2, '0')}</span><span className="admin-project-symbol" aria-hidden="true">{game.emoji || '&'}</span><i /></div>
               <div className="admin-project-content">
-                <div className="admin-project-badges"><span>{game.portfolioSection === 'OTHER' ? 'Side quest' : 'Game world'}</span><span>{contextLabels[game.projectContext] || 'Personal'}</span><span className={'admin-badge ' + (game.published ? 'published' : 'draft')}>{game.published ? 'Live' : 'Draft'}</span></div>
+                <div className="admin-project-badges"><span>{game.portfolioSection === 'OTHER' ? 'Additional work' : 'Game project'}</span><span>{contextLabels[game.projectContext] || 'Personal'}</span><span className={'admin-badge ' + (game.published ? 'published' : 'draft')}>{game.published ? 'Live' : 'Draft'}</span></div>
                 <h2>{game.title}</h2><p className="admin-project-slug">/{game.slug}</p>
                 <p className="admin-project-description">{game.description}</p>
                 <div className="admin-project-meta"><span>{game.tag || 'Project'}</span><span>{game.year || 'Year open'}</span></div>
                 <div className="admin-project-actions">
-                  {game.published && <Link href={destination} target="_blank" className="admin-button admin-button-small">View <span aria-hidden="true">{'�'}</span></Link>}
+                  {game.published && <Link href={destination} target="_blank" className="admin-button admin-button-small">View <span aria-hidden="true">↗</span></Link>}
                   {!readOnly && <><Link href={'/admin/games/' + game.id + '/edit'} className="admin-button admin-button-small">Edit</Link><button type="button" className="admin-button admin-button-small admin-button-danger" onClick={() => handleDelete(game.id, game.title)} disabled={deletingId === game.id}>{deletingId === game.id ? 'Deleting...' : 'Delete'}</button></>}
                 </div>
               </div>

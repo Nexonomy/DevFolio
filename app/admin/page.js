@@ -36,18 +36,18 @@ export default async function AdminDashboardPage() {
     <div className="admin-page admin-dashboard">
       <section className="admin-dashboard-hero">
         <div>
-          <p className="admin-kicker">Portfolio control room</p>
-          <h1 className="admin-title">Project library.</h1>
-          <p className="admin-subtitle">Search, sort, edit, and publish every game world and side quest from one clear workspace.</p>
+          <p className="admin-kicker">Portfolio administration</p>
+          <h1 className="admin-title">Content library.</h1>
+          <p className="admin-subtitle">Manage primary game projects, additional work, publishing status, and portfolio order.</p>
         </div>
         {!readOnly && <Link href="/admin/games/new" className="admin-button admin-button-primary"><span aria-hidden="true">+</span> New Project</Link>}
       </section>
 
       <div className="admin-stats" aria-label="Portfolio project summary">
         <article><span>All projects</span><strong>{String(games.length).padStart(2, '0')}</strong><i>Complete library</i></article>
-        <article><span>Game worlds</span><strong>{String(gameCount).padStart(2, '0')}</strong><i>Main portfolio</i></article>
-        <article><span>Side quests</span><strong>{String(otherCount).padStart(2, '0')}</strong><i>Other things</i></article>
-        <article><span>Live now</span><strong>{String(publishedCount).padStart(2, '0')}</strong><i>Published</i></article>
+        <article><span>Game projects</span><strong>{String(gameCount).padStart(2, '0')}</strong><i>Primary portfolio</i></article>
+        <article><span>Additional work</span><strong>{String(otherCount).padStart(2, '0')}</strong><i>Secondary portfolio</i></article>
+        <article><span>Published</span><strong>{String(publishedCount).padStart(2, '0')}</strong><i>Visible publicly</i></article>
       </div>
 
       {isDemo && (
@@ -64,7 +64,7 @@ export default async function AdminDashboardPage() {
       )}
 
       <div className="admin-library-heading">
-        <div><p className="admin-kicker">Content shelf</p><h2>Everything on display</h2></div>
+        <div><p className="admin-kicker">Project management</p><h2>Project records</h2></div>
         <span>{games.length} entries</span>
       </div>
       <GameList games={games} readOnly={readOnly} />

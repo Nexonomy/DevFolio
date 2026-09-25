@@ -1,19 +1,14 @@
-'use client';
-
 function safeProfile(value) { try { const url = new URL(value); return url.protocol === 'https:' ? url.href : null; } catch { return null; } }
 
 export default function Contact({ profile }) {
   const email = profile.email;
-  const profiles = [['GitHub', profile.githubUrl], ['LinkedIn', profile.linkedinUrl]].map(([label, value]) => ({ label, href: safeProfile(value) })).filter((item) => item.href);
   const emailHref = email && email.includes('@') && email.includes('.') ? 'mailto:' + email : null;
-  const composeEmail = (event) => {
-    event.preventDefault(); if (!emailHref) return;
-    const data = new FormData(event.currentTarget); const name = String(data.get('name') || '').trim(); const replyTo = String(data.get('replyTo') || '').trim(); const context = String(data.get('context') || 'Portfolio enquiry').trim(); const message = String(data.get('message') || '').trim();
-    const subject = '[Portfolio] ' + context + ' - ' + name;
-    const body = ['Hi ' + profile.name.split(' ')[0] + ',', '', message, '', 'From: ' + name, 'Reply to: ' + replyTo].join(String.fromCharCode(10));
-    window.location.href = emailHref + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-  };
-  return <section id="contact" className="section contact-section" aria-labelledby="contact-title"><div className="contact-layout"><div className="contact-copy"><p className="section-label">Say hey</p><h2 id="contact-title" className="section-title">Got a weird idea?<br /><em>I’m listening.</em></h2><p className="contact-intro">Talk games, swap ideas, or tell me about something you want to make.</p><div className="contact-links">{emailHref && <a href={emailHref}>{email} ↗</a>}{profiles.map((item) => <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer">{item.label} ↗</a>)}</div></div>
-    {emailHref && <form className="contact-form" onSubmit={composeEmail}><div className="contact-form-heading"><span aria-hidden="true">✦</span><div><p>Start a conversation</p><small>Your email app opens with everything ready.</small></div></div><div className="contact-field-row"><label><span>Your name</span><input name="name" type="text" autoComplete="name" placeholder="What should I call you?" required /></label><label><span>Your email</span><input name="replyTo" type="email" autoComplete="email" placeholder="you@example.com" required /></label></div><label><span>What is this about?</span><select name="context" defaultValue="Game project"><option>Game project</option><option>Job opportunity</option><option>Creative collaboration</option><option>Portfolio feedback</option><option>Something else</option></select></label><label><span>Your message</span><textarea name="message" rows="6" placeholder="Give me the context, the idea, or the problem you want to solve..." required /></label><button type="submit">Compose email <span aria-hidden="true">↗</span></button></form>}
-    {!emailHref && profiles.length === 0 && <p className="contact-pending">Contact details will be added soon.</p>}</div><footer className="portfolio-footer"><span>© {new Date().getFullYear()} {profile.name}</span><span>Crafted with care. Made for play.</span><a href="#hero">Back to top ↑</a></footer></section>;
+  const links = [['Email', emailHref, email], ['GitHub', safeProfile(profile.githubUrl), 'View profile'], ['LinkedIn', safeProfile(profile.linkedinUrl), 'Connect'], ['Résumé', profile.resumeUrl, 'Download PDF']].filter((item) => item[1]);
+
+  return <section id="contact" className="section contact-section" aria-labelledby="contact-title">
+    <div className="contact-card"><h2 id="contact-title">Contact</h2><p>Have a role, project, or strange idea in mind? I’m always happy to talk games and interactive experiences.</p>{emailHref && <a className="contact-email" href={emailHref}>{email}</a>}
+      <div className="contact-links">{links.map(([label, href, detail]) => <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined} download={label === 'Résumé' ? true : undefined}><span>{label}</span><small>{detail}</small><b aria-hidden="true">↗</b></a>)}</div>
+    </div>
+    <footer className="portfolio-footer"><span>© {new Date().getFullYear()} {profile.name}</span><span>Game developer &amp; designer</span><a href="#hero">Back to top ↑</a></footer>
+  </section>;
 }

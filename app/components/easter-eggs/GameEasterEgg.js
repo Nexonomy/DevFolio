@@ -1,4 +1,9 @@
-// Small decorative discoveries. No canvas, timers, focus stops, or layout space.
+'use client';
+
+import { useState } from 'react';
+import { playAlertTone, playOneUp } from './retroAudio';
+
+// Small discoveries that stay outside the content grid and never take layout space.
 const enabledByDefault = process.env.NEXT_PUBLIC_LIVING_WORLDS !== 'false'
   && process.env.NEXT_PUBLIC_RETRO_EASTER_EGGS !== 'false';
 
@@ -85,9 +90,45 @@ function Invader() {
 }
 
 const artwork = { mushroom: Mushroom, pacman: Pacman, blocks: Blocks, invader: Invader };
+const interactions = {
+  mushroom: {
+    label: 'Collect hidden mushroom',
+    feedback: '1UP!',
+    playSound: playOneUp,
+  },
+  invader: {
+    label: 'Fire alien invader',
+    feedback: 'PEW!',
+    playSound: playAlertTone,
+  },
+};
 
 export default function GameEasterEgg({ kind, enabled = enabledByDefault }) {
+  const [activation, setActivation] = useState(0);
   const Artwork = artwork[kind];
   if (!enabled || !Artwork) return null;
-  return <div className={`game-easter-egg game-easter-egg--${kind}`} aria-hidden="true"><Artwork /></div>;
+
+  const interaction = interactions[kind];
+  if (!interaction) {
+    return <div className={`game-easter-egg game-easter-egg--${kind}`} aria-hidden="true"><Artwork /></div>;
+  }
+
+  const activate = () => {
+    setActivation((current) => current + 1);
+    interaction.playSound();
+  };
+
+  return (
+    <button
+      type="button"
+      className={`game-easter-egg game-easter-egg--${kind} game-easter-egg--interactive ${activation ? 'is-active' : ''}`}
+      onClick={activate}
+      aria-label={interaction.label}
+      title={interaction.label}
+    >
+      <Artwork key={activation} />
+      <span className="game-easter-egg-feedback" aria-hidden="true" key={`feedback-${activation}`}>{interaction.feedback}</span>
+      <span className="sr-only" role="status">{activation ? `${interaction.feedback} ${activation}` : ''}</span>
+    </button>
+  );
 }

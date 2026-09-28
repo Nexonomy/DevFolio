@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import OtherProjects from './OtherProjects';
@@ -11,9 +11,7 @@ import RetroAudioToggle from './easter-eggs/RetroAudioToggle';
 import AnimatedContent from './reactbits/AnimatedContent';
 import ClickSpark from './reactbits/ClickSpark';
 import GlareHover from './reactbits/GlareHover';
-import PixelTransition from './reactbits/PixelTransition';
 
-const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const projectPlaceholders = [
   '/project-placeholders/magic-student.png',
   '/project-placeholders/luggage-character.png',
@@ -32,113 +30,6 @@ function SceneNav({ initials }) {
       </div>
     </nav>
   );
-}
-
-function BasketballTransition() {
-  const courtRef = useRef(null);
-  const [open, setOpen] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const [ball, setBall] = useState({ x: 42, y: 148 });
-  const [scored, setScored] = useState(false);
-
-  const moveBall = (event) => {
-    if (!dragging || !courtRef.current || scored) return;
-    const box = courtRef.current.getBoundingClientRect();
-    setBall({
-      x: clamp(event.clientX - box.left, 18, box.width - 18),
-      y: clamp(event.clientY - box.top, 18, box.height - 18),
-    });
-  };
-
-  const finishShot = (event) => {
-    if (!dragging || scored) return;
-    setDragging(false);
-    const box = courtRef.current?.getBoundingClientRect();
-    const release = box && event ? {
-      x: clamp(event.clientX - box.left, 18, box.width - 18),
-      y: clamp(event.clientY - box.top, 18, box.height - 18),
-    } : ball;
-    setBall(release);
-    if (Math.hypot(release.x - 220, release.y - 72) < 46) {
-      setScored(true);
-    }
-  };
-
-  const goToWork = () => {
-    document.querySelector('#portfolio')?.scrollIntoView({ behavior: 'smooth' });
-    window.history.replaceState(null, '', '#portfolio');
-  };
-  const skip = () => {
-    setOpen(false);
-    goToWork();
-  };
-  useEffect(() => {
-    if (!scored) return undefined;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const midpoint = window.setTimeout(() => {
-      document.querySelector('#portfolio')?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
-      window.history.replaceState(null, '', '#portfolio');
-    }, reduceMotion ? 0 : 750);
-    const complete = window.setTimeout(() => {
-      setOpen(false);
-      setScored(false);
-      setBall({ x: 42, y: 148 });
-    }, reduceMotion ? 50 : 1900);
-    return () => {
-      window.clearTimeout(midpoint);
-      window.clearTimeout(complete);
-    };
-  }, [scored]);
-
-  if (!open) {
-    return (
-      <button type="button" className="saad-next-launch" onClick={() => setOpen(true)} aria-label="Play to enter selected work">
-        <span>Next: selected work</span><b aria-hidden="true">↘</b>
-      </button>
-    );
-  }
-
-  return (
-    <>
-    <div className={`saad-court-shell ${scored ? 'is-scored' : ''}`}>
-      <div className="saad-court-topline"><span>{scored ? 'Nice shot.' : 'Drag the ball into the hoop'}</span><button type="button" onClick={skip}>Skip →</button></div>
-      <div
-        ref={courtRef}
-        className="saad-court"
-        onPointerMove={moveBall}
-        onPointerUp={finishShot}
-        onPointerCancel={finishShot}
-      >
-        <span className="saad-court-line" aria-hidden="true" />
-        <span className="saad-backboard" aria-hidden="true" />
-        <span className="saad-hoop" aria-hidden="true" />
-        <button
-          type="button"
-          className="saad-ball"
-          aria-label="Basketball. Drag it into the hoop, or press Enter to shoot."
-          style={{ left: ball.x, top: ball.y }}
-          onKeyDown={(event) => {
-            if ((event.key === 'Enter' || event.key === ' ') && !scored) {
-              event.preventDefault();
-              setScored(true);
-            }
-          }}
-          onPointerDown={(event) => {
-            event.currentTarget.setPointerCapture(event.pointerId);
-            setDragging(true);
-          }}
-          onPointerUp={finishShot}
-        ><i /></button>
-        {scored && <span className="saad-score-burst" aria-hidden="true">SWISH!</span>}
-      </div>
-    </div>
-    <PixelTransition active={scored} />
-    </>
-  );
-}
-
-function DownLink({ href, label }) {
-  return <a className="saad-scene-next" href={href}><span>{label}</span><b aria-hidden="true">↓</b></a>;
 }
 
 function ExperienceGroup({ title, note, number, label, items }) {
@@ -221,7 +112,6 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
         </figure>
 
         <GameEasterEgg kind="mushroom" />
-        <BasketballTransition />
       </section>
 
       <section className="saad-scene saad-portfolio" id="portfolio">
@@ -267,7 +157,6 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
           })}
         </div>
         </AnimatedContent>
-        <DownLink href="#other-projects" label="Next: other projects" />
         <GameEasterEgg kind="pacman" />
       </section>
 

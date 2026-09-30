@@ -1,19 +1,26 @@
 'use client';
 
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import PixelTransition from './reactbits/PixelTransition';
 
 const ProjectTransitionContext = createContext(null);
+const transitionVariants = ['scatter', 'checker', 'iris', 'cascade'];
 
 export function ProjectTransitionProvider({ children }) {
   const router = useRouter();
   const [destination, setDestination] = useState(null);
   const [active, setActive] = useState(false);
+  const [variant, setVariant] = useState('scatter');
+  const previousVariant = useRef(null);
 
   const openProject = useCallback((href) => {
     if (active) return;
+    const choices = transitionVariants.filter((item) => item !== previousVariant.current);
+    const nextVariant = choices[Math.floor(Math.random() * choices.length)];
+    previousVariant.current = nextVariant;
+    setVariant(nextVariant);
     setDestination(href);
     setActive(true);
   }, [active]);
@@ -32,6 +39,7 @@ export function ProjectTransitionProvider({ children }) {
       {children}
       <PixelTransition
         active={active}
+        variant={variant}
         columns={14}
         rows={9}
         onMidpoint={changePage}

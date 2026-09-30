@@ -7,13 +7,11 @@ import './PixelTransition.css';
 // Adapted from React Bits: PixelTransition, exposed as a controlled transition overlay.
 export default function PixelTransition({ active, onMidpoint, onComplete, columns = 12, rows = 8 }) {
   const gridRef = useRef(null);
-  const handledRef = useRef(false);
   const pixelCount = columns * rows;
   const pixels = useMemo(() => Array.from({ length: pixelCount }, (_, index) => index), [pixelCount]);
 
   useEffect(() => {
-    if (!active || handledRef.current || !gridRef.current) return undefined;
-    handledRef.current = true;
+    if (!active || !gridRef.current) return undefined;
     const elements = gridRef.current.children;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) {

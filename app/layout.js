@@ -2,6 +2,7 @@ import './globals.css';
 import './portfolio.css';
 import localFont from 'next/font/local';
 import MotionLayer from './components/MotionLayer';
+import { ProjectTransitionProvider } from './components/ProjectTransition';
 const space = localFont({ src: './fonts/SpaceGrotesk.ttf', variable: '--font-space', display: 'swap', weight: '300 700' });
 
 export const metadata = {
@@ -13,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" data-theme="light" data-scroll-behavior="smooth" className={space.variable}>
-      <body><MotionLayer />{children}</body>
+      <body><MotionLayer /><ProjectTransitionProvider>{children}</ProjectTransitionProvider></body>
     </html>
   );
 }

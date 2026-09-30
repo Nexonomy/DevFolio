@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import AnimatedContent from './reactbits/AnimatedContent';
 import GlareHover from './reactbits/GlareHover';
 import GameEasterEgg from './easter-eggs/GameEasterEgg';
 import FilterRail from './FilterRail';
+import { ProjectTransitionLink } from './ProjectTransition';
 
 const placeholderCovers = [
   '/project-placeholders/magic-student.png',
@@ -17,6 +17,7 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
   const track = useRef(null);
   const progressRail = useRef(null);
   const drag = useRef({ active:false, axis:null, startX:0, startY:0, scrollLeft:0, moved:false, lastX:0, lastTime:0, velocity:0, elastic:0 });
+  const suppressClick = useRef(false);
   const momentum = useRef(null);
   const elasticFrame = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -139,6 +140,7 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
     track.current.classList.remove('is-gliding');
     track.current.style.removeProperty('scroll-behavior');
     setElastic(0);
+    suppressClick.current = false;
     drag.current = {
       active:true,
       axis:null,
@@ -151,7 +153,6 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
       velocity:0,
       elastic:0,
     };
-    event.currentTarget.setPointerCapture?.(event.pointerId);
   };
   const dragTrack = (event) => {
     if (!drag.current.active) return;
@@ -162,9 +163,9 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
       drag.current.axis = Math.abs(distanceX) > Math.abs(distanceY) * 1.08 ? 'x' : 'y';
       if (drag.current.axis === 'y') {
         drag.current.active = false;
-        if (event.currentTarget.hasPointerCapture?.(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
         return;
       }
+      event.currentTarget.setPointerCapture?.(event.pointerId);
       setIsDragging(true);
     }
     if (drag.current.axis !== 'x') return;
@@ -197,6 +198,7 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
   const stopDrag = (event) => {
     if (!drag.current.active) return;
     drag.current.active = false;
+    suppressClick.current = drag.current.moved;
     if (event.currentTarget.hasPointerCapture?.(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
 
     const element = track.current;
@@ -235,10 +237,10 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
     momentum.current = requestAnimationFrame(glide);
   };
   const protectLinks = (event) => {
-    if (drag.current.moved) {
+    if (suppressClick.current) {
       event.preventDefault();
       event.stopPropagation();
-      drag.current.moved = false;
+      suppressClick.current = false;
     }
   };
   return <section id="other-projects" className="section other-work-section" aria-labelledby="other-work-title">
@@ -258,7 +260,7 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
       {visibleProjects.map((project) => {
         const index = projects.indexOf(project);
         return (
-        <Link draggable="false" key={project.id || project.slug} href={'/projects/' + project.slug} className="other-card other-cover-card">
+        <ProjectTransitionLink draggable="false" key={project.id || project.slug} href={'/projects/' + project.slug} className="other-card other-cover-card">
           <GlareHover className="other-card-art" background={project.bgColor || '#121212'}>
             <Image
               draggable="false"
@@ -275,7 +277,7 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
             <b>{project.tech}</b>
             <i aria-hidden="true">↗</i>
           </div>
-        </Link>
+        </ProjectTransitionLink>
         );
       })}
     </div>

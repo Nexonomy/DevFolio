@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import OtherProjects from './OtherProjects';
+import { ProjectTransitionLink } from './ProjectTransition';
 import RetroEasterEggs from './easter-eggs/RetroEasterEggs';
 import SecretChest from './easter-eggs/SecretChest';
 import GameEasterEgg from './easter-eggs/GameEasterEgg';
@@ -182,7 +182,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
           {visibleGames.map((game) => {
             const index = games.indexOf(game);
             return (
-            <Link href={`/games/${game.slug}`} className={`saad-project-card saad-project-${index + 1}`} key={game.id || game.slug}>
+            <ProjectTransitionLink href={`/games/${game.slug}`} className={`saad-project-card saad-project-${index + 1}`} key={game.id || game.slug}>
               <GlareHover className="saad-project-art" background={game.bgColor || '#242424'}>
                 <Image
                   src={game.coverImageUrl || projectPlaceholders[index % projectPlaceholders.length]}
@@ -199,7 +199,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
                 <ul>{(game.categories || []).slice(0, 3).map((category) => <li key={category}>{category}</li>)}</ul>
                 <b aria-hidden="true">↗</b>
               </div>
-            </Link>
+            </ProjectTransitionLink>
             );
           })}
         </div>

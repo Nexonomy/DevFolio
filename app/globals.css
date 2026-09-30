@@ -882,4 +882,9 @@ body { background: var(--cream); color: var(--brown); }
 .admin-portrait-actions { display:flex; flex-wrap:wrap; gap:8px; }
 .admin-portrait-actions label { position:relative; }
 .admin-portrait-actions input { position:absolute; width:1px; height:1px; overflow:hidden; opacity:0; }
-@media (max-width:560px) { .admin-portrait-editor { grid-template-columns:1fr; } .admin-portrait-preview { width:125px; } }
+.admin-experience-logo-editor { display:grid; grid-template-columns:66px minmax(0,1fr); gap:16px; align-items:center; padding:14px; border:1px dashed #8e7dff45; border-radius:16px; background:#090b1945; }
+.admin-experience-logo-preview { display:grid; width:58px; height:58px; overflow:hidden; place-items:center; border:1px solid #ffffff24; border-radius:13px; color:var(--admin-violet); background:#f2eee4; font-size:.7rem; font-weight:850; }
+.admin-experience-logo-preview img { width:100%; height:100%; padding:7px; object-fit:contain; }
+.admin-experience-logo-editor strong { color:var(--admin-text); font-size:.76rem; text-transform:none; letter-spacing:0; }
+.admin-experience-logo-editor p { margin:4px 0 10px; color:var(--admin-muted); font-size:.61rem; font-weight:500; line-height:1.45; text-transform:none; letter-spacing:0; }
+@media (max-width:560px) { .admin-portrait-editor,.admin-experience-logo-editor { grid-template-columns:1fr; } .admin-portrait-preview { width:125px; } }

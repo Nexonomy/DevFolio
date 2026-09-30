@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-const blankExperience = () => ({ period: '', role: '', organization: '', type: 'Company', track: 'PROFESSIONAL', icon: '✦', description: '', current: false });
+const blankExperience = () => ({ period: '', role: '', organization: '', type: 'Company', track: 'PROFESSIONAL', icon: '✦', logoImageUrl: null, description: '', current: false });
 const blankTool = () => ({ name: '', icon: '◇' });
 
 export default function ProfileForm({ initialProfile }) {
@@ -11,6 +11,7 @@ export default function ProfileForm({ initialProfile }) {
   const [status, setStatus] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploadingPortrait, setUploadingPortrait] = useState(false);
+  const [uploadingExperienceLogo, setUploadingExperienceLogo] = useState(null);
   const setField = (name, value) => setForm((current) => ({ ...current, [name]: value }));
   const updateItem = (field, index, patch) => setForm((current) => ({ ...current, [field]: current[field].map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item) }));
   const removeItem = (field, index) => setForm((current) => ({ ...current, [field]: current[field].filter((_, itemIndex) => itemIndex !== index) }));
@@ -37,6 +38,21 @@ export default function ProfileForm({ initialProfile }) {
     } catch (error) { setStatus(error.message); }
     finally { setUploadingPortrait(false); event.target.value = ''; }
   };
+  const uploadExperienceImage = async (event, index) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) return;
+    setUploadingExperienceLogo(index); setStatus('');
+    try {
+      const body = new FormData(); body.append('file', file);
+      const response = await fetch('/api/upload', { method: 'POST', body });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Logo upload failed');
+      updateItem('experiences', index, { logoImageUrl: data.url });
+      setStatus('Organization logo uploaded. Save the profile to publish it.');
+    } catch (error) { setStatus(error.message); }
+    finally { setUploadingExperienceLogo(null); input.value = ''; }
+  };
   const save = async (event) => {
     event.preventDefault(); setSaving(true); setStatus('');
     try {
@@ -54,7 +70,7 @@ export default function ProfileForm({ initialProfile }) {
       <button className="admin-button admin-button-primary admin-profile-save" type="submit" disabled={saving}>{saving ? <><span className="admin-login-loader"><i /><i /><i /></span> Saving…</> : 'Save profile ↗'}</button>
     </header>
 
-    {status && <p className={status.startsWith('Saved') ? 'admin-save-status is-success' : 'admin-error'} role="status">{status}</p>}
+    {status && <p className={status.startsWith('Saved') || status.includes('uploaded') ? 'admin-save-status is-success' : 'admin-error'} role="status">{status}</p>}
 
     <section className="admin-profile-panel">
       <div className="admin-profile-panel-title"><span>01</span><div><h2>Identity & opening</h2><p>The first words visitors see.</p></div></div>
@@ -97,6 +113,22 @@ export default function ProfileForm({ initialProfile }) {
             <label className="admin-label">Type<input className="admin-input" value={item.type} onChange={(e) => updateItem('experiences', index, { type: e.target.value })} /></label>
             <label className="admin-label">Experience section<select className="admin-input" value={item.track || 'ACADEMIC'} onChange={(e) => updateItem('experiences', index, { track: e.target.value })}><option value="PROFESSIONAL">Professional experience</option><option value="ACADEMIC">Academic experience</option></select></label>
             <label className="admin-label">Icon<input className="admin-input" value={item.icon} onChange={(e) => updateItem('experiences', index, { icon: e.target.value })} /></label>
+            <div className="admin-experience-logo-editor admin-label-full">
+              <div className="admin-experience-logo-preview">
+                {item.logoImageUrl ? <img src={item.logoImageUrl} alt={`${item.organization || item.role} logo preview`} /> : <span>{String(index + 1).padStart(2, '0')}</span>}
+              </div>
+              <div>
+                <strong>Organization logo</strong>
+                <p>Optional. A square PNG, JPG, WebP, or SVG works best. Without one, the numbered badge stays visible.</p>
+                <div className="admin-portrait-actions">
+                  <label className="admin-button admin-button-small">
+                    {uploadingExperienceLogo === index ? 'Uploading…' : item.logoImageUrl ? 'Replace logo' : 'Upload logo'}
+                    <input type="file" accept="image/*" onChange={(event) => uploadExperienceImage(event, index)} disabled={uploadingExperienceLogo !== null} />
+                  </label>
+                  {item.logoImageUrl && <button type="button" className="admin-button admin-button-small admin-button-danger" onClick={() => updateItem('experiences', index, { logoImageUrl: null })}>Remove logo</button>}
+                </div>
+              </div>
+            </div>
             <label className="admin-label admin-checkbox-label"><input type="checkbox" checked={item.current} onChange={(e) => updateItem('experiences', index, { current: e.target.checked })} /> Current role</label>
             <label className="admin-label admin-label-full">Description<textarea className="admin-textarea" rows="3" value={item.description} onChange={(e) => updateItem('experiences', index, { description: e.target.value })} /></label>
           </div>

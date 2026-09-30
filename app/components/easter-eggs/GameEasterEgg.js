@@ -118,11 +118,25 @@ export default function GameEasterEgg({ kind, enabled = enabledByDefault }) {
     interaction.playSound();
   };
 
+  const trackPointer = (event) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const pointerPosition = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+    event.currentTarget.style.setProperty('--egg-shift', `${pointerPosition * 5}px`);
+    event.currentTarget.style.setProperty('--egg-aim', `${pointerPosition * 8}deg`);
+  };
+
+  const resetPointer = (event) => {
+    event.currentTarget.style.setProperty('--egg-shift', '0px');
+    event.currentTarget.style.setProperty('--egg-aim', '0deg');
+  };
+
   return (
     <button
       type="button"
       className={`game-easter-egg game-easter-egg--${kind} game-easter-egg--interactive ${activation ? 'is-active' : ''}`}
       onClick={activate}
+      onPointerMove={trackPointer}
+      onPointerLeave={resetPointer}
       aria-label={interaction.label}
       title={interaction.label}
     >

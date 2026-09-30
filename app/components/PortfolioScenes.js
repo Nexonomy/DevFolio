@@ -11,24 +11,66 @@ import RetroAudioToggle from './easter-eggs/RetroAudioToggle';
 import AnimatedContent from './reactbits/AnimatedContent';
 import ClickSpark from './reactbits/ClickSpark';
 import GlareHover from './reactbits/GlareHover';
+import FilterRail from './FilterRail';
 
 const projectPlaceholders = [
   '/project-placeholders/magic-student.png',
   '/project-placeholders/luggage-character.png',
 ];
+const sceneLinks = [
+  { href: '#intro', number: '01', label: 'Intro', kind: 'intro' },
+  { href: '#portfolio', number: '02', label: 'Work', kind: 'work' },
+  { href: '#other-projects', number: '03', label: 'Other', kind: 'other' },
+  { href: '#experience', number: '04', label: 'Experience', kind: 'experience' },
+  { href: '#contact', number: '05', label: 'Contact', kind: 'contact' },
+];
+function SceneLink({ href, number, label, kind }) {
+  const animatedLabel = kind === 'work'
+    ? [...label].map((letter, index) => <span className="saad-nav-letter" style={{ '--letter-index': index }} key={`${letter}-${index}`}>{letter}</span>)
+    : label;
+
+  return (
+    <a className={`saad-nav-link saad-nav-link--${kind}`} href={href} aria-label={`${number} ${label}`}>
+      <span className="saad-nav-index" aria-hidden="true">{number}</span>
+      <i className="saad-nav-charm" aria-hidden="true">
+        {kind === 'intro' && <span className="saad-nav-caret">_</span>}
+        {kind === 'work' && <span className="saad-nav-hammer">⌁</span>}
+        {kind === 'other' && <span className="saad-nav-dpad">✣</span>}
+        {kind === 'experience' && <span className="saad-nav-xp"><b /></span>}
+        {kind === 'contact' && <span className="saad-nav-chat">hi!</span>}
+      </i>
+      <span className="saad-nav-label" aria-hidden="true">{animatedLabel}</span>
+    </a>
+  );
+}
 
 function SceneNav({ initials }) {
   return (
     <nav className="saad-nav" aria-label="Portfolio sections">
       <a className="saad-mark" href="#intro" aria-label="Back to introduction">{initials}<span>.</span></a>
-      <div>
-        <a href="#intro"><span>01</span> Intro</a>
-        <a href="#portfolio"><span>02</span> Work</a>
-        <a href="#other-projects"><span>03</span> Other</a>
-        <a href="#experience"><span>04</span> Experience</a>
-        <a href="#contact"><span>05</span> Contact</a>
-      </div>
+      <div>{sceneLinks.map((link) => <SceneLink {...link} key={link.href} />)}</div>
     </nav>
+  );
+}
+
+function ExperienceMark({ item, index }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const number = String(index + 1).padStart(2, '0');
+
+  if (!item.logoImageUrl || imageFailed) {
+    return <span className="saad-experience-index" aria-label={`Experience ${number}`}>{number}</span>;
+  }
+
+  return (
+    <span className="saad-experience-index has-logo">
+      <Image
+        src={item.logoImageUrl}
+        alt=""
+        fill
+        sizes="42px"
+        onError={() => setImageFailed(true)}
+      />
+    </span>
   );
 }
 
@@ -43,7 +85,7 @@ function ExperienceGroup({ title, note, number, label, items }) {
       <ol className="saad-timeline">
         {items.map((item, index) => (
           <li key={`${item.role}-${index}`}>
-            <span className="saad-experience-index">{String(index + 1).padStart(2, '0')}</span>
+            <ExperienceMark item={item} index={index} />
             <div className="saad-experience-card">
               <div className="saad-experience-meta"><time>{item.period}</time><small>{item.type}</small></div>
               <h4>{item.role}</h4>
@@ -93,7 +135,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
       <section className="saad-scene saad-intro" id="intro">
         <div className="saad-intro-copy">
           <p className="saad-kicker">{copy.introKicker}</p>
-          <h1>Hi, I’m<br /><em>{profile.name.split(' ')[0]}.</em></h1>
+          <h1>Hi, I’m<br /><em>{[...profile.name.split(' ')[0]].map((letter, index) => <span className="saad-name-letter" style={{ '--name-index': index }} key={`${letter}-${index}`}>{letter}</span>)}.</em></h1>
           <p className="saad-intro-lead">{profile.heroSubtitle}</p>
           <div className="saad-intro-links">
             {profile.linkedinUrl && <a href={profile.linkedinUrl} target="_blank" rel="noreferrer">LinkedIn ↗</a>}
@@ -105,6 +147,8 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
         <figure className="saad-portrait">
           <div className="saad-portrait-frame">
             {profile.profileImageUrl ? <Image src={profile.profileImageUrl} alt={profile.name} fill priority sizes="(max-width: 700px) 68vw, 34vw" /> : <span>{initials}<small>portrait</small></span>}
+            <span className="saad-portrait-player" aria-hidden="true">PLAYER 01</span>
+            <i className="saad-portrait-scan" aria-hidden="true" />
           </div>
           <figcaption><b>I build playable ideas.</b><span>Code · systems · worlds</span></figcaption>
           <i className="saad-doodle saad-doodle-one" aria-hidden="true">✦</i>
@@ -125,9 +169,12 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
 
         {demoMode && <p className="saad-demo-notice">Preview mode · Sample project entries are for layout preview only. Replace them with your own work before publishing.</p>}
 
-        <nav className="project-filter-nav" aria-label="Filter game projects by genre">
-          {gameGenres.map((genre) => <button type="button" key={genre} aria-pressed={gameFilter === genre} onClick={() => setGameFilter(genre)}>{genre}</button>)}
-        </nav>
+        <FilterRail
+          items={gameGenres}
+          value={gameFilter}
+          onChange={setGameFilter}
+          label="Filter game projects by genre"
+        />
 
         <AnimatedContent delay={0.08}>
         <div className={`saad-project-grid ${gameFilter === 'All' ? '' : 'is-filtered'}`}>
@@ -170,9 +217,13 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
           <p>{copy.experienceDescription}</p>
         </div>
         </AnimatedContent>
-        <nav className="project-filter-nav experience-filter-nav" aria-label="Filter experience by track">
-          {['All', 'Professional', 'Academic'].map((track) => <button type="button" key={track} aria-pressed={experienceFilter === track} onClick={() => setExperienceFilter(track)}>{track}</button>)}
-        </nav>
+        <FilterRail
+          items={['All', 'Professional', 'Academic']}
+          value={experienceFilter}
+          onChange={setExperienceFilter}
+          label="Filter experience by track"
+          className="experience-filter-nav"
+        />
         <div className="saad-experience-columns">
           {experienceFilter !== 'Academic' && <ExperienceGroup number="01" title="Professional experience" note="Industry and independent practice" label="Career track" items={professionalExperience} />}
           {experienceFilter !== 'Professional' && <ExperienceGroup number="02" title="Academic experience" note="Campus teams, societies, and jams" label="Learning track" items={academicExperience} />}
@@ -185,6 +236,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
       </section>
 
       <section className="saad-contact" id="contact" aria-labelledby="contact-title">
+        <div className="retro-audio-dock"><RetroAudioToggle /></div>
         <p className="saad-kicker">05 / Contact</p>
         <div className="saad-contact-grid">
           <div>
@@ -207,7 +259,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
               {profile.linkedinUrl && <a href={profile.linkedinUrl} target="_blank" rel="noreferrer">LinkedIn ↗</a>}
               {profile.resumeUrl && <a href={profile.resumeUrl} target="_blank" rel="noreferrer">Résumé ↗</a>}
             </div>
-            <div className="retro-footer-controls"><RetroAudioToggle /><SecretChest /></div>
+            <div className="retro-footer-controls"><SecretChest /></div>
           </div>
         </div>
       </section>

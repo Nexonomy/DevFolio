@@ -1,7 +1,16 @@
 import { notFound } from 'next/navigation';
 import GameDetail from '@/app/components/GameDetail';
-import { getPublishedGame, isDemo } from '@/lib/portfolio';
-export const dynamic = 'force-dynamic';
+import { getPublishedGame, getPublishedGames, isDemo } from '@/lib/portfolio';
+
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const games = await getPublishedGames();
+  return games
+    .filter((game) => game.portfolioSection !== 'OTHER')
+    .map((game) => ({ slug:game.slug }));
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const game = await getPublishedGame(slug);

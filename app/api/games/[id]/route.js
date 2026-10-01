@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/api-auth';
 import { gameInclude, parseGameBody } from '@/lib/games';
 import { deleteDemoProject, readDemoProjects, updateDemoProject } from '@/lib/demo-store';
 import { isDemo } from '@/lib/portfolio';
+import { revalidatePortfolio } from '@/lib/revalidate-portfolio';
 
 export async function GET(request, { params }) {
   try {
@@ -36,8 +37,11 @@ export async function PUT(request, { params }) {
     if (isDemo) {
       const projects = await readDemoProjects();
       if (projects.some((project) => project.slug === data.slug && project.id !== id)) return NextResponse.json({ error:'Slug already exists' }, { status:409 });
+      const existing = projects.find((project) => project.id === id);
       const game = await updateDemoProject(id, data);
-      return game ? NextResponse.json(game) : NextResponse.json({ error:'Project not found' }, { status:404 });
+      if (!game) return NextResponse.json({ error:'Project not found' }, { status:404 });
+      revalidatePortfolio(existing, game);
+      return NextResponse.json(game);
     }
 
     const existing = await prisma.game.findUnique({ where:{ id } });
@@ -61,6 +65,7 @@ export async function PUT(request, { params }) {
         include:gameInclude,
       });
     });
+    revalidatePortfolio(existing, game);
     return NextResponse.json(game);
   } catch (error) {
     console.error('PUT /api/games/[id] error:', error);
@@ -76,13 +81,17 @@ export async function DELETE(request, { params }) {
     const { id } = await params;
 
     if (isDemo) {
+      const existing = (await readDemoProjects()).find((project) => project.id === id);
       const deleted = await deleteDemoProject(id);
-      return deleted ? NextResponse.json({ success:true }) : NextResponse.json({ error:'Project not found' }, { status:404 });
+      if (!deleted) return NextResponse.json({ error:'Project not found' }, { status:404 });
+      revalidatePortfolio(existing);
+      return NextResponse.json({ success:true });
     }
 
     const existing = await prisma.game.findUnique({ where:{ id } });
     if (!existing) return NextResponse.json({ error:'Project not found' }, { status:404 });
     await prisma.game.delete({ where:{ id } });
+    revalidatePortfolio(existing);
     return NextResponse.json({ success:true });
   } catch (error) {
     console.error('DELETE /api/games/[id] error:', error);

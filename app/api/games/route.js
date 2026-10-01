@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/api-auth';
 import { gameInclude, parseGameBody } from '@/lib/games';
 import { createDemoProject, readDemoProjects } from '@/lib/demo-store';
 import { isDemo } from '@/lib/portfolio';
+import { revalidatePortfolio } from '@/lib/revalidate-portfolio';
 
 export async function GET(request) {
   try {
@@ -38,7 +39,9 @@ export async function POST(request) {
     if (isDemo) {
       const projects = await readDemoProjects();
       if (projects.some((project) => project.slug === data.slug)) return NextResponse.json({ error: 'Slug already exists' }, { status: 409 });
-      return NextResponse.json(await createDemoProject(data), { status: 201 });
+      const game = await createDemoProject(data);
+      revalidatePortfolio(game);
+      return NextResponse.json(game, { status: 201 });
     }
 
     const existing = await prisma.game.findUnique({ where: { slug: data.slug } });
@@ -55,6 +58,7 @@ export async function POST(request) {
       },
       include:gameInclude,
     });
+    revalidatePortfolio(game);
     return NextResponse.json(game, { status:201 });
   } catch (error) {
     console.error('POST /api/games error:', error);

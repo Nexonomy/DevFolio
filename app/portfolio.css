@@ -640,6 +640,19 @@ body:has(.saad-site) .scroll-rail { display:block; }
 .project-filter-nav button:hover { color:var(--saad-cream); border-color:#686868; transform:translateY(-2px); }
 .project-filter-nav button[aria-pressed="true"] { color:#0a0a0a; background:var(--saad-orange); border-color:var(--saad-orange); }
 .filter-rail-cue { display:none; }
+/* Mouse users: grab cursor while dragging and visible arrow buttons when the rail overflows. */
+.project-filter-nav.is-dragging { cursor:grabbing; scroll-behavior:auto; scroll-snap-type:none; user-select:none; }
+.project-filter-nav.is-dragging button { pointer-events:none; }
+.filter-rail-arrow { position:absolute; z-index:3; top:4px; display:none; width:36px; height:36px; place-items:center; padding:0; border:1px solid #3d3d3d; border-radius:var(--radius-sm); color:var(--saad-cream); background:#111; font:inherit; font-size:15px; cursor:pointer; transition:color .2s,background .2s,border-color .2s; }
+.filter-rail-arrow.is-prev { left:0; }
+.filter-rail-arrow.is-next { right:0; }
+.filter-rail-arrow:hover { color:#0a0a0a; background:var(--saad-orange); border-color:var(--saad-orange); }
+@media (hover:hover) and (pointer:fine) {
+  .project-filter-nav { cursor:grab; }
+  .filter-rail-shell.has-left-overflow .filter-rail-arrow.is-prev,
+  .filter-rail-shell.has-right-overflow .filter-rail-arrow.is-next { display:grid; }
+  .filter-rail-shell::before,.filter-rail-shell::after { width:56px; }
+}
 .filter-rail-shell.other-filter-nav { max-width:none; margin:20px 0 0; }
 .filter-rail-shell.experience-filter-nav { margin-top:-18px; }
 @media (max-width:620px) {

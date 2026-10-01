@@ -48,10 +48,10 @@ export default function GameDetail({ game }) {
   return (
     <div className="game-detail-page">
       <nav className="game-detail-topbar" aria-label="Project navigation">
-        <Link href="/" className="game-detail-brand" aria-label="Ahsan Tariq home">AT<span>.</span></Link>
         <Link href={isGame ? '/#portfolio' : '/#other-projects'} className="game-detail-back">
           <span aria-hidden="true">←</span> All projects
         </Link>
+        <Link href="/" className="game-detail-brand" aria-label="Ahsan Tariq home">AT<span>.</span></Link>
         <span className="game-detail-index">{projectNumber} / Selected work</span>
       </nav>
 

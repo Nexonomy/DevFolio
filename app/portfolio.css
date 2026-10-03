@@ -792,7 +792,7 @@ section:is(:hover,:focus-within)>.game-easter-egg * { animation-play-state:runni
 .retro-audio-toggle { display:flex; align-items:center; gap:7px; min-height:34px; padding:0 10px; border:1px solid #0a0a0a; border-radius:var(--radius-sm); color:#0a0a0a; background:transparent; font:700 9px/1 var(--font-space),Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }
 .retro-audio-toggle span { display:grid; width:15px; height:15px; place-items:center; border:1px solid currentColor; }
 .retro-audio-toggle:hover { color:#f2eee4; background:#0a0a0a; }
-.retro-audio-dock { position:absolute; z-index:5; left:clamp(14px,2vw,24px); bottom:clamp(14px,2vw,24px); }
+.retro-audio-dock { position:absolute; z-index:5; left:clamp(14px,2vw,24px); bottom:clamp(14px,2vw,24px); display:flex; gap:10px; flex-wrap:wrap; }
 .retro-audio-dock .retro-audio-toggle { min-height:36px; border-color:#4b4b4b; color:var(--saad-cream); background:#0a0a0ae8; box-shadow:4px 4px 0 #e65f2b; backdrop-filter:blur(8px); transition:color .2s,background .2s,transform .2s,box-shadow .2s; }
 .retro-audio-dock .retro-audio-toggle:hover,.retro-audio-dock .retro-audio-toggle:focus-visible { color:#0a0a0a; border-color:var(--saad-orange); background:var(--saad-orange); box-shadow:2px 2px 0 #f2eee4; transform:translate(2px,2px); }
 .retro-audio-dock .retro-audio-toggle:focus-visible { outline:1px solid var(--saad-cream); outline-offset:4px; }

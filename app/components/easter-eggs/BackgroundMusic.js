@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const DEFAULT_SRC = process.env.NEXT_PUBLIC_BGM_URL || '/bgm/ambient.mp3';
-const DEFAULT_VOLUME = 0.18;
+const DEFAULT_VOLUME = 0.8;
 const FADE_MS = 900;
 const STORAGE_KEY = 'devfolio-bgm-on';
 

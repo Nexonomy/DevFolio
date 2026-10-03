@@ -1,6 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
   <rect width="180" height="180" rx="38" fill="#0a0a0a"/>
-  <rect x="16" y="16" width="148" height="148" rx="26" fill="none" stroke="#e65f2b" stroke-width="5"/>
-  <text x="90" y="118" font-family="'Space Grotesk', 'Arial Black', sans-serif" font-size="72" font-weight="800" text-anchor="middle" fill="#f2eee4" letter-spacing="-3">AT</text>
-  <circle cx="146" cy="34" r="8" fill="#e65f2b"/>
+  <!-- legs -->
+  <rect x="38" y="106" width="20" height="22" rx="3" fill="#f2eee4"/>
+  <rect x="122" y="106" width="20" height="22" rx="3" fill="#f2eee4"/>
+  <rect x="50" y="124" width="20" height="20" rx="3" fill="#f2eee4"/>
+  <rect x="110" y="124" width="20" height="20" rx="3" fill="#f2eee4"/>
+  <!-- tail -->
+  <path d="M135 100 L152 94 L152 112 Z" fill="#f2eee4"/>
+  <!-- head -->
+  <circle cx="38" cy="92" r="17" fill="#f2eee4"/>
+  <circle cx="33" cy="86" r="4" fill="#0a0a0a"/>
+  <!-- shell -->
+  <ellipse cx="90" cy="94" rx="52" ry="37" fill="#e65f2b"/>
+  <ellipse cx="90" cy="94" rx="52" ry="37" fill="none" stroke="#0a0a0a" stroke-width="4"/>
+  <!-- shell plates -->
+  <path d="M90 60 L90 128 M56 80 L124 80 M56 108 L124 108 M72 60 L60 128 M108 60 L120 128" stroke="#0a0a0a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
 </svg>

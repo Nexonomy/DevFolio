@@ -98,11 +98,12 @@ export default async function AdminIntegrationsPage() {
           </p>
         </Row>
 
-        <Row title="Analytics" status={statusBadge(true, databaseConfigured ? 'Postgres' : 'File log')}>
-          <KeyValue label="Backend" value={databaseConfigured ? 'Prisma (requires Visit model)' : '.analytics/visits.jsonl (file)'} mono />
+        <Row title="Analytics" status={statusBadge(true, 'Vercel Web Analytics')}>
+          <KeyValue label="Backend" value="@vercel/analytics (hosted on Vercel)" mono />
           <KeyValue label="Admin view" value="/admin/analytics" mono />
+          <KeyValue label="Dashboard" value="vercel.com → project → Analytics" mono />
           <p style={{ margin: '8px 0 0', opacity: 0.7, fontSize: '13px' }}>
-            Bot traffic, Do Not Track, and admin pages are filtered. Country data appears automatically when deployed on Vercel.
+            Zero self-hosted plumbing. Enable Analytics once in the Vercel project settings; events are counted and shown in Vercel&apos;s own dashboard.
           </p>
         </Row>
 

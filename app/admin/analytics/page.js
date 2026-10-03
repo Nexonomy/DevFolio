@@ -1,38 +1,17 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { requireAuth } from '@/lib/api-auth';
-import { readVisits, summarise } from '@/lib/analytics';
 
 export const dynamic = 'force-dynamic';
 
-function formatUA(ua) {
-  if (!ua) return 'Unknown client';
-  if (/iPhone|iPad/.test(ua)) return 'iOS';
-  if (/Android/.test(ua)) return 'Android';
-  if (/Edg\//.test(ua)) return 'Edge';
-  if (/Firefox/.test(ua)) return 'Firefox';
-  if (/Chrome/.test(ua)) return 'Chrome';
-  if (/Safari/.test(ua)) return 'Safari';
-  return ua.slice(0, 48);
-}
-
-function relative(iso) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
+const VERCEL_PROJECT = 'nexs-projects-aa2f4c4a/devfolio';
 
 export default async function AdminAnalyticsPage() {
   const session = await requireAuth();
   if (!session) redirect('/admin/login');
 
-  const visits = await readVisits({ limit: 1000 });
-  const stats = summarise(visits);
-  const recent = visits.slice(0, 25);
+  const analyticsUrl = `https://vercel.com/${VERCEL_PROJECT}/analytics`;
+  const speedUrl = `https://vercel.com/${VERCEL_PROJECT}/speed-insights`;
 
   return (
     <div className="admin-page admin-dashboard">
@@ -40,72 +19,36 @@ export default async function AdminAnalyticsPage() {
         <div>
           <p className="admin-kicker">Portfolio analytics</p>
           <h1 className="admin-title">Who&rsquo;s visiting.</h1>
-          <p className="admin-subtitle">Lightweight, self-hosted page views. Bots and admin visits are ignored. Visitors can opt out with Do Not Track.</p>
+          <p className="admin-subtitle">Page views, top pages, referrers, countries, and device breakdowns live on your Vercel dashboard. No self-hosted store, no gaps, no cold-start loss.</p>
         </div>
       </section>
 
-      <div className="admin-stats" aria-label="Visit summary">
-        <article><span>Total visits</span><strong>{String(stats.total).padStart(2, '0')}</strong><i>Lifetime recorded</i></article>
-        <article><span>Unique visitors</span><strong>{String(stats.uniqueVisitors).padStart(2, '0')}</strong><i>Daily hashed</i></article>
-        <article><span>Last 24 hours</span><strong>{String(stats.last24h).padStart(2, '0')}</strong><i>Recent activity</i></article>
-        <article><span>Last 7 days</span><strong>{String(stats.last7d).padStart(2, '0')}</strong><i>Weekly reach</i></article>
+      <div style={{ display: 'grid', gap: '18px', marginTop: '28px', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+        <article style={{ padding: '22px 24px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
+          <h2 style={{ margin: '0 0 10px', fontSize: '15px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Web Analytics</h2>
+          <p style={{ margin: '0 0 16px', opacity: 0.75, fontSize: '14px' }}>Visits, unique visitors, top pages, referrers, countries. Updates in near-real-time.</p>
+          <Link href={analyticsUrl} target="_blank" rel="noreferrer" className="admin-button admin-button-primary">
+            Open in Vercel <span aria-hidden="true">↗</span>
+          </Link>
+        </article>
+
+        <article style={{ padding: '22px 24px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
+          <h2 style={{ margin: '0 0 10px', fontSize: '15px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Speed Insights</h2>
+          <p style={{ margin: '0 0 16px', opacity: 0.75, fontSize: '14px' }}>Real-user Core Web Vitals — LCP, INP, CLS — scored per page. Enable it to see what recruiters&rsquo; devices actually experience.</p>
+          <Link href={speedUrl} target="_blank" rel="noreferrer" className="admin-button">
+            Open in Vercel <span aria-hidden="true">↗</span>
+          </Link>
+        </article>
       </div>
 
-      <div style={{ display: 'grid', gap: '24px', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', marginTop: '32px' }}>
-        <AnalyticsBlock title="Top pages" rows={stats.topPaths} empty="No visits yet." />
-        <AnalyticsBlock title="Top referrers" rows={stats.topReferrers} empty="No referrers yet." />
-        <AnalyticsBlock title="Top countries" rows={stats.topCountries} empty="No country data yet (available when deployed on Vercel)." />
-      </div>
-
-      <section style={{ marginTop: '32px' }}>
-        <h2 style={{ marginBottom: '12px' }}>Recent visits</h2>
-        {recent.length === 0 ? (
-          <p style={{ opacity: 0.7 }}>No visits recorded yet. Open the public site in another tab to generate one.</p>
-        ) : (
-          <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '8px' }}>
-            {recent.map((visit, index) => (
-              <li
-                key={`${visit.at}-${index}`}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'minmax(80px,auto) 1fr minmax(90px,auto) minmax(80px,auto)',
-                  gap: '12px',
-                  alignItems: 'center',
-                  padding: '10px 14px',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                }}
-              >
-                <time dateTime={visit.at} style={{ opacity: 0.6 }}>{relative(visit.at)}</time>
-                <span style={{ fontFamily: 'monospace' }}>{visit.path}</span>
-                <span style={{ opacity: 0.7 }}>{visit.country || '—'}</span>
-                <span style={{ opacity: 0.6 }}>{formatUA(visit.userAgent)}</span>
-              </li>
-            ))}
-          </ol>
-        )}
+      <section style={{ marginTop: '32px', padding: '20px 24px', border: '1px dashed rgba(255,255,255,0.12)', borderRadius: '12px', opacity: 0.85 }}>
+        <h3 style={{ margin: '0 0 8px', fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.7 }}>One-time setup</h3>
+        <ol style={{ margin: 0, paddingLeft: '20px', fontSize: '14px', lineHeight: 1.6 }}>
+          <li>Open the Vercel project &rarr; <strong>Analytics</strong> tab &rarr; click <strong>Enable</strong>.</li>
+          <li>Hobby plan includes 2,500 events / month free &mdash; plenty for a portfolio.</li>
+          <li>Data begins appearing within a minute of the first visit after enabling.</li>
+        </ol>
       </section>
     </div>
-  );
-}
-
-function AnalyticsBlock({ title, rows, empty }) {
-  return (
-    <article style={{ padding: '18px 20px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px' }}>
-      <h3 style={{ margin: '0 0 12px', fontSize: '14px', letterSpacing: '0.04em', textTransform: 'uppercase', opacity: 0.75 }}>{title}</h3>
-      {rows.length === 0 ? (
-        <p style={{ opacity: 0.6, fontSize: '13px', margin: 0 }}>{empty}</p>
-      ) : (
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '6px' }}>
-          {rows.map((row) => (
-            <li key={row.key} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-              <span style={{ fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={row.key}>{row.key}</span>
-              <strong>{row.count}</strong>
-            </li>
-          ))}
-        </ul>
-      )}
-    </article>
   );
 }

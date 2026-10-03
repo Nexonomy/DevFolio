@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "@vercel/analytics": "^1.5.0",
     "@vercel/blob": "^2.4.0",
     "animejs": "^4.4.1",
     "dotenv": "^17.4.2",

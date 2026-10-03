@@ -1,8 +1,8 @@
 import './globals.css';
 import './portfolio.css';
 import localFont from 'next/font/local';
+import { Analytics } from '@vercel/analytics/next';
 import MotionLayer from './components/MotionLayer';
-import AnalyticsPing from './components/AnalyticsPing';
 import { ProjectTransitionProvider } from './components/ProjectTransition';
 const space = localFont({ src: './fonts/SpaceGrotesk.ttf', variable: '--font-space', display: 'swap', weight: '300 700' });
 
@@ -43,7 +43,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" data-theme="light" data-scroll-behavior="smooth" className={space.variable}>
       <head><noscript><style>{`[style*="visibility: hidden"],[style*="visibility:hidden"]{visibility:visible !important;opacity:1 !important;transform:none !important;}`}</style></noscript></head>
-      <body><MotionLayer /><AnalyticsPing /><ProjectTransitionProvider>{children}</ProjectTransitionProvider></body>
+      <body><MotionLayer /><ProjectTransitionProvider>{children}</ProjectTransitionProvider><Analytics /></body>
     </html>
   );
 }

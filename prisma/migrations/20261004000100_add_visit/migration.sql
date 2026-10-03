@@ -1,0 +1,18 @@
+-- CreateTable
+CREATE TABLE "Visit" (
+    "id" TEXT NOT NULL,
+    "path" TEXT NOT NULL,
+    "referrer" TEXT,
+    "userAgent" TEXT,
+    "country" TEXT,
+    "visitorHash" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Visit_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "Visit_createdAt_idx" ON "Visit"("createdAt");
+
+-- CreateIndex
+CREATE INDEX "Visit_visitorHash_idx" ON "Visit"("visitorHash");

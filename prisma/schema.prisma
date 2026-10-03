@@ -47,6 +47,19 @@ model Video {
   game       Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
 }
 
+model Visit {
+  id          String   @id @default(cuid())
+  path        String
+  referrer    String?
+  userAgent   String?
+  country     String?
+  visitorHash String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([visitorHash])
+}
+
 model Profile {
   id           String   @id @default("primary")
   name         String

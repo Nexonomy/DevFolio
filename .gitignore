@@ -41,6 +41,12 @@ env
 /public/demo-uploads/*
 !/public/demo-uploads/1789137694201-PassportSizePhoto.png
 
+# Local analytics log (file-backed fallback when no Visit table exists)
+/.analytics/
+
+# Editor / tooling
+/.claude/
+
 # vercel
 .vercel
 

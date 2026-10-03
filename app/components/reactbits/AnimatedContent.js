@@ -53,7 +53,16 @@ export default function AnimatedContent({
       onEnter: () => tween.play(),
     });
 
+    // Safety net: if ScrollTrigger never fires (element already past viewport, GSAP race,
+    // crawler-sized viewport, etc.), reveal the content so it is never permanently invisible.
+    const safety = window.setTimeout(() => {
+      if (tween.progress() === 0) {
+        gsap.set(element, { [axis]: 0, scale: 1, opacity: 1, visibility: 'visible', clearProps: 'transform,opacity' });
+      }
+    }, 1500);
+
     return () => {
+      window.clearTimeout(safety);
       trigger.kill();
       tween.kill();
     };

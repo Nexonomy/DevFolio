@@ -2,7 +2,7 @@ import PortfolioScenes from './components/PortfolioScenes';
 import { getPublishedGames, isDemo } from '@/lib/portfolio';
 import { getProfile } from '@/lib/profile';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export default async function Home() {
   const [projects, profile] = await Promise.all([getPublishedGames(), getProfile()]);

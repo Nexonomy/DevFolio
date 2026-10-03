@@ -14,7 +14,7 @@ export default function MotionLayer() {
     if (pathname.startsWith('/admin')) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const finePointer = window.matchMedia('(pointer: fine)').matches;
-    const pixelCursor = finePointer && Boolean(document.querySelector('.saad-site'));
+    const pixelCursor = finePointer;
     document.documentElement.classList.add('motion-ready');
     document.documentElement.classList.toggle('has-pixel-cursor', pixelCursor);
 

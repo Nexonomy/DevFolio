@@ -18,6 +18,8 @@ export default function AdminNav() {
           <Link href="/admin" className={pathname === '/admin' ? 'active' : ''}>Library</Link>
           <Link href="/admin/games/new" className={pathname === '/admin/games/new' ? 'active' : ''}>New Project</Link>
           <Link href="/admin/profile" className={pathname === '/admin/profile' ? 'active' : ''}>Profile &amp; Content</Link>
+          <Link href="/admin/analytics" className={pathname === '/admin/analytics' ? 'active' : ''}>Analytics</Link>
+          <Link href="/admin/integrations" className={pathname === '/admin/integrations' ? 'active' : ''}>Integrations</Link>
           <Link href="/" target="_blank">View Portfolio <span aria-hidden="true">↗</span></Link>
           <button type="button" className="admin-link-button" onClick={() => signOut({ callbackUrl: '/admin/login' })}>Sign Out</button>
         </nav>

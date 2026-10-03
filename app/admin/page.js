@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import GameList from '@/app/components/admin/GameList';
+import ExportButton from '@/app/components/admin/ExportButton';
 import { prisma } from '@/lib/prisma';
 import { gameInclude } from '@/lib/games';
 import { readDemoProjects } from '@/lib/demo-store';
@@ -40,7 +41,10 @@ export default async function AdminDashboardPage() {
           <h1 className="admin-title">Content library.</h1>
           <p className="admin-subtitle">Manage primary game projects, additional work, publishing status, and portfolio order.</p>
         </div>
-        {!readOnly && <Link href="/admin/games/new" className="admin-button admin-button-primary"><span aria-hidden="true">+</span> New Project</Link>}
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          {!readOnly && <Link href="/admin/games/new" className="admin-button admin-button-primary"><span aria-hidden="true">+</span> New Project</Link>}
+          <ExportButton className="admin-button" />
+        </div>
       </section>
 
       <div className="admin-stats" aria-label="Portfolio project summary">

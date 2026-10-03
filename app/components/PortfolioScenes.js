@@ -112,17 +112,46 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
   const gameGenres = ['All', ...new Set(games.map((game) => game.tag).filter(Boolean))];
   const visibleGames = gameFilter === 'All' ? games : games.filter((game) => game.tag === gameFilter);
 
-  const sendContactEmail = (event) => {
+  const [contactSending, setContactSending] = useState(false);
+
+  const sendContactEmail = async (event) => {
     event.preventDefault();
-    if (!profile.email) return;
-    const data = new FormData(event.currentTarget);
-    const name = data.get('name');
-    const senderEmail = data.get('email');
-    const subject = data.get('subject') || 'Portfolio enquiry';
-    const message = data.get('message');
-    const body = `Hi ${profile.name.split(' ')[0]},\n\n${message}\n\nFrom: ${name}\nEmail: ${senderEmail}`;
-    setContactStatus('Opening your email app with the message ready to send…');
-    window.location.href = `mailto:${profile.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    if (!profile.email || contactSending) return;
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const payload = {
+      name: data.get('name') || '',
+      email: data.get('email') || '',
+      subject: data.get('subject') || '',
+      message: data.get('message') || '',
+      company: data.get('company') || '',
+    };
+
+    setContactSending(true);
+    setContactStatus('Sending your message…');
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.ok) {
+        setContactStatus(`Message sent — ${profile.email} will reply soon.`);
+        form.reset();
+      } else if (result.fallback) {
+        const subject = payload.subject || 'Portfolio enquiry';
+        const body = `Hi ${profile.name.split(' ')[0]},\n\n${payload.message}\n\nFrom: ${payload.name}\nEmail: ${payload.email}`;
+        setContactStatus('Email service is offline — opening your email app as a fallback…');
+        window.location.href = `mailto:${profile.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      } else {
+        setContactStatus(result.error || 'Could not send right now. Please try again.');
+      }
+    } catch {
+      setContactStatus('Network error — please try again or email directly.');
+    } finally {
+      setContactSending(false);
+    }
   };
 
   return (
@@ -251,8 +280,9 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
               </div>
               <label><span>Subject</span><input name="subject" type="text" placeholder="Let’s build something" /></label>
               <label><span>Message</span><textarea name="message" rows="4" placeholder="Tell me a little about the game, team, or opportunity…" required /></label>
-              <button type="submit"><span>Continue to email</span><b aria-hidden="true">↗</b></button>
-              <p className="saad-contact-status" aria-live="polite">{contactStatus || `This opens your email app with a message addressed to ${profile.email}.`}</p>
+              <input type="text" name="company" tabIndex="-1" autoComplete="off" aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' }} />
+              <button type="submit" disabled={contactSending}><span>{contactSending ? 'Sending…' : 'Send message'}</span><b aria-hidden="true">↗</b></button>
+              <p className="saad-contact-status" aria-live="polite">{contactStatus || `Messages are delivered to ${profile.email}.`}</p>
             </form>
             <div className="saad-contact-links">
               {profile.githubUrl && <a href={profile.githubUrl} target="_blank" rel="noreferrer">GitHub ↗</a>}

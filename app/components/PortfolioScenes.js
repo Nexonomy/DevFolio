@@ -8,6 +8,7 @@ import RetroEasterEggs from './easter-eggs/RetroEasterEggs';
 import SecretChest from './easter-eggs/SecretChest';
 import GameEasterEgg from './easter-eggs/GameEasterEgg';
 import RetroAudioToggle from './easter-eggs/RetroAudioToggle';
+import BackgroundMusic from './easter-eggs/BackgroundMusic';
 import AnimatedContent from './reactbits/AnimatedContent';
 import ClickSpark from './reactbits/ClickSpark';
 import GlareHover from './reactbits/GlareHover';
@@ -265,7 +266,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
       </section>
 
       <section className="saad-contact" id="contact" aria-labelledby="contact-title">
-        <div className="retro-audio-dock"><RetroAudioToggle /></div>
+        <div className="retro-audio-dock"><BackgroundMusic /><RetroAudioToggle /></div>
         <p className="saad-kicker">05 / Contact</p>
         <div className="saad-contact-grid">
           <div>

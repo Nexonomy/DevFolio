@@ -37,7 +37,49 @@ export default function GameDetail({ game }) {
   const [active, setActive] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const dialogRef = useRef(null);
+  const thumbsRef = useRef(null);
+  const dragRef = useRef(null);
   const current = media[active];
+
+  useEffect(() => {
+    const track = thumbsRef.current;
+    if (!track) return undefined;
+    const onWheel = (event) => {
+      if (track.scrollWidth <= track.clientWidth || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+      const atStart = track.scrollLeft <= 0 && event.deltaY < 0;
+      const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 1 && event.deltaY > 0;
+      if (atStart || atEnd) return;
+      event.preventDefault();
+      track.scrollLeft += event.deltaY;
+    };
+    track.addEventListener('wheel', onWheel, { passive: false });
+    return () => track.removeEventListener('wheel', onWheel);
+  }, [media.length]);
+
+  const onThumbsPointerDown = (event) => {
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+    dragRef.current = { startX: event.clientX, startScroll: thumbsRef.current.scrollLeft, moved: false, id: event.pointerId };
+  };
+  const onThumbsPointerMove = (event) => {
+    const drag = dragRef.current;
+    const track = thumbsRef.current;
+    if (!drag || !track) return;
+    const delta = event.clientX - drag.startX;
+    if (!drag.moved && Math.abs(delta) > 5) {
+      drag.moved = true;
+      track.setPointerCapture(drag.id);
+      track.classList.add('is-dragging');
+    }
+    if (drag.moved) track.scrollLeft = drag.startScroll - delta;
+  };
+  const endThumbsDrag = () => {
+    const drag = dragRef.current;
+    dragRef.current = null;
+    const track = thumbsRef.current;
+    if (!drag?.moved || !track) return;
+    track.classList.remove('is-dragging');
+    if (track.hasPointerCapture(drag.id)) track.releasePointerCapture(drag.id);
+  };
   const step = (delta) => setActive((index) => (index + delta + media.length) % media.length);
 
   useEffect(() => {
@@ -97,7 +139,16 @@ export default function GameDetail({ game }) {
             </div>
 
             {media.length > 1 && (
-              <ul className="game-detail-thumbs" aria-label="Project images">
+              <ul
+                ref={thumbsRef}
+                className="game-detail-thumbs"
+                aria-label="Project images"
+                onPointerDown={onThumbsPointerDown}
+                onPointerMove={onThumbsPointerMove}
+                onPointerUp={endThumbsDrag}
+                onPointerCancel={endThumbsDrag}
+                onDragStart={(event) => event.preventDefault()}
+              >
                 {media.map((item, index) => (
                   <li key={item.src}>
                     <button type="button" className={index === active ? 'is-active' : undefined} aria-pressed={index === active} aria-label={`Show ${item.alt}`} onClick={() => setActive(index)}>

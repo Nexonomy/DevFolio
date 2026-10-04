@@ -1035,8 +1035,10 @@ section:is(:hover,:focus-within)>.game-easter-egg * { animation-play-state:runni
 @media (max-width:680px) { .game-lightbox-video { width:calc(100vw - 32px); } }
 
 /* Project page hierarchy: one case-study panel of cards; recognition and team fill the media column. */
-.game-detail-thumbs { scrollbar-width:none; -webkit-mask-image:linear-gradient(90deg,#000 88%,transparent); mask-image:linear-gradient(90deg,#000 88%,transparent); }
-.game-detail-thumbs::-webkit-scrollbar { display:none; }
+.game-detail-thumbs { padding-bottom:10px; cursor:grab; user-select:none; overscroll-behavior-x:contain; }
+.game-detail-thumbs.is-dragging { cursor:grabbing; scroll-behavior:auto; }
+.game-detail-thumbs.is-dragging button { pointer-events:none; }
+.game-detail-thumbs img { -webkit-user-drag:none; }
 .game-detail-side { display:grid; gap:12px; margin-top:6px; }
 .game-detail-side.has-both { grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); }
 .game-detail-side .game-case-recognition,.game-detail-side .game-case-team { padding:16px 18px; }

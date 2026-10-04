@@ -1065,3 +1065,6 @@ section:is(:hover,:focus-within)>.game-easter-egg * { animation-play-state:runni
 @media (max-width:520px) {
   .game-detail-side.has-both { grid-template-columns:1fr; }
 }
+
+/* "Cover coming soon" placeholder: shown whole (never cropped) on its own light-grey backdrop. */
+img.is-placeholder-cover { object-fit:contain !important; transform:none !important; filter:none !important; }

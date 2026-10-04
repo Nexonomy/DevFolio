@@ -8,10 +8,8 @@ import GameEasterEgg from './easter-eggs/GameEasterEgg';
 import FilterRail from './FilterRail';
 import { ProjectTransitionLink } from './ProjectTransition';
 
-const placeholderCovers = [
-  '/project-placeholders/magic-student.png',
-  '/project-placeholders/luggage-character.png',
-];
+const PLACEHOLDER_COVER = '/project-placeholders/coming-soon.jpg';
+const PLACEHOLDER_BG = '#e8e8e8';
 
 export default function OtherProjects({ projects = [], title = 'Additional Projects', description = 'Selected creative and technical work beyond game development.' }) {
   const track = useRef(null);
@@ -261,11 +259,12 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
         const index = projects.indexOf(project);
         return (
         <ProjectTransitionLink draggable="false" key={project.id || project.slug} href={'/projects/' + project.slug} className="other-card other-cover-card">
-          <GlareHover className="other-card-art" background={project.bgColor || '#121212'}>
+          <GlareHover className="other-card-art" background={project.coverImageUrl ? (project.bgColor || '#121212') : PLACEHOLDER_BG}>
             <Image
               draggable="false"
-              src={project.coverImageUrl || placeholderCovers[index % placeholderCovers.length]}
-              alt={`${project.title} project cover`}
+              src={project.coverImageUrl || PLACEHOLDER_COVER}
+              className={project.coverImageUrl ? undefined : 'is-placeholder-cover'}
+              alt={project.coverImageUrl ? `${project.title} project cover` : `${project.title}: cover image coming soon`}
               fill
               sizes="(max-width: 620px) 86vw, (max-width: 980px) 72vw, 34vw"
             />

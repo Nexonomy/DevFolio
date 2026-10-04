@@ -113,7 +113,7 @@ export default function GameDetail({ game }) {
       <header className="game-detail-hero">
         <div className="game-detail-hero-content">
           <div className="game-detail-media">
-            <div className="game-detail-cover" style={{ background: game.bgColor }}>
+            <div className="game-detail-cover" style={{ background: current ? game.bgColor : '#e8e8e8' }}>
               {current?.type !== 'video' && <span className="game-detail-cover-label">Project {projectNumber}</span>}
               {current?.type === 'video' ? (
                 <iframe
@@ -130,10 +130,7 @@ export default function GameDetail({ game }) {
                   <span className="game-detail-cover-zoom" aria-hidden="true">⤢</span>
                 </button>
               ) : (
-                <div className="game-detail-placeholder" aria-hidden="true">
-                  <span className="game-detail-placeholder-mark">{game.emoji || '✳'}</span>
-                  <span>{game.tag}</span>
-                </div>
+                <Image src="/project-placeholders/coming-soon.jpg" alt={`${game.title}: cover image coming soon`} fill className="game-detail-cover-image is-placeholder-cover" priority sizes="(max-width: 900px) 100vw, 640px" />
               )}
               {game.year && current?.type !== 'video' && <span className="game-detail-cover-year">{game.year}</span>}
             </div>

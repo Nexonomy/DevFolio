@@ -18,10 +18,8 @@ import GlareHover from './reactbits/GlareHover';
 import FilterRail from './FilterRail';
 
 const FEATURED_GAME_COUNT = 6;
-const projectPlaceholders = [
-  '/project-placeholders/magic-student.png',
-  '/project-placeholders/luggage-character.png',
-];
+const PLACEHOLDER_COVER = '/project-placeholders/coming-soon.jpg';
+const PLACEHOLDER_BG = '#e8e8e8';
 const sceneLinks = [
   { href: '#intro', number: '01', label: 'Intro', kind: 'intro' },
   { href: '#portfolio', number: '02', label: 'Work', kind: 'work' },
@@ -302,10 +300,11 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
             const index = games.indexOf(game);
             return (
             <ProjectTransitionLink href={`/games/${game.slug}`} className={`saad-project-card saad-project-${index + 1}`} key={game.id || game.slug}>
-              <GlareHover className="saad-project-art" background={game.bgColor || '#242424'}>
+              <GlareHover className="saad-project-art" background={game.coverImageUrl ? (game.bgColor || '#242424') : PLACEHOLDER_BG}>
                 <Image
-                  src={game.coverImageUrl || projectPlaceholders[index % projectPlaceholders.length]}
-                  alt={`${game.title} project cover`}
+                  src={game.coverImageUrl || PLACEHOLDER_COVER}
+                  className={game.coverImageUrl ? undefined : 'is-placeholder-cover'}
+                  alt={game.coverImageUrl ? `${game.title} project cover` : `${game.title}: cover image coming soon`}
                   fill
                   loading="lazy"
                   sizes="(max-width: 700px) 100vw, (max-width: 1250px) 50vw, 33vw"

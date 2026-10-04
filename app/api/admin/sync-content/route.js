@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma';
 import { defaultProfile } from '@/lib/profile';
 import { seedProjects } from '@/lib/portfolio-seed-projects';
 import { revalidatePortfolio } from '@/lib/revalidate-portfolio';
+import { seedCaseStudies } from '@/lib/portfolio-seed-case-studies';
+
+const isEmpty = (value) => value == null || value === '' || (Array.isArray(value) && value.length === 0);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -63,6 +66,20 @@ export async function POST(request) {
         projectResults.push({ slug: game.slug, action: existing ? 'updated' : 'created' });
       }
       summary.projects = { ok: true, count: projectResults.length, details: projectResults };
+    }
+
+    if (scope === 'case-studies') {
+      const filled = [];
+      for (const [slug, study] of Object.entries(seedCaseStudies)) {
+        const game = await prisma.game.findUnique({ where: { slug } });
+        if (!game) continue;
+        const patch = Object.fromEntries(Object.entries(study).filter(([field]) => isEmpty(game[field])));
+        if (Object.keys(patch).length) {
+          await prisma.game.update({ where: { slug }, data: patch });
+          filled.push({ slug, fields: Object.keys(patch).length });
+        }
+      }
+      summary.caseStudies = { ok: true, projects: filled.length, details: filled };
     }
 
     // Bust the cached home and project pages so the sync is visible immediately.

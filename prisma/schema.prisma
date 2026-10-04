@@ -23,6 +23,15 @@ model Game {
   sortOrder     Int          @default(0)
   portfolioSection String     @default("GAME")
   projectContext  String      @default("PERSONAL")
+  role          String?
+  contribution  String?
+  contributions String[]     @default([])
+  team          String[]     @default([])
+  recognition   String?
+  features      String[]     @default([])
+  highlights    String[]     @default([])
+  platforms     String?
+  liveUrl       String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   screenshots   Screenshot[]

@@ -1,0 +1,10 @@
+-- AlterTable
+ALTER TABLE "Game" ADD COLUMN "role" TEXT,
+ADD COLUMN "contribution" TEXT,
+ADD COLUMN "contributions" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "team" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "recognition" TEXT,
+ADD COLUMN "features" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "highlights" TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+ADD COLUMN "platforms" TEXT,
+ADD COLUMN "liveUrl" TEXT;

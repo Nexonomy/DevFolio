@@ -4,8 +4,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { slugify } from '@/lib/slug';
 import { getBlobDeliveryUrl } from '@/lib/blob';
+import { GAME_GENRES } from '@/lib/games';
 
 const emptyVideo = () => ({ youtubeUrl: '', title: '' });
+const joinLines = (value) => (Array.isArray(value) ? value.join('\n') : value || '');
+const CUSTOM_GENRE = '__custom__';
 
 function mapGameToForm(game) {
   return {
@@ -23,6 +26,15 @@ function mapGameToForm(game) {
     sortOrder: game?.sortOrder ?? 0,
     portfolioSection: game?.portfolioSection || 'GAME',
     projectContext: game?.projectContext || 'PERSONAL',
+    role: game?.role || '',
+    contribution: game?.contribution || '',
+    contributions: joinLines(game?.contributions),
+    team: joinLines(game?.team),
+    recognition: game?.recognition || '',
+    features: joinLines(game?.features),
+    highlights: joinLines(game?.highlights),
+    platforms: game?.platforms || '',
+    liveUrl: game?.liveUrl || '',
     screenshots: game?.screenshots?.map((item) => ({
       url: item.url,
       alt: item.alt || '',
@@ -41,6 +53,7 @@ export default function GameForm({ game }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [customGenre, setCustomGenre] = useState(() => Boolean(game?.tag) && !GAME_GENRES.some((genre) => genre.toLowerCase() === game.tag.toLowerCase()));
 
   const updateField = (field, value) => {
     setForm((current) => {
@@ -237,17 +250,48 @@ export default function GameForm({ game }) {
           </select>
         </label>
 
-        <label className="admin-label">
-          {form.portfolioSection === 'GAME' ? 'Genre *' : 'Project type / discipline *'}
-          <input
-            className="admin-input"
-            value={form.tag}
-            onChange={(event) => updateField('tag', event.target.value)}
-            placeholder="PLATFORMER, SHORT FILM, WEB APP..."
-            required
-          />
-          <small className="admin-field-help">This value appears in the public filter navigation.</small>
-        </label>
+        {form.portfolioSection === 'GAME' ? (
+          <label className="admin-label">
+            Genre *
+            <select
+              className="admin-input"
+              value={customGenre ? CUSTOM_GENRE : (GAME_GENRES.find((genre) => genre.toLowerCase() === form.tag.toLowerCase()) || '')}
+              onChange={(event) => {
+                if (event.target.value === CUSTOM_GENRE) { setCustomGenre(true); return; }
+                setCustomGenre(false);
+                updateField('tag', event.target.value);
+              }}
+              required={!customGenre}
+            >
+              <option value="" disabled>Choose a genre…</option>
+              {GAME_GENRES.map((genre) => <option key={genre} value={genre}>{genre}</option>)}
+              <option value={CUSTOM_GENRE}>Custom…</option>
+            </select>
+            {customGenre && (
+              <input
+                className="admin-input"
+                style={{ marginTop: '8px' }}
+                value={form.tag}
+                onChange={(event) => updateField('tag', event.target.value)}
+                placeholder="Type a custom genre"
+                required
+              />
+            )}
+            <small className="admin-field-help">Genres become the filter buttons on the site. Picking from the list keeps filters consistent across projects.</small>
+          </label>
+        ) : (
+          <label className="admin-label">
+            Project type / discipline *
+            <input
+              className="admin-input"
+              value={form.tag}
+              onChange={(event) => updateField('tag', event.target.value)}
+              placeholder="Short film, Web app, Motion design…"
+              required
+            />
+            <small className="admin-field-help">This value appears in the public filter navigation.</small>
+          </label>
+        )}
 
         <label className="admin-label">
           Project Categories
@@ -331,6 +375,49 @@ export default function GameForm({ game }) {
           Published (visible on homepage)
         </label>
       </div>
+
+      <section className="admin-section">
+        <h2 className="admin-section-title">Case study</h2>
+        <p className="admin-hint" style={{ margin: '0 0 16px' }}>Everything here is optional; sections only appear on the project page when filled. For lists, put one item per line. Start a line with “Title: …” to give it a bold heading.</p>
+        <div className="admin-form-grid">
+          <label className="admin-label">
+            My role
+            <input className="admin-input" value={form.role} onChange={(event) => updateField('role', event.target.value)} placeholder="Lead Gameplay Engineer" />
+          </label>
+          <label className="admin-label">
+            Platforms
+            <input className="admin-input" value={form.platforms} onChange={(event) => updateField('platforms', event.target.value)} placeholder="Android, iOS, WebGL" />
+          </label>
+          <label className="admin-label admin-label-full">
+            Contribution summary
+            <textarea className="admin-textarea" rows={3} value={form.contribution} onChange={(event) => updateField('contribution', event.target.value)} placeholder="Two or three sentences on what you owned and delivered." />
+          </label>
+          <label className="admin-label admin-label-full">
+            What I built (one per line)
+            <textarea className="admin-textarea" rows={5} value={form.contributions} onChange={(event) => updateField('contributions', event.target.value)} placeholder={'Netcode: Built Photon Fusion state sync with lag compensation\nMatchmaking lobby with private room codes'} />
+          </label>
+          <label className="admin-label">
+            Team (one per line)
+            <textarea className="admin-textarea" rows={4} value={form.team} onChange={(event) => updateField('team', event.target.value)} placeholder={'3 Developers\n1 UI Artist\n1 Game Designer'} />
+          </label>
+          <label className="admin-label">
+            Recognition / special note
+            <textarea className="admin-textarea" rows={4} value={form.recognition} onChange={(event) => updateField('recognition', event.target.value)} placeholder="Awards, launch results, or a certificate this project earned." />
+          </label>
+          <label className="admin-label admin-label-full">
+            Features &amp; highlights (one per line)
+            <textarea className="admin-textarea" rows={5} value={form.features} onChange={(event) => updateField('features', event.target.value)} placeholder={'Real-time 6-player online racing\nCloud profiles and leaderboards'} />
+          </label>
+          <label className="admin-label admin-label-full">
+            Technical highlights (one per line, “Title: details”)
+            <textarea className="admin-textarea" rows={5} value={form.highlights} onChange={(event) => updateField('highlights', event.target.value)} placeholder={'Procedural generation: Graph-based room stitching with solvability checks'} />
+          </label>
+          <label className="admin-label admin-label-full">
+            Live link (store page, itch.io, or demo)
+            <input className="admin-input" type="url" value={form.liveUrl} onChange={(event) => updateField('liveUrl', event.target.value)} placeholder="https://play.google.com/store/apps/details?id=…" pattern="https://.*" />
+          </label>
+        </div>
+      </section>
 
       <section className="admin-section">
         <h2 className="admin-section-title">Cover Image</h2>

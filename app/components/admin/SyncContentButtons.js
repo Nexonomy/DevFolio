@@ -12,6 +12,11 @@ function friendly(summary) {
     const updated = summary.projects.details?.filter((p) => p.action === 'updated').length ?? 0;
     parts.push(`${summary.projects.count} projects synced — ${created} created, ${updated} updated.`);
   }
+  if (summary?.caseStudies?.ok) {
+    parts.push(summary.caseStudies.projects
+      ? `Filled empty case-study fields on ${summary.caseStudies.projects} project${summary.caseStudies.projects === 1 ? '' : 's'}.`
+      : 'Every case study already has content; nothing changed.');
+  }
   return parts.join(' ');
 }
 
@@ -62,10 +67,11 @@ function SyncButton({ scope, label, className = 'admin-button' }) {
 export default function SyncContentButtons() {
   return (
     <div style={{ display: 'grid', gap: '14px' }}>
-      <SyncButton scope="profile" label="Sync profile from source" className="admin-button admin-button-primary" />
+      <SyncButton scope="case-studies" label="Fill project case studies (safe)" className="admin-button admin-button-primary" />
+      <SyncButton scope="profile" label="Reset profile from source" />
       <SyncButton scope="projects" label="Sync all 10 projects" />
       <p style={{ margin: 0, opacity: 0.6, fontSize: '12px' }}>
-        Warning: syncing the profile replaces everything you edited in Profile &amp; Content with the copy in the codebase. Only use it to reset. Project sync updates the 10 seeded projects by slug and deletes nothing.
+        “Fill project case studies” only writes into empty fields (role, contribution, features…) for the 10 master-doc projects, so it never overwrites your edits. “Reset profile” replaces everything in Profile &amp; Content with the codebase copy, so only use it to start over. Project sync overwrites the 10 seeded projects’ core details by slug and deletes nothing.
       </p>
     </div>
   );

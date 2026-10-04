@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/api-auth';
-import { gameInclude, parseGameBody } from '@/lib/games';
+import { gameInclude, parseGameBody, pickCaseStudy } from '@/lib/games';
 import { deleteDemoProject, readDemoProjects, updateDemoProject } from '@/lib/demo-store';
 import { isDemo } from '@/lib/portfolio';
 import { revalidatePortfolio } from '@/lib/revalidate-portfolio';
@@ -59,6 +59,7 @@ export async function PUT(request, { params }) {
           categories:data.categories, tech:data.tech, year:data.year, emoji:data.emoji,
           bgColor:data.bgColor, coverImageUrl:data.coverImageUrl, published:data.published,
           sortOrder:data.sortOrder, portfolioSection:data.portfolioSection, projectContext:data.projectContext,
+        ...pickCaseStudy(data),
           screenshots:{ create:data.screenshots.filter((item) => item.url) },
           videos:{ create:data.videos.filter((item) => item.youtubeUrl) },
         },

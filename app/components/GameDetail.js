@@ -6,6 +6,16 @@ import Link from 'next/link';
 import { extractYouTubeId } from '@/lib/youtube';
 import { getBlobDeliveryUrl } from '@/lib/blob';
 
+function splitTitle(text) {
+  const match = String(text).match(/^([^:]{2,60}):\s+(.+)$/s);
+  return match ? [match[1].trim(), match[2].trim()] : [String(text), ''];
+}
+
+function SplitLine({ text }) {
+  const [title, body] = splitTitle(text);
+  return body ? <><strong>{title}</strong> {body}</> : title;
+}
+
 export default function GameDetail({ game }) {
   const contextLabels = { PERSONAL:'Personal project', COMPANY:'Company project', ACADEMIC:'Academic project', HACKATHON:'Hackathon' };
   const [lightboxUrl, setLightboxUrl] = useState(null);
@@ -13,7 +23,11 @@ export default function GameDetail({ game }) {
   const screenshotTrackRef = useRef(null);
   const galleryAnimationRef = useRef(null);
   const isGame = game.portfolioSection !== 'OTHER';
-  const techItems = (game.tech || '').split('·').map((item) => item.trim()).filter(Boolean);
+  const techItems = (game.tech || '').split(/[·,]/).map((item) => item.trim()).filter(Boolean);
+  const contributions = game.contributions || [];
+  const team = game.team || [];
+  const features = game.features || [];
+  const highlights = game.highlights || [];
   const projectNumber = String((game.sortOrder ?? 0) + 1).padStart(2, '0');
   useEffect(() => {
     if (lightboxUrl) dialogRef.current?.showModal();
@@ -83,25 +97,86 @@ export default function GameDetail({ game }) {
             <h1 className="game-detail-title">{game.title}</h1>
             <p className="game-detail-description">{game.description}</p>
             <div className="game-detail-facts">
+              {game.role && <div className="is-wide"><small>My role</small><strong>{game.role}</strong></div>}
               {game.year && <div><small>Year</small><strong>{game.year}</strong></div>}
-              <div><small>Discipline</small><strong>{game.tag}</strong></div>
+              <div><small>{isGame ? 'Genre' : 'Discipline'}</small><strong>{game.tag}</strong></div>
+              {game.platforms && <div><small>Platforms</small><strong>{game.platforms}</strong></div>}
+              <div><small>Context</small><strong>{contextLabels[game.projectContext] || 'Personal project'}</strong></div>
             </div>
-            {techItems.length > 0 && <ul className="game-detail-tech-list" aria-label="Tools and technologies">{techItems.map((item) => <li key={item}>{item}</li>)}</ul>}
+            {game.liveUrl && <a className="game-detail-live" href={game.liveUrl} target="_blank" rel="noreferrer">View live project <b aria-hidden="true">↗</b></a>}
           </div>
         </div>
       </header>
 
-      {(game.overview || game.challenge || game.role || game.contributions?.length > 0) && (
-        <section className="game-detail-section game-design-breakdown">
-          <p className="game-detail-section-kicker">Development breakdown</p>
+      {(game.contribution || contributions.length > 0 || team.length > 0 || game.recognition) && (
+        <section className="game-detail-section">
+          <p className="game-detail-section-kicker">Role &amp; contribution</p>
           <h2 className="game-detail-section-title">What I built</h2>
-          <div className="game-design-grid">
-            {game.overview && <article><span>01 / Overview</span><p>{game.overview}</p></article>}
-            {game.challenge && <article><span>02 / Development challenge</span><p>{game.challenge}</p></article>}
-            {game.role && <article><span>03 / My role</span><p>{game.role}</p></article>}
-            {game.contributions?.length > 0 && <article><span>04 / Contributions</span><ul>{game.contributions.map((item) => <li key={item}>{item}</li>)}</ul></article>}
+          <div className="game-case-layout">
+            <div className="game-case-main">
+              {game.contribution && <p className="game-case-lead">{game.contribution}</p>}
+              {contributions.length > 0 && (
+                <ul className="game-case-list">
+                  {contributions.map((item) => <li key={item}><SplitLine text={item} /></li>)}
+                </ul>
+              )}
+            </div>
+            {(team.length > 0 || game.recognition) && (
+              <aside className="game-case-aside">
+                {game.recognition && (
+                  <div className="game-case-recognition">
+                    <span><b aria-hidden="true">★</b> Recognition</span>
+                    <p>{game.recognition}</p>
+                  </div>
+                )}
+                {team.length > 0 && (
+                  <div className="game-case-team">
+                    <span>Team</span>
+                    <ul>{team.map((member) => <li key={member}>{member}</li>)}</ul>
+                  </div>
+                )}
+              </aside>
+            )}
           </div>
-          {game.sourceUrl && <a className="game-source-link" href={game.sourceUrl} target="_blank" rel="noreferrer">View original project notes ↗</a>}
+        </section>
+      )}
+
+      {(techItems.length > 0 || features.length > 0) && (
+        <section className="game-detail-section">
+          <div className="game-case-split">
+            {features.length > 0 && (
+              <div>
+                <p className="game-detail-section-kicker">Features</p>
+                <h2 className="game-detail-section-title">Highlights</h2>
+                <ul className="game-case-features">{features.map((item) => <li key={item}>{item}</li>)}</ul>
+              </div>
+            )}
+            {techItems.length > 0 && (
+              <div>
+                <p className="game-detail-section-kicker">Tools</p>
+                <h2 className="game-detail-section-title">Tech stack</h2>
+                <ul className="game-detail-tech-list game-case-tech" aria-label="Tools and technologies">{techItems.map((item) => <li key={item}>{item}</li>)}</ul>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {highlights.length > 0 && (
+        <section className="game-detail-section">
+          <p className="game-detail-section-kicker">Behind the build</p>
+          <h2 className="game-detail-section-title">Technical highlights</h2>
+          <div className="game-design-grid">
+            {highlights.map((item, index) => {
+              const [title, body] = splitTitle(item);
+              return (
+                <article key={item}>
+                  <span>{String(index + 1).padStart(2, '0')}{body ? ` / ${title}` : ''}</span>
+                  <p>{body || title}</p>
+                </article>
+              );
+            })}
+          </div>
         </section>
       )}
 

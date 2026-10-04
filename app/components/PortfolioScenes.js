@@ -87,7 +87,7 @@ function CertificateThumb({ item }) {
     <>
       <button type="button" className="saad-certificate-thumb" onClick={() => dialogRef.current?.showModal()} aria-label={`View certificate: ${label}`}>
         <img src={item.certificateImageUrl} alt="" loading="lazy" onError={() => setFailed(true)} />
-        <span>View certificate ↗</span>
+        <span>View</span>
       </button>
       <dialog ref={dialogRef} className="saad-certificate-dialog" aria-label={label} onClick={(event) => { if (event.target === event.currentTarget) close(); }}>
         <figure>

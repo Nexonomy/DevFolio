@@ -715,10 +715,13 @@ body:has(.saad-site) .scroll-rail { display:block; }
 .saad-certificate-thumb:hover img,.saad-certificate-thumb:focus-visible img { transform:scale(1.04); filter:none; }
 .saad-certificate-thumb:hover,.saad-certificate-thumb:focus-visible { border-color:var(--saad-orange); }
 .saad-certificate-thumb:focus-visible { outline:1px solid var(--saad-cream); outline-offset:3px; }
-.saad-certificate-dialog { width:min(1100px,calc(100vw - 32px)); max-height:calc(100vh - 32px); padding:0; border:1px solid #444; border-radius:var(--radius-sm); color:var(--saad-cream); background:#0d0d0d; }
+.saad-certificate-dialog { position:fixed; inset:0; margin:auto; width:fit-content; max-width:min(1100px,calc(100vw - 32px)); height:fit-content; max-height:calc(100vh - 32px); padding:0; border:1px solid #444; border-radius:var(--radius-sm); color:var(--saad-cream); background:#0d0d0d; }
 .saad-certificate-dialog::backdrop { background:#000c; backdrop-filter:blur(4px); }
+.has-pixel-cursor .saad-certificate-dialog,.has-pixel-cursor .saad-certificate-dialog * { cursor:auto !important; }
+.has-pixel-cursor .saad-certificate-dialog button { cursor:pointer !important; }
+.has-pixel-cursor .saad-certificate-dialog::backdrop { cursor:zoom-out; }
 .saad-certificate-dialog figure { margin:0; }
-.saad-certificate-dialog img { display:block; width:100%; max-height:calc(100vh - 110px); object-fit:contain; background:#000; }
+.saad-certificate-dialog img { display:block; max-width:100%; width:auto; max-height:calc(100vh - 110px); object-fit:contain; background:#000; }
 .saad-certificate-dialog figcaption { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 16px; font-size:13px; }
 .saad-certificate-dialog figcaption button { flex:none; width:34px; height:34px; border:1px solid #555; color:var(--saad-cream); background:transparent; cursor:pointer; }
 .saad-certificate-dialog figcaption button:hover,.saad-certificate-dialog figcaption button:focus-visible { color:#0a0a0a; border-color:var(--saad-orange); background:var(--saad-orange); }

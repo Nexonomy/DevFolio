@@ -1,17 +1,18 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// Adapted from React Bits: AnimatedContent (CSS variant).
+const EASE = 'cubic-bezier(.215,.61,.355,1)';
+
+// Adapted from React Bits: AnimatedContent, using IntersectionObserver and CSS transitions instead of GSAP.
+// Content is visible by default; only elements still below the fold get hidden, then revealed on scroll.
 export default function AnimatedContent({
   children,
   distance = 34,
   direction = 'vertical',
   reverse = false,
   duration = 0.72,
-  ease = 'power3.out',
+  ease: _ease,
   initialOpacity = 0,
   scale = 0.985,
   threshold = 0.12,
@@ -23,50 +24,32 @@ export default function AnimatedContent({
 
   useEffect(() => {
     const element = ref.current;
-    if (!element) return undefined;
+    if (!element || !('IntersectionObserver' in window)) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    if (element.getBoundingClientRect().top < window.innerHeight * (1 - threshold)) return undefined;
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) {
-      gsap.set(element, { clearProps: 'all', visibility: 'visible' });
-      return undefined;
-    }
-
-    gsap.registerPlugin(ScrollTrigger);
-    const axis = direction === 'horizontal' ? 'x' : 'y';
+    const axis = direction === 'horizontal' ? 'X' : 'Y';
     const offset = reverse ? -distance : distance;
-    const startPercent = (1 - threshold) * 100;
+    element.style.opacity = String(initialOpacity);
+    element.style.transform = `translate${axis}(${offset}px) scale(${scale})`;
 
-    gsap.set(element, { [axis]: offset, scale, opacity: initialOpacity, visibility: 'visible' });
-    const tween = gsap.to(element, {
-      [axis]: 0,
-      scale: 1,
-      opacity: 1,
-      duration,
-      delay,
-      ease,
-      paused: true,
-    });
-    const trigger = ScrollTrigger.create({
-      trigger: element,
-      start: `top ${startPercent}%`,
-      once: true,
-      onEnter: () => tween.play(),
-    });
-
-    // Safety net: if ScrollTrigger never fires (element already past viewport, GSAP race,
-    // crawler-sized viewport, etc.), reveal the content so it is never permanently invisible.
-    const safety = window.setTimeout(() => {
-      if (tween.progress() === 0) {
-        gsap.set(element, { [axis]: 0, scale: 1, opacity: 1, visibility: 'visible', clearProps: 'transform,opacity' });
-      }
-    }, 1500);
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      element.style.transition = `opacity ${duration}s ${EASE} ${delay}s, transform ${duration}s ${EASE} ${delay}s`;
+      void element.offsetHeight;
+      element.style.opacity = '';
+      element.style.transform = '';
+    }, { rootMargin: `0px 0px -${Math.round(threshold * 100)}% 0px` });
+    observer.observe(element);
 
     return () => {
-      window.clearTimeout(safety);
-      trigger.kill();
-      tween.kill();
+      observer.disconnect();
+      element.style.opacity = '';
+      element.style.transform = '';
+      element.style.transition = '';
     };
-  }, [delay, direction, distance, duration, ease, initialOpacity, reverse, scale, threshold]);
+  }, [delay, direction, distance, duration, initialOpacity, reverse, scale, threshold]);
 
-  return <div ref={ref} className={className} style={{ visibility: 'hidden' }} {...props}>{children}</div>;
+  return <div ref={ref} className={className} {...props}>{children}</div>;
 }

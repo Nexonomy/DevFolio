@@ -3,6 +3,7 @@
 import { SessionProvider } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import AdminNav from '@/app/components/admin/AdminNav';
+import './admin.css';
 
 function AdminShell({ children }) {
   const pathname = usePathname();

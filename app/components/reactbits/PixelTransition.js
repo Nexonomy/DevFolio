@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useRef } from 'react';
-import { gsap } from 'gsap';
 import './PixelTransition.css';
+
+// GSAP is only needed when a transition plays, so it stays out of the initial bundle.
+let gsapPromise;
+const loadGsap = () => (gsapPromise ??= import('gsap').then((module) => module.gsap || module.default));
 
 // Adapted from React Bits: PixelTransition, exposed as a controlled transition overlay.
 export default function PixelTransition({ active, reveal = false, onMidpoint, onComplete, columns = 12, rows = 8, variant = 'scatter' }) {
@@ -13,6 +16,16 @@ export default function PixelTransition({ active, reveal = false, onMidpoint, on
   const reducedMotionRef = useRef(false);
   const pixelCount = columns * rows;
   const pixels = useMemo(() => Array.from({ length: pixelCount }, (_, index) => index), [pixelCount]);
+
+  useEffect(() => {
+    const warm = () => { loadGsap().catch(() => {}); };
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(warm, { timeout: 6000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(warm, 3000);
+    return () => window.clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     revealRef.current = reveal;
@@ -71,23 +84,34 @@ export default function PixelTransition({ active, reveal = false, onMidpoint, on
     };
     const animation = animations[variant] || animations.scatter;
 
-    gsap.set(gridRef.current, { visibility:'visible', opacity:1 });
-    gsap.set(elements, animation.initial);
-    const timeline = gsap.timeline({ onComplete });
-    timelineRef.current = timeline;
-    timeline.to(elements, animation.enter);
-    timeline.call(() => {
-      waitingToRevealRef.current = true;
+    let disposed = false;
+    let timeline = null;
+    loadGsap().then((gsap) => {
+      if (disposed || !gridRef.current) return;
+      gsap.set(gridRef.current, { visibility:'visible', opacity:1 });
+      gsap.set(elements, animation.initial);
+      timeline = gsap.timeline({ onComplete });
+      timelineRef.current = timeline;
+      timeline.to(elements, animation.enter);
+      timeline.call(() => {
+        waitingToRevealRef.current = true;
+        onMidpoint?.();
+        if (revealRef.current) waitingToRevealRef.current = false;
+        else timeline.pause();
+      });
+      timeline.to(gridRef.current, { opacity:0, duration:0.24, ease:'power2.out' }, '+=0.06');
+    }).catch(() => {
+      // If the animation library can't load, still navigate and finish.
+      if (disposed) return;
       onMidpoint?.();
-      if (revealRef.current) waitingToRevealRef.current = false;
-      else timeline.pause();
+      onComplete?.();
     });
-    timeline.to(gridRef.current, { opacity:0, duration:0.24, ease:'power2.out' }, '+=0.06');
 
     return () => {
+      disposed = true;
       waitingToRevealRef.current = false;
       timelineRef.current = null;
-      timeline.kill();
+      timeline?.kill();
     };
   }, [active, columns, onComplete, onMidpoint, rows, variant]);
 

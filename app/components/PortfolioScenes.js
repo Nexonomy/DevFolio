@@ -1,15 +1,18 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import OtherProjects from './OtherProjects';
 import { ProjectTransitionLink } from './ProjectTransition';
-import RetroEasterEggs from './easter-eggs/RetroEasterEggs';
-import SecretChest from './easter-eggs/SecretChest';
-import GameEasterEgg from './easter-eggs/GameEasterEgg';
-import RetroAudioToggle from './easter-eggs/RetroAudioToggle';
-import BackgroundMusic from './easter-eggs/BackgroundMusic';
 import AnimatedContent from './reactbits/AnimatedContent';
+
+// Decorative extras load after hydration so they stay out of the critical bundle.
+const RetroEasterEggs = dynamic(() => import('./easter-eggs/RetroEasterEggs'), { ssr: false });
+const SecretChest = dynamic(() => import('./easter-eggs/SecretChest'), { ssr: false });
+const GameEasterEgg = dynamic(() => import('./easter-eggs/GameEasterEgg'), { ssr: false });
+const RetroAudioToggle = dynamic(() => import('./easter-eggs/RetroAudioToggle'), { ssr: false });
+const BackgroundMusic = dynamic(() => import('./easter-eggs/BackgroundMusic'), { ssr: false });
 import ClickSpark from './reactbits/ClickSpark';
 import GlareHover from './reactbits/GlareHover';
 import FilterRail from './FilterRail';

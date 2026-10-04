@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/api-auth';
 import { prisma } from '@/lib/prisma';
 import { defaultProfile } from '@/lib/profile';
 import { seedProjects } from '@/lib/portfolio-seed-projects';
+import { revalidatePortfolio } from '@/lib/revalidate-portfolio';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -62,6 +63,13 @@ export async function POST(request) {
         projectResults.push({ slug: game.slug, action: existing ? 'updated' : 'created' });
       }
       summary.projects = { ok: true, count: projectResults.length, details: projectResults };
+    }
+
+    // Bust the cached home and project pages so the sync is visible immediately.
+    try {
+      revalidatePortfolio(...seedProjects);
+    } catch (revalError) {
+      console.warn('[sync-content] revalidate warning:', revalError?.message);
     }
 
     return NextResponse.json({ ok: true, scope, summary });

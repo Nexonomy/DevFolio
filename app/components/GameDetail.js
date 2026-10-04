@@ -115,6 +115,23 @@ export default function GameDetail({ game }) {
                 ))}
               </ul>
             )}
+
+            {(game.recognition || team.length > 0) && (
+              <div className={`game-detail-side${game.recognition && team.length > 0 ? ' has-both' : ''}`}>
+                {game.recognition && (
+                  <div className="game-case-recognition">
+                    <span><b aria-hidden="true">★</b> Recognition</span>
+                    <p>{game.recognition}</p>
+                  </div>
+                )}
+                {team.length > 0 && (
+                  <div className="game-case-team">
+                    <span>Team</span>
+                    <ul>{team.map((member) => <li key={member}>{member}</li>)}</ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="game-detail-meta">
@@ -134,60 +151,40 @@ export default function GameDetail({ game }) {
         </div>
       </header>
 
-      {(game.contribution || contributions.length > 0 || team.length > 0 || game.recognition) && (
-        <section className="game-detail-section">
-          <p className="game-detail-section-kicker">Role &amp; contribution</p>
-          <h2 className="game-detail-section-title">What I built</h2>
-          <div className="game-case-layout">
-            <div className="game-case-main">
-              {game.contribution && <p className="game-case-lead">{game.contribution}</p>}
-              {contributions.length > 0 && (
-                <ul className="game-case-list">
-                  {contributions.map((item) => <li key={item}><SplitLine text={item} /></li>)}
-                </ul>
-              )}
-            </div>
-            {(team.length > 0 || game.recognition) && (
-              <aside className="game-case-aside">
-                {game.recognition && (
-                  <div className="game-case-recognition">
-                    <span><b aria-hidden="true">★</b> Recognition</span>
-                    <p>{game.recognition}</p>
-                  </div>
+      {(game.contribution || contributions.length > 0 || features.length > 0 || highlights.length > 0) && (
+        <section className="game-detail-section game-case" aria-label="Case study">
+          <h2 className="game-case-heading">Case study</h2>
+          <div className="game-case-grid">
+            {(game.contribution || contributions.length > 0) && (
+              <article className="game-case-card is-wide">
+                <p className="game-case-label">Role &amp; contribution</p>
+                <h3>What I built</h3>
+                {game.contribution && <p className="game-case-lead">{game.contribution}</p>}
+                {contributions.length > 0 && (
+                  <ul className={`game-case-list${contributions.length > 2 ? ' is-columns' : ''}`}>
+                    {contributions.map((item) => <li key={item}><SplitLine text={item} /></li>)}
+                  </ul>
                 )}
-                {team.length > 0 && (
-                  <div className="game-case-team">
-                    <span>Team</span>
-                    <ul>{team.map((member) => <li key={member}>{member}</li>)}</ul>
-                  </div>
-                )}
-              </aside>
+              </article>
             )}
-          </div>
-        </section>
-      )}
-
-      {(features.length > 0 || highlights.length > 0) && (
-        <section className="game-detail-section">
-          <div className="game-case-split">
             {features.length > 0 && (
-              <div>
-                <p className="game-detail-section-kicker">Features</p>
-                <h2 className="game-detail-section-title">Highlights</h2>
+              <article className={`game-case-card${highlights.length === 0 ? ' is-wide' : ''}`}>
+                <p className="game-case-label">Features</p>
+                <h3>Highlights</h3>
                 <ul className="game-case-features">{features.map((item) => <li key={item}>{item}</li>)}</ul>
-              </div>
+              </article>
             )}
             {highlights.length > 0 && (
-              <div>
-                <p className="game-detail-section-kicker">Behind the build</p>
-                <h2 className="game-detail-section-title">Technical notes</h2>
+              <article className={`game-case-card${features.length === 0 ? ' is-wide' : ''}`}>
+                <p className="game-case-label">Behind the build</p>
+                <h3>Technical notes</h3>
                 <ol className="game-case-notes">
                   {highlights.map((item) => {
                     const [title, body] = splitTitle(item);
                     return <li key={item}>{body ? <><strong>{title}</strong><p>{body}</p></> : <p>{title}</p>}</li>;
                   })}
                 </ol>
-              </div>
+              </article>
             )}
           </div>
         </section>

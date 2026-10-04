@@ -1033,3 +1033,33 @@ section:is(:hover,:focus-within)>.game-easter-egg * { animation-play-state:runni
 .game-detail-thumb-play { position:absolute; inset:0; display:grid; place-items:center; color:#fff; background:#0006; font-size:14px; }
 .game-lightbox-video { width:min(1200px,calc(100vw - 140px)); aspect-ratio:16/9; max-height:calc(100vh - 120px); border:0; border-radius:var(--radius-lg); background:#000; }
 @media (max-width:680px) { .game-lightbox-video { width:calc(100vw - 32px); } }
+
+/* Project page hierarchy: one case-study panel of cards; recognition and team fill the media column. */
+.game-detail-thumbs { scrollbar-width:none; -webkit-mask-image:linear-gradient(90deg,#000 88%,transparent); mask-image:linear-gradient(90deg,#000 88%,transparent); }
+.game-detail-thumbs::-webkit-scrollbar { display:none; }
+.game-detail-side { display:grid; gap:12px; margin-top:6px; }
+.game-detail-side.has-both { grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); }
+.game-detail-side .game-case-recognition,.game-detail-side .game-case-team { padding:16px 18px; }
+.game-detail-side .game-case-team ul { gap:6px; margin-top:10px; }
+.game-detail-side .game-case-team li,.game-detail-side .game-case-recognition p { font-size:13px; }
+.game-detail-side .game-case-recognition p { margin-top:8px; }
+.game-detail-section.game-case { width:min(1180px,100%); padding:36px 0 48px; }
+.game-case-heading { margin:0 0 16px; color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; }
+.game-case-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.game-case-card { min-width:0; padding:clamp(20px,2.4vw,30px); border:1px solid #2a2c32; border-radius:var(--radius-lg); background:linear-gradient(160deg,#141519,#0f1013); }
+.game-case-card.is-wide { grid-column:1 / -1; }
+.game-case-label { margin:0; color:var(--orange); font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; }
+.game-case-card h3 { margin:6px 0 0; color:var(--ink); font:650 clamp(20px,1.8vw,26px)/1.15 var(--font-space),Arial,sans-serif; letter-spacing:-.03em; }
+.game-case-card .game-case-lead { max-width:820px; margin:14px 0 0; font-size:15px; }
+.game-case-card .game-case-list { margin-top:18px; }
+.game-case-card .game-case-list li { background:#0b0c0e; }
+.game-case-list.is-columns { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.game-case-card .game-case-features,.game-case-card .game-case-notes { margin-top:16px; }
+.game-detail-footer { padding-top:28px; }
+@media (max-width:900px) {
+  .game-case-grid,.game-case-list.is-columns { grid-template-columns:1fr; }
+  .game-case-card.is-wide { grid-column:auto; }
+}
+@media (max-width:520px) {
+  .game-detail-side.has-both { grid-template-columns:1fr; }
+}

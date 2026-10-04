@@ -76,6 +76,13 @@ function ExperienceMark({ item, index }) {
   );
 }
 
+function groupSpan(roles) {
+  const parts = (period) => String(period || '').split(/\s+[—–-]\s+/);
+  const end = parts(roles[0].period).at(-1);
+  const start = parts(roles.at(-1).period)[0];
+  return start === end ? start : `${start} — ${end}`;
+}
+
 function groupByOrganization(items) {
   const groups = [];
   for (const item of items) {
@@ -107,7 +114,7 @@ function ExperienceGroup({ title, note, number, label, items }) {
               </div>
             ) : (
               <div className="saad-experience-card">
-                <div className="saad-experience-meta"><time>{group.roles.length} roles</time><small>{group.roles.some((role) => role.current) ? 'Current' : 'Company'}</small></div>
+                <div className="saad-experience-meta"><time>{groupSpan(group.roles)}</time><small>{group.roles.length} roles</small></div>
                 <h4>{group.organization}</h4>
                 <ol className="saad-role-tree">
                   {group.roles.map((role, roleIndex) => (
@@ -133,7 +140,8 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
   const copy = profile.sectionCopy || {};
   const experiences = profile.experiences || [];
   const professionalExperience = experiences.filter((item) => item.track === 'PROFESSIONAL');
-  const academicExperience = experiences.filter((item) => item.track !== 'PROFESSIONAL');
+  const academicExperience = experiences.filter((item) => item.track === 'ACADEMIC');
+  const achievements = experiences.filter((item) => item.track === 'ACHIEVEMENT');
   const [contactStatus, setContactStatus] = useState('');
   const [gameFilter, setGameFilter] = useState('All');
   const [experienceFilter, setExperienceFilter] = useState('All');
@@ -286,15 +294,16 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
         </div>
         </AnimatedContent>
         <FilterRail
-          items={['All', 'Professional', 'Academic']}
+          items={['All', 'Professional', 'Academic', 'Achievements']}
           value={experienceFilter}
           onChange={setExperienceFilter}
           label="Filter experience by track"
           className="experience-filter-nav"
         />
         <div className="saad-experience-columns">
-          {experienceFilter !== 'Academic' && <ExperienceGroup number="01" title="Professional experience" note="Industry and independent practice" label="Career track" items={professionalExperience} />}
-          {experienceFilter !== 'Professional' && <ExperienceGroup number="02" title="Academic experience" note="Campus teams, societies, and jams" label="Learning track" items={academicExperience} />}
+          {['All', 'Professional'].includes(experienceFilter) && professionalExperience.length > 0 && <ExperienceGroup number="01" title="Professional experience" note="Studios and industry roles" label="Career track" items={professionalExperience} />}
+          {['All', 'Academic'].includes(experienceFilter) && academicExperience.length > 0 && <ExperienceGroup number="02" title="Academic experience" note="Campus leadership and mentoring" label="Community track" items={academicExperience} />}
+          {['All', 'Achievements'].includes(experienceFilter) && achievements.length > 0 && <ExperienceGroup number="03" title="Achievements" note="Competitions and recognition" label="Honors" items={achievements} />}
         </div>
         <div className="saad-toolbox">
           <div><span>Development toolkit</span><p>Tools I use to move from an idea to a playable build.</p></div>

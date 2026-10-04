@@ -490,7 +490,7 @@ a { color:inherit; }
   .saad-section-head { margin-bottom:32px; }
   .saad-site .other-work-section { padding-top:105px; padding-bottom:64px; }
   .saad-experience-group-head { min-height:96px; padding-block:16px; }
-  .saad-experience-group .saad-timeline li { min-height:210px; padding-block:21px; }
+  .saad-experience-group .saad-timeline li { min-height:0; padding-block:21px; }
   .saad-contact { min-height:calc(100svh - 76px); align-content:start; padding-top:105px; padding-bottom:70px; }
   .saad-contact-grid { grid-template-columns:minmax(280px,.72fr) minmax(480px,1.28fr); gap:clamp(52px,7vw,94px); align-items:center; }
   .saad-contact h2 { font-size:clamp(3.2rem,6vw,5.5rem); }
@@ -699,7 +699,7 @@ body:has(.saad-site) .scroll-rail { display:block; }
 .saad-experience-group-head h3 { margin:0; font-size:clamp(23px,3vw,36px); line-height:1; letter-spacing:-.04em; }
 .saad-experience-group-head>b { color:var(--saad-muted); font-size:11px; font-weight:650; text-transform:uppercase; letter-spacing:.1em; }
 .saad-experience-group .saad-timeline { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; max-width:none; border:0; }
-.saad-experience-group .saad-timeline li { position:relative; display:grid; grid-template-columns:44px minmax(0,1fr); gap:14px; min-height:235px; padding:25px 24px; border:0; border-right:1px solid #2f2f2f; border-bottom:1px solid #2f2f2f; transition:background .2s; }
+.saad-experience-group .saad-timeline li { position:relative; display:grid; grid-template-columns:44px minmax(0,1fr); gap:14px; min-height:0; padding:25px 24px; border:0; border-right:1px solid #2f2f2f; border-bottom:1px solid #2f2f2f; transition:background .2s; }
 .saad-experience-group .saad-timeline li:nth-child(even) { border-right:0; }
 .saad-experience-group .saad-timeline li:hover { background:#151515; }
 .saad-experience-index { position:relative; display:grid; width:42px; height:42px; overflow:hidden; place-items:center; border:1px solid #484848; border-radius:var(--radius-xs); color:var(--saad-orange); background:#0a0a0a; font-size:10px; font-weight:750; transition:color .2s,background .2s,border-color .2s,transform .2s; }
@@ -709,8 +709,8 @@ body:has(.saad-site) .scroll-rail { display:block; }
 .saad-experience-group .saad-timeline li:hover .saad-experience-index.has-logo { border-color:var(--saad-orange); transform:translateY(-2px); }
 .saad-experience-group .saad-timeline li:hover .saad-experience-index.has-logo img { transform:scale(1.08); }
 .saad-experience-card { min-width:0; }
-.saad-experience-group .saad-timeline li.is-grouped { grid-column:1 / -1; border-right:0; }
-.saad-role-tree { position:relative; margin:18px 0 0; padding:0 0 0 22px; list-style:none; }
+.saad-role-tree { position:relative; margin:16px 0 0; padding:0 0 0 22px; list-style:none; }
+.saad-role-tree .saad-experience-meta { flex-wrap:wrap; gap:4px 12px; }
 .saad-role-tree::before { content:""; position:absolute; top:6px; bottom:10px; left:5px; width:1px; background:#3a3a3a; }
 .saad-experience-group .saad-timeline .saad-role-tree li { position:relative; display:block; min-height:0; padding:0 0 20px; border:0; background:none; }
 .saad-experience-group .saad-timeline .saad-role-tree li:last-child { padding-bottom:0; }

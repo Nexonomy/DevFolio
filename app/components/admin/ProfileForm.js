@@ -111,7 +111,7 @@ export default function ProfileForm({ initialProfile }) {
             <label className="admin-label">Role<input className="admin-input" value={item.role} onChange={(e) => updateItem('experiences', index, { role: e.target.value })} required /></label>
             <label className="admin-label">Organization<input className="admin-input" value={item.organization} onChange={(e) => updateItem('experiences', index, { organization: e.target.value })} /></label>
             <label className="admin-label">Type<input className="admin-input" value={item.type} onChange={(e) => updateItem('experiences', index, { type: e.target.value })} /></label>
-            <label className="admin-label">Experience section<select className="admin-input" value={item.track || 'ACADEMIC'} onChange={(e) => updateItem('experiences', index, { track: e.target.value })}><option value="PROFESSIONAL">Professional experience</option><option value="ACADEMIC">Academic experience</option></select></label>
+            <label className="admin-label">Experience section<select className="admin-input" value={item.track || 'ACADEMIC'} onChange={(e) => updateItem('experiences', index, { track: e.target.value })}><option value="PROFESSIONAL">Professional experience</option><option value="ACADEMIC">Academic experience</option><option value="ACHIEVEMENT">Achievement</option></select></label>
             <label className="admin-label">Icon<input className="admin-input" value={item.icon} onChange={(e) => updateItem('experiences', index, { icon: e.target.value })} /></label>
             <div className="admin-experience-logo-editor admin-label-full">
               <div className="admin-experience-logo-preview">

@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/api-auth';
 import { getProfile } from '@/lib/profile';
 import { isDemo } from '@/lib/portfolio';
 import ExportButton from '@/app/components/admin/ExportButton';
+import SyncContentButtons from '@/app/components/admin/SyncContentButtons';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,6 +133,13 @@ export default async function AdminIntegrationsPage() {
             Downloads a single JSON file with your profile, every game, every other project, screenshots, videos, and categories — the complete state the public site renders from.
           </p>
           <ExportButton className="admin-button" />
+        </Row>
+
+        <Row title="Sync from source (profile + projects)" status={statusBadge(true, 'Available')}>
+          <p style={{ margin: 0, opacity: 0.75, fontSize: '13px' }}>
+            Pushes the canonical profile and the 10-project master seed from the codebase into Postgres. Use after a profile rewrite, or when adding a new project record to the seed. Idempotent — safe to re-run.
+          </p>
+          <SyncContentButtons />
         </Row>
       </div>
     </div>

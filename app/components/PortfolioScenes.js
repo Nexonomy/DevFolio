@@ -79,20 +79,41 @@ function ExperienceMark({ item, index }) {
 function CertificateThumb({ item }) {
   const dialogRef = useRef(null);
   const [failed, setFailed] = useState(false);
-  if (!item.certificateImageUrl || failed) return null;
+  const [active, setActive] = useState(0);
+  const images = [...new Set([...(item.certificateImages || []), item.certificateImageUrl].filter(Boolean))];
+  if (!images.length || failed) return null;
   const label = `${item.role}${item.organization ? ` — ${item.organization}` : ''}`;
+  const count = images.length;
   const close = () => dialogRef.current?.close();
+  const step = (delta) => setActive((current) => (current + delta + count) % count);
+  const open = () => { setActive(0); dialogRef.current?.showModal(); };
+  const onKeyDown = (event) => {
+    if (count < 2) return;
+    if (event.key === 'ArrowRight') { event.preventDefault(); step(1); }
+    if (event.key === 'ArrowLeft') { event.preventDefault(); step(-1); }
+  };
 
   return (
     <>
-      <button type="button" className="saad-certificate-thumb" onClick={() => dialogRef.current?.showModal()} aria-label={`View certificate: ${label}`}>
-        <img src={item.certificateImageUrl} alt="" loading="lazy" onError={() => setFailed(true)} />
-        <span>View</span>
+      <button type="button" className="saad-certificate-thumb" onClick={open} aria-label={`View ${count === 1 ? 'certificate' : `${count} images`}: ${label}`}>
+        <img src={images[0]} alt="" loading="lazy" onError={() => setFailed(true)} />
+        <span>View{count > 1 ? ` · ${count}` : ''}</span>
       </button>
-      <dialog ref={dialogRef} className="saad-certificate-dialog" aria-label={label} onClick={(event) => { if (event.target === event.currentTarget) close(); }}>
+      <dialog ref={dialogRef} className="saad-certificate-dialog" aria-label={label} onKeyDown={onKeyDown} onClick={(event) => { if (event.target === event.currentTarget) close(); }}>
         <figure>
-          <img src={item.certificateImageUrl} alt={`Certificate: ${label}`} />
-          <figcaption><span>{label}</span><button type="button" onClick={close} aria-label="Close certificate">✕</button></figcaption>
+          <div className="saad-certificate-stage">
+            <img src={images[active]} alt={`${label} — image ${active + 1} of ${count}`} />
+            {count > 1 && (
+              <>
+                <button type="button" className="saad-certificate-nav is-prev" onClick={() => step(-1)} aria-label="Previous image">‹</button>
+                <button type="button" className="saad-certificate-nav is-next" onClick={() => step(1)} aria-label="Next image">›</button>
+              </>
+            )}
+          </div>
+          <figcaption>
+            <span>{label}{count > 1 && <b>{active + 1} / {count}</b>}</span>
+            <button type="button" onClick={close} aria-label="Close viewer">✕</button>
+          </figcaption>
         </figure>
       </dialog>
     </>

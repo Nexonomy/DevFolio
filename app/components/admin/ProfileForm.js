@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-const blankExperience = () => ({ period: '', role: '', organization: '', type: 'Company', track: 'PROFESSIONAL', icon: '✦', logoImageUrl: null, certificateImageUrl: null, description: '', current: false });
+const blankExperience = () => ({ period: '', role: '', organization: '', type: 'Company', track: 'PROFESSIONAL', icon: '✦', logoImageUrl: null, certificateImages: [], description: '', current: false });
 const blankTool = () => ({ name: '', icon: '◇' });
 
 export default function ProfileForm({ initialProfile }) {
@@ -49,9 +49,38 @@ export default function ProfileForm({ initialProfile }) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Image upload failed');
       updateItem('experiences', index, { [field]: data.url });
-      setStatus(`${field === 'certificateImageUrl' ? 'Certificate image' : 'Organization logo'} uploaded. Save the profile to publish it.`);
+      setStatus('Organization logo uploaded. Save the profile to publish it.');
     } catch (error) { setStatus(error.message); }
     finally { setUploadingExperienceLogo(null); input.value = ''; }
+  };
+  const certificatesOf = (item) => [...new Set([...(item.certificateImages || []), item.certificateImageUrl].filter(Boolean))];
+  const setCertificates = (index, update) => setForm((current) => ({
+    ...current,
+    experiences: current.experiences.map((item, itemIndex) => itemIndex === index
+      ? { ...item, certificateImageUrl: null, certificateImages: update(certificatesOf(item)) }
+      : item),
+  }));
+  const uploadCertificates = async (event, index) => {
+    const input = event.currentTarget;
+    const files = [...(input.files || [])];
+    if (!files.length) return;
+    setUploadingExperienceLogo(`${index}-certificates`); setStatus('');
+    const uploaded = [];
+    try {
+      for (const file of files) {
+        const body = new FormData(); body.append('file', file);
+        const response = await fetch('/api/upload', { method: 'POST', body });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || `Upload failed for ${file.name}`);
+        uploaded.push(data.url);
+      }
+      setStatus(`${uploaded.length} image${uploaded.length === 1 ? '' : 's'} uploaded. Save the profile to publish.`);
+    } catch (error) {
+      setStatus(uploaded.length ? `${uploaded.length} uploaded, then: ${error.message}` : error.message);
+    } finally {
+      if (uploaded.length) setCertificates(index, (images) => [...images, ...uploaded].slice(0, 12));
+      setUploadingExperienceLogo(null); input.value = '';
+    }
   };
   const save = async (event) => {
     event.preventDefault(); setSaving(true); setStatus('');
@@ -129,20 +158,31 @@ export default function ProfileForm({ initialProfile }) {
                 </div>
               </div>
             </div>
-            <div className="admin-experience-logo-editor admin-label-full">
-              <div className="admin-experience-logo-preview">
-                {item.certificateImageUrl ? <img src={item.certificateImageUrl} alt={`${item.role} certificate preview`} /> : <span>★</span>}
-              </div>
-              <div>
-                <strong>Certificate or award image</strong>
-                <p>Optional. Shown as a thumbnail on the card; visitors click it to view full size. Landscape photos or scans work best.</p>
-                <div className="admin-portrait-actions">
-                  <label className="admin-button admin-button-small">
-                    {uploadingExperienceLogo === `${index}-certificateImageUrl` ? 'Uploading…' : item.certificateImageUrl ? 'Replace image' : 'Upload image'}
-                    <input type="file" accept="image/*" onChange={(event) => uploadExperienceImage(event, index, 'certificateImageUrl')} disabled={uploadingExperienceLogo !== null} />
-                  </label>
-                  {item.certificateImageUrl && <button type="button" className="admin-button admin-button-small admin-button-danger" onClick={() => updateItem('experiences', index, { certificateImageUrl: null })}>Remove image</button>}
-                </div>
+            <div className="admin-label-full">
+              <strong>Certificates and photos</strong>
+              <p style={{ margin: '4px 0 12px', opacity: 0.7, fontSize: '13px' }}>Optional, up to 12. The first image is the card thumbnail; visitors can browse all of them full size. Use the arrows to reorder.</p>
+              {certificatesOf(item).length > 0 && (
+                <ul style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '10px', margin: '0 0 12px', padding: 0, listStyle: 'none' }}>
+                  {certificatesOf(item).map((url, imageIndex, images) => (
+                    <li key={url} style={{ position: 'relative', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', overflow: 'hidden' }}>
+                      <img src={url} alt={`Certificate ${imageIndex + 1} preview`} style={{ display: 'block', width: '100%', aspectRatio: '16 / 10', objectFit: 'cover' }} />
+                      {imageIndex === 0 && <span style={{ position: 'absolute', top: '6px', left: '6px', padding: '2px 6px', borderRadius: '4px', background: '#000c', fontSize: '10px' }}>Cover</span>}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '4px', padding: '6px' }}>
+                        <span style={{ display: 'flex', gap: '4px' }}>
+                          <button type="button" className="admin-button admin-button-small" disabled={imageIndex === 0} aria-label="Move image earlier" onClick={() => setCertificates(index, (list) => { const next = [...list]; [next[imageIndex - 1], next[imageIndex]] = [next[imageIndex], next[imageIndex - 1]]; return next; })}>←</button>
+                          <button type="button" className="admin-button admin-button-small" disabled={imageIndex === images.length - 1} aria-label="Move image later" onClick={() => setCertificates(index, (list) => { const next = [...list]; [next[imageIndex + 1], next[imageIndex]] = [next[imageIndex], next[imageIndex + 1]]; return next; })}>→</button>
+                        </span>
+                        <button type="button" className="admin-button admin-button-small admin-button-danger" aria-label={`Remove image ${imageIndex + 1}`} onClick={() => setCertificates(index, (list) => list.filter((entry) => entry !== url))}>✕</button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="admin-portrait-actions">
+                <label className="admin-button admin-button-small">
+                  {uploadingExperienceLogo === `${index}-certificates` ? 'Uploading…' : certificatesOf(item).length ? 'Add more images' : 'Upload images'}
+                  <input type="file" accept="image/*" multiple onChange={(event) => uploadCertificates(event, index)} disabled={uploadingExperienceLogo !== null || certificatesOf(item).length >= 12} />
+                </label>
               </div>
             </div>
             <label className="admin-label admin-checkbox-label"><input type="checkbox" checked={item.current} onChange={(e) => updateItem('experiences', index, { current: e.target.checked })} /> Current role</label>

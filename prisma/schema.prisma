@@ -5,6 +5,8 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Migrations run over Neon's direct (unpooled) connection; the pooler can strand migration locks.
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 model Game {

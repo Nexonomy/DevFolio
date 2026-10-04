@@ -924,3 +924,33 @@ section:is(:hover,:focus-within)>.game-easter-egg * { animation-play-state:runni
   .saad-project-grid.is-filtered { grid-template-columns:1fr; }
   .saad-project-grid.is-filtered .saad-project-card { aspect-ratio:1.16/1; }
 }
+
+/* Cover art: every project image sits in a fixed 16:9 frame with its text below, so one 1920x1080 upload fits everywhere uncropped. */
+.saad-site .saad-project-grid .saad-project-card,
+.saad-site .saad-project-grid .saad-project-card:first-child,
+.saad-site .saad-project-grid .saad-project-card:not(:first-child),
+.saad-site .saad-project-grid.is-filtered .saad-project-card { display:flex; flex-direction:column; height:100%; aspect-ratio:auto; background:#111; }
+.saad-site .saad-project-grid .saad-project-card .saad-project-art,
+.saad-site .saad-project-grid .saad-project-card:not(:first-child) .saad-project-art { position:relative; inset:auto; flex:none; width:100%; height:auto; min-height:0; aspect-ratio:16/9; border:0; border-bottom:1px solid #2c2c2c; border-radius:0; }
+.saad-site .saad-project-grid .saad-project-art::after { border-width:0; }
+.saad-site .saad-project-grid .saad-project-art img { transform:none; }
+.saad-site .saad-project-grid .saad-project-card:hover .saad-project-art img { transform:scale(1.04); }
+.saad-site .saad-project-grid .saad-project-art>span { top:50%; font-size:clamp(48px,5vw,80px); }
+.saad-site .saad-project-grid .saad-project-card .saad-project-info,
+.saad-site .saad-project-grid .saad-project-card:not(:first-child) .saad-project-info { position:relative; inset:auto; z-index:auto; flex:1; display:flex; flex-direction:column; min-height:0; padding:clamp(16px,1.6vw,22px); background:#111; }
+.saad-site .saad-project-grid .saad-project-info h3 { margin:7px 34px 8px 0; font-size:clamp(22px,2.1vw,32px); transition:color .2s; }
+.saad-site .saad-project-grid .saad-project-card:hover .saad-project-info h3 { color:var(--saad-orange); }
+.saad-site .saad-project-grid .saad-project-info p { font-size:13px; line-height:1.5; -webkit-line-clamp:3; }
+.saad-site .saad-project-grid .saad-project-info ul { display:flex; flex-wrap:wrap; gap:5px; margin:auto 0 0; padding-top:14px; }
+.saad-site .saad-project-grid .saad-project-info b { top:clamp(16px,1.6vw,22px); right:clamp(16px,1.6vw,22px); }
+
+.saad-site .other-card.other-cover-card,
+.saad-site .other-track.is-filtered .other-card.other-cover-card { display:flex; flex-direction:column; aspect-ratio:auto; background:#111; }
+.saad-site .other-cover-card .other-card-art { position:relative; inset:auto; flex:none; width:100%; height:auto; aspect-ratio:16/9; border:0; border-bottom:1px solid #2c2c2c; border-radius:0; }
+.saad-site .other-cover-card .other-card-art::after { border-width:0; }
+.saad-site .other-cover-card .other-card-art img { transform:none; }
+.saad-site .other-cover-card:hover .other-card-art img { transform:scale(1.04); }
+.saad-site .other-cover-card .other-card-overlay,
+.saad-site .other-cover-card:hover .other-card-overlay { position:relative; inset:auto; flex:1; padding:16px 42px 18px 18px; background:#111; }
+
+.game-detail-cover { min-height:0; aspect-ratio:16/9; }

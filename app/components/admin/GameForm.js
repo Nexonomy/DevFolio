@@ -334,6 +334,7 @@ export default function GameForm({ game }) {
 
       <section className="admin-section">
         <h2 className="admin-section-title">Cover Image</h2>
+        <p style={{ margin: '0 0 12px', opacity: 0.7, fontSize: '13px' }}>Use a 16:9 image, ideally 1920 × 1080 px (JPG or WebP, under ~500 KB). Every card and the project page show it at 16:9, so it is never cropped.</p>
         <div className="admin-upload-row">
           <input type="file" accept="image/*" onChange={handleCoverUpload} disabled={uploading} />
           {form.coverImageUrl && (

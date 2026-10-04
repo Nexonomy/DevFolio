@@ -1027,3 +1027,9 @@ section:is(:hover,:focus-within)>.game-easter-egg * { animation-play-state:runni
   .game-lightbox-image { max-width:calc(100vw - 32px); }
   .game-lightbox-nav { top:auto; bottom:18px; width:44px; height:44px; transform:none; }
 }
+.game-detail-cover-video { position:absolute; inset:0; z-index:1; width:100%; height:100%; border:0; }
+.game-detail-cover:has(.game-detail-cover-video)::after { display:none; }
+.game-detail-thumbs button>img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.game-detail-thumb-play { position:absolute; inset:0; display:grid; place-items:center; color:#fff; background:#0006; font-size:14px; }
+.game-lightbox-video { width:min(1200px,calc(100vw - 140px)); aspect-ratio:16/9; max-height:calc(100vh - 120px); border:0; border-radius:var(--radius-lg); background:#000; }
+@media (max-width:680px) { .game-lightbox-video { width:calc(100vw - 32px); } }

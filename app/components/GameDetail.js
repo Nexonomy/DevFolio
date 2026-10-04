@@ -27,6 +27,9 @@ export default function GameDetail({ game }) {
   const highlights = game.highlights || [];
   const projectNumber = String((game.sortOrder ?? 0) + 1).padStart(2, '0');
   const media = [
+    ...(game.videos || []).map((video) => ({ videoId: extractYouTubeId(video.youtubeUrl), title: video.title }))
+      .filter((video) => video.videoId)
+      .map(({ videoId, title }) => ({ type: 'video', videoId, src: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`, alt: title || `${game.title} video` })),
     ...(game.coverImageUrl ? [{ src: getBlobDeliveryUrl(game.coverImageUrl), alt: `${game.title} cover` }] : []),
     ...(game.screenshots || []).map((shot, index) => ({ src: getBlobDeliveryUrl(shot.url), alt: shot.alt || `${game.title} screenshot ${index + 1}` })),
   ];
@@ -69,8 +72,17 @@ export default function GameDetail({ game }) {
         <div className="game-detail-hero-content">
           <div className="game-detail-media">
             <div className="game-detail-cover" style={{ background: game.bgColor }}>
-              <span className="game-detail-cover-label">Project {projectNumber}</span>
-              {current ? (
+              {current?.type !== 'video' && <span className="game-detail-cover-label">Project {projectNumber}</span>}
+              {current?.type === 'video' ? (
+                <iframe
+                  key={current.videoId}
+                  className="game-detail-cover-video"
+                  src={`https://www.youtube-nocookie.com/embed/${current.videoId}?rel=0`}
+                  title={current.alt}
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : current ? (
                 <button type="button" className="game-detail-cover-open" onClick={() => setLightboxOpen(true)} aria-label={`View ${current.alt} full screen`}>
                   <Image key={current.src} src={current.src} alt={current.alt} fill className="game-detail-cover-image" priority={active === 0} sizes="(max-width: 900px) 100vw, 640px" />
                   <span className="game-detail-cover-zoom" aria-hidden="true">⤢</span>
@@ -81,7 +93,7 @@ export default function GameDetail({ game }) {
                   <span>{game.tag}</span>
                 </div>
               )}
-              {game.year && <span className="game-detail-cover-year">{game.year}</span>}
+              {game.year && current?.type !== 'video' && <span className="game-detail-cover-year">{game.year}</span>}
             </div>
 
             {media.length > 1 && (
@@ -89,7 +101,15 @@ export default function GameDetail({ game }) {
                 {media.map((item, index) => (
                   <li key={item.src}>
                     <button type="button" className={index === active ? 'is-active' : undefined} aria-pressed={index === active} aria-label={`Show ${item.alt}`} onClick={() => setActive(index)}>
-                      <Image src={item.src} alt="" fill sizes="120px" />
+                      {item.type === 'video' ? (
+                        <>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.src} alt="" loading="lazy" />
+                          <span className="game-detail-thumb-play" aria-hidden="true">▶</span>
+                        </>
+                      ) : (
+                        <Image src={item.src} alt="" fill sizes="120px" />
+                      )}
                     </button>
                   </li>
                 ))}
@@ -173,33 +193,6 @@ export default function GameDetail({ game }) {
         </section>
       )}
 
-      {(game.videos || []).length > 0 && (
-        <section className="game-detail-section">
-          <p className="game-detail-section-kicker">In motion</p>
-          <h2 className="game-detail-section-title">Videos</h2>
-          <div className="game-detail-videos">
-            {game.videos.map((video) => {
-              const videoId = extractYouTubeId(video.youtubeUrl);
-              if (!videoId) return null;
-
-              return (
-                <div key={video.id} className="game-detail-video">
-                  {video.title && <h3 className="game-detail-video-title">{video.title}</h3>}
-                  <div className="game-detail-video-embed">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${videoId}`}
-                      title={video.title || `${game.title} video`}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
       <footer className="game-detail-footer">
         <p>End of case study</p>
         <Link href={isGame ? '/#portfolio' : '/#other-projects'}><span>Explore more work</span><b aria-hidden="true">↗</b></Link>
@@ -215,8 +208,19 @@ export default function GameDetail({ game }) {
           aria-label={`${game.title} images`}
         >
           <button type="button" className="game-lightbox-close" aria-label="Close" onClick={() => dialogRef.current?.close()}>×</button>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={current.src} alt={current.alt} className="game-lightbox-image" />
+          {current.type === 'video' ? (
+            <iframe
+              key={current.videoId}
+              className="game-lightbox-video"
+              src={`https://www.youtube-nocookie.com/embed/${current.videoId}?rel=0`}
+              title={current.alt}
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={current.src} alt={current.alt} className="game-lightbox-image" />
+          )}
           {media.length > 1 && (
             <>
               <button type="button" className="game-lightbox-nav is-prev" aria-label="Previous image" onClick={() => step(-1)}>‹</button>

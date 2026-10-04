@@ -65,7 +65,7 @@ export default function SyncContentButtons() {
       <SyncButton scope="profile" label="Sync profile from source" className="admin-button admin-button-primary" />
       <SyncButton scope="projects" label="Sync all 10 projects" />
       <p style={{ margin: 0, opacity: 0.6, fontSize: '12px' }}>
-        Upserts by id / slug. Existing records are replaced with the data in <code>lib/profile.js</code> and <code>lib/portfolio-seed-projects.js</code>. Nothing is deleted.
+        Warning: syncing the profile replaces everything you edited in Profile &amp; Content with the copy in the codebase. Only use it to reset. Project sync updates the 10 seeded projects by slug and deletes nothing.
       </p>
     </div>
   );

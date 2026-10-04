@@ -709,6 +709,19 @@ body:has(.saad-site) .scroll-rail { display:block; }
 .saad-experience-group .saad-timeline li:hover .saad-experience-index.has-logo { border-color:var(--saad-orange); transform:translateY(-2px); }
 .saad-experience-group .saad-timeline li:hover .saad-experience-index.has-logo img { transform:scale(1.08); }
 .saad-experience-card { min-width:0; }
+.saad-certificate-thumb { position:relative; display:block; width:100%; max-width:320px; aspect-ratio:16/10; margin:16px 0 0; padding:0; overflow:hidden; border:1px solid #3a3a3a; border-radius:var(--radius-xs); background:#151515; cursor:zoom-in; }
+.saad-certificate-thumb img { width:100%; height:100%; object-fit:cover; transition:transform .3s cubic-bezier(.2,.8,.2,1),filter .3s; filter:saturate(.85); }
+.saad-certificate-thumb span { position:absolute; right:0; bottom:0; left:0; padding:8px 10px; color:var(--saad-cream); background:linear-gradient(transparent,#0a0a0ae6); font-size:10px; font-weight:700; letter-spacing:.1em; text-align:left; text-transform:uppercase; }
+.saad-certificate-thumb:hover img,.saad-certificate-thumb:focus-visible img { transform:scale(1.04); filter:none; }
+.saad-certificate-thumb:hover,.saad-certificate-thumb:focus-visible { border-color:var(--saad-orange); }
+.saad-certificate-thumb:focus-visible { outline:1px solid var(--saad-cream); outline-offset:3px; }
+.saad-certificate-dialog { width:min(1100px,calc(100vw - 32px)); max-height:calc(100vh - 32px); padding:0; border:1px solid #444; border-radius:var(--radius-sm); color:var(--saad-cream); background:#0d0d0d; }
+.saad-certificate-dialog::backdrop { background:#000c; backdrop-filter:blur(4px); }
+.saad-certificate-dialog figure { margin:0; }
+.saad-certificate-dialog img { display:block; width:100%; max-height:calc(100vh - 110px); object-fit:contain; background:#000; }
+.saad-certificate-dialog figcaption { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 16px; font-size:13px; }
+.saad-certificate-dialog figcaption button { flex:none; width:34px; height:34px; border:1px solid #555; color:var(--saad-cream); background:transparent; cursor:pointer; }
+.saad-certificate-dialog figcaption button:hover,.saad-certificate-dialog figcaption button:focus-visible { color:#0a0a0a; border-color:var(--saad-orange); background:var(--saad-orange); }
 .saad-role-tree { position:relative; margin:16px 0 0; padding:0 0 0 22px; list-style:none; }
 .saad-role-tree .saad-experience-meta { flex-wrap:wrap; gap:4px 12px; }
 .saad-role-tree::before { content:""; position:absolute; top:6px; bottom:10px; left:5px; width:1px; background:#3a3a3a; }

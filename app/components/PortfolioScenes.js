@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import OtherProjects from './OtherProjects';
 import { ProjectTransitionLink } from './ProjectTransition';
@@ -76,6 +76,29 @@ function ExperienceMark({ item, index }) {
   );
 }
 
+function CertificateThumb({ item }) {
+  const dialogRef = useRef(null);
+  const [failed, setFailed] = useState(false);
+  if (!item.certificateImageUrl || failed) return null;
+  const label = `${item.role}${item.organization ? ` — ${item.organization}` : ''}`;
+  const close = () => dialogRef.current?.close();
+
+  return (
+    <>
+      <button type="button" className="saad-certificate-thumb" onClick={() => dialogRef.current?.showModal()} aria-label={`View certificate: ${label}`}>
+        <img src={item.certificateImageUrl} alt="" loading="lazy" onError={() => setFailed(true)} />
+        <span>View certificate ↗</span>
+      </button>
+      <dialog ref={dialogRef} className="saad-certificate-dialog" aria-label={label} onClick={(event) => { if (event.target === event.currentTarget) close(); }}>
+        <figure>
+          <img src={item.certificateImageUrl} alt={`Certificate: ${label}`} />
+          <figcaption><span>{label}</span><button type="button" onClick={close} aria-label="Close certificate">✕</button></figcaption>
+        </figure>
+      </dialog>
+    </>
+  );
+}
+
 function groupSpan(roles) {
   const parts = (period) => String(period || '').split(/\s+[—–-]\s+/);
   const end = parts(roles[0].period).at(-1);
@@ -111,6 +134,7 @@ function ExperienceGroup({ title, note, number, label, items }) {
                 <h4>{group.roles[0].role}</h4>
                 <b>{group.organization}</b>
                 <p>{group.roles[0].description}</p>
+                <CertificateThumb item={group.roles[0]} />
               </div>
             ) : (
               <div className="saad-experience-card">
@@ -122,6 +146,7 @@ function ExperienceGroup({ title, note, number, label, items }) {
                       <div className="saad-experience-meta"><time>{role.period}</time><small>{role.type}</small></div>
                       <h5>{role.role}</h5>
                       <p>{role.description}</p>
+                      <CertificateThumb item={role} />
                     </li>
                   ))}
                 </ol>
@@ -140,7 +165,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
   const copy = profile.sectionCopy || {};
   const experiences = profile.experiences || [];
   const professionalExperience = experiences.filter((item) => item.track === 'PROFESSIONAL');
-  const academicExperience = experiences.filter((item) => item.track === 'ACADEMIC');
+  const academicExperience = experiences.filter((item) => item.track === 'ACADEMIC' && !['University', 'Pre-University'].includes(item.type));
   const achievements = experiences.filter((item) => item.track === 'ACHIEVEMENT');
   const [contactStatus, setContactStatus] = useState('');
   const [gameFilter, setGameFilter] = useState('All');
@@ -294,7 +319,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
         </div>
         </AnimatedContent>
         <FilterRail
-          items={['All', 'Professional', 'Academic', 'Achievements']}
+          items={['All', 'Professional', 'Leadership', 'Achievements']}
           value={experienceFilter}
           onChange={setExperienceFilter}
           label="Filter experience by track"
@@ -302,7 +327,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
         />
         <div className="saad-experience-columns">
           {['All', 'Professional'].includes(experienceFilter) && professionalExperience.length > 0 && <ExperienceGroup number="01" title="Professional experience" note="Studios and industry roles" label="Career track" items={professionalExperience} />}
-          {['All', 'Academic'].includes(experienceFilter) && academicExperience.length > 0 && <ExperienceGroup number="02" title="Academic experience" note="Campus leadership and mentoring" label="Community track" items={academicExperience} />}
+          {['All', 'Leadership'].includes(experienceFilter) && academicExperience.length > 0 && <ExperienceGroup number="02" title="Leadership & community" note="Societies, mentoring, and campus tech" label="Community track" items={academicExperience} />}
           {['All', 'Achievements'].includes(experienceFilter) && achievements.length > 0 && <ExperienceGroup number="03" title="Achievements" note="Competitions and recognition" label="Honors" items={achievements} />}
         </div>
         <div className="saad-toolbox">

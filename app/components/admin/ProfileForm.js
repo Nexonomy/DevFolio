@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-const blankExperience = () => ({ period: '', role: '', organization: '', type: 'Company', track: 'PROFESSIONAL', icon: '✦', logoImageUrl: null, description: '', current: false });
+const blankExperience = () => ({ period: '', role: '', organization: '', type: 'Company', track: 'PROFESSIONAL', icon: '✦', logoImageUrl: null, certificateImageUrl: null, description: '', current: false });
 const blankTool = () => ({ name: '', icon: '◇' });
 
 export default function ProfileForm({ initialProfile }) {
@@ -38,18 +38,18 @@ export default function ProfileForm({ initialProfile }) {
     } catch (error) { setStatus(error.message); }
     finally { setUploadingPortrait(false); event.target.value = ''; }
   };
-  const uploadExperienceImage = async (event, index) => {
+  const uploadExperienceImage = async (event, index, field = 'logoImageUrl') => {
     const input = event.currentTarget;
     const file = input.files?.[0];
     if (!file) return;
-    setUploadingExperienceLogo(index); setStatus('');
+    setUploadingExperienceLogo(`${index}-${field}`); setStatus('');
     try {
       const body = new FormData(); body.append('file', file);
       const response = await fetch('/api/upload', { method: 'POST', body });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Logo upload failed');
-      updateItem('experiences', index, { logoImageUrl: data.url });
-      setStatus('Organization logo uploaded. Save the profile to publish it.');
+      if (!response.ok) throw new Error(data.error || 'Image upload failed');
+      updateItem('experiences', index, { [field]: data.url });
+      setStatus(`${field === 'certificateImageUrl' ? 'Certificate image' : 'Organization logo'} uploaded. Save the profile to publish it.`);
     } catch (error) { setStatus(error.message); }
     finally { setUploadingExperienceLogo(null); input.value = ''; }
   };
@@ -111,7 +111,7 @@ export default function ProfileForm({ initialProfile }) {
             <label className="admin-label">Role<input className="admin-input" value={item.role} onChange={(e) => updateItem('experiences', index, { role: e.target.value })} required /></label>
             <label className="admin-label">Organization<input className="admin-input" value={item.organization} onChange={(e) => updateItem('experiences', index, { organization: e.target.value })} /></label>
             <label className="admin-label">Type<input className="admin-input" value={item.type} onChange={(e) => updateItem('experiences', index, { type: e.target.value })} /></label>
-            <label className="admin-label">Experience section<select className="admin-input" value={item.track || 'ACADEMIC'} onChange={(e) => updateItem('experiences', index, { track: e.target.value })}><option value="PROFESSIONAL">Professional experience</option><option value="ACADEMIC">Academic experience</option><option value="ACHIEVEMENT">Achievement</option></select></label>
+            <label className="admin-label">Experience section<select className="admin-input" value={item.track || 'ACADEMIC'} onChange={(e) => updateItem('experiences', index, { track: e.target.value })}><option value="PROFESSIONAL">Professional experience</option><option value="ACADEMIC">Leadership &amp; community</option><option value="ACHIEVEMENT">Achievement</option></select></label>
             <label className="admin-label">Icon<input className="admin-input" value={item.icon} onChange={(e) => updateItem('experiences', index, { icon: e.target.value })} /></label>
             <div className="admin-experience-logo-editor admin-label-full">
               <div className="admin-experience-logo-preview">
@@ -122,10 +122,26 @@ export default function ProfileForm({ initialProfile }) {
                 <p>Optional. A square PNG, JPG, WebP, or SVG works best. Without one, the numbered badge stays visible.</p>
                 <div className="admin-portrait-actions">
                   <label className="admin-button admin-button-small">
-                    {uploadingExperienceLogo === index ? 'Uploading…' : item.logoImageUrl ? 'Replace logo' : 'Upload logo'}
-                    <input type="file" accept="image/*" onChange={(event) => uploadExperienceImage(event, index)} disabled={uploadingExperienceLogo !== null} />
+                    {uploadingExperienceLogo === `${index}-logoImageUrl` ? 'Uploading…' : item.logoImageUrl ? 'Replace logo' : 'Upload logo'}
+                    <input type="file" accept="image/*" onChange={(event) => uploadExperienceImage(event, index, 'logoImageUrl')} disabled={uploadingExperienceLogo !== null} />
                   </label>
                   {item.logoImageUrl && <button type="button" className="admin-button admin-button-small admin-button-danger" onClick={() => updateItem('experiences', index, { logoImageUrl: null })}>Remove logo</button>}
+                </div>
+              </div>
+            </div>
+            <div className="admin-experience-logo-editor admin-label-full">
+              <div className="admin-experience-logo-preview">
+                {item.certificateImageUrl ? <img src={item.certificateImageUrl} alt={`${item.role} certificate preview`} /> : <span>★</span>}
+              </div>
+              <div>
+                <strong>Certificate or award image</strong>
+                <p>Optional. Shown as a thumbnail on the card; visitors click it to view full size. Landscape photos or scans work best.</p>
+                <div className="admin-portrait-actions">
+                  <label className="admin-button admin-button-small">
+                    {uploadingExperienceLogo === `${index}-certificateImageUrl` ? 'Uploading…' : item.certificateImageUrl ? 'Replace image' : 'Upload image'}
+                    <input type="file" accept="image/*" onChange={(event) => uploadExperienceImage(event, index, 'certificateImageUrl')} disabled={uploadingExperienceLogo !== null} />
+                  </label>
+                  {item.certificateImageUrl && <button type="button" className="admin-button admin-button-small admin-button-danger" onClick={() => updateItem('experiences', index, { certificateImageUrl: null })}>Remove image</button>}
                 </div>
               </div>
             </div>

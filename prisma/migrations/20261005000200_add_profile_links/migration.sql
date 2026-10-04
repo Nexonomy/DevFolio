@@ -1,0 +1,2 @@
+ALTER TABLE "Profile"
+ADD COLUMN "links" JSONB NOT NULL DEFAULT '[]'::jsonb;

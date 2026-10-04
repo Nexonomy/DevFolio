@@ -187,6 +187,12 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
   const nameParts = profile.name.split(' ').filter(Boolean);
   const initials = `${nameParts[0]?.[0] || ''}${nameParts.at(-1)?.[0] || ''}`;
   const copy = profile.sectionCopy || {};
+  const socialLinks = [
+    profile.linkedinUrl && { label: 'LinkedIn', url: profile.linkedinUrl },
+    profile.githubUrl && { label: 'GitHub', url: profile.githubUrl },
+    profile.resumeUrl && { label: 'Résumé', url: profile.resumeUrl },
+    ...(profile.links || []),
+  ].filter(Boolean);
   const experiences = profile.experiences || [];
   const professionalExperience = experiences.filter((item) => item.track === 'PROFESSIONAL');
   const academicExperience = experiences.filter((item) => item.track === 'ACADEMIC' && !['University', 'Pre-University'].includes(item.type));
@@ -255,9 +261,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
           <h1>Hi, I’m<br /><em>{[...profile.name.split(' ')[0]].map((letter, index) => <span className="saad-name-letter" style={{ '--name-index': index }} key={`${letter}-${index}`}>{letter}</span>)}.</em></h1>
           <p className="saad-intro-lead">{profile.heroSubtitle}</p>
           <div className="saad-intro-links">
-            {profile.linkedinUrl && <a href={profile.linkedinUrl} target="_blank" rel="noreferrer">LinkedIn ↗</a>}
-            {profile.githubUrl && <a href={profile.githubUrl} target="_blank" rel="noreferrer">GitHub ↗</a>}
-            {profile.resumeUrl && <a href={profile.resumeUrl} target="_blank" rel="noreferrer">Résumé ↗</a>}
+            {socialLinks.map((link) => <a key={link.label + link.url} href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>)}
           </div>
         </div>
 
@@ -383,9 +387,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
               <p className="saad-contact-status" aria-live="polite">{contactStatus || `Messages are delivered to ${profile.email}.`}</p>
             </form>
             <div className="saad-contact-links">
-              {profile.githubUrl && <a href={profile.githubUrl} target="_blank" rel="noreferrer">GitHub ↗</a>}
-              {profile.linkedinUrl && <a href={profile.linkedinUrl} target="_blank" rel="noreferrer">LinkedIn ↗</a>}
-              {profile.resumeUrl && <a href={profile.resumeUrl} target="_blank" rel="noreferrer">Résumé ↗</a>}
+              {socialLinks.map((link) => <a key={link.label + link.url} href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>)}
             </div>
             <div className="retro-footer-controls"><SecretChest /></div>
           </div>

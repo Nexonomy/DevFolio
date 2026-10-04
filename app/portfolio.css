@@ -386,7 +386,7 @@ a { color:inherit; }
 .saad-intro h1 em:hover .saad-name-letter:nth-child(odd) { translate:0 -7px; rotate:-3deg; color:#f08255; }
 .saad-intro h1 em:hover .saad-name-letter:nth-child(even) { translate:0 4px; rotate:3deg; }
 .saad-intro-lead { max-width:610px; margin:34px 0 0; color:#d4d0c6; font-size:clamp(17px,2vw,24px); line-height:1.45; }
-.saad-intro-links { display:flex; gap:10px; margin-top:32px; }
+.saad-intro-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:32px; }
 .saad-intro-links a,.saad-footer a { padding:9px 13px; border:1px solid #484848; border-radius:var(--radius-sm); color:var(--saad-cream); font-size:12px; font-weight:650; text-decoration:none; }
 .saad-intro-links a:first-child { color:#0a0a0a; background:var(--saad-cream); border-color:var(--saad-cream); }
 .saad-intro-links a:hover,.saad-footer a:hover { color:#0a0a0a; background:var(--saad-orange); border-color:var(--saad-orange); }

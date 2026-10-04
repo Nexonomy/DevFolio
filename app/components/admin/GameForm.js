@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { slugify } from '@/lib/slug';
 import { getBlobDeliveryUrl } from '@/lib/blob';
 import { GAME_GENRES } from '@/lib/games';
@@ -53,6 +53,18 @@ export default function GameForm({ game }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [tab, setTab] = useState('basics');
+  const [savedSnapshot] = useState(() => JSON.stringify(mapGameToForm(game)));
+  const dirty = JSON.stringify(form) !== savedSnapshot;
+  const [leaving, setLeaving] = useState(false);
+
+  useEffect(() => {
+    if (!dirty || leaving) return undefined;
+    const warn = (event) => { event.preventDefault(); event.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty, leaving]);
+
   const [customGenre, setCustomGenre] = useState(() => Boolean(game?.tag) && !GAME_GENRES.some((genre) => genre.toLowerCase() === game.tag.toLowerCase()));
 
   const updateField = (field, value) => {
@@ -174,6 +186,19 @@ export default function GameForm({ game }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const required = [['title', 'Title'], ['slug', 'Slug'], ['description', 'Description'], ['tag', 'Genre'], ['tech', 'Tech stack']]
+      .filter(([field]) => !String(form[field] ?? '').trim())
+      .map(([, label]) => label);
+    if (required.length) {
+      setTab('basics');
+      setError(`Please fill in: ${required.join(', ')}.`);
+      return;
+    }
+    if (form.liveUrl && !/^https:\/\//i.test(form.liveUrl)) {
+      setTab('case');
+      setError('The live link must start with https://');
+      return;
+    }
     setLoading(true);
     setError('');
 
@@ -197,17 +222,28 @@ export default function GameForm({ game }) {
       return;
     }
 
+    setLeaving(true);
     router.push('/admin');
     router.refresh();
   };
 
   return (
-    <form className="admin-form admin-game-form" onSubmit={handleSubmit}>
+    <form className="admin-form admin-game-form" onSubmit={handleSubmit} noValidate>
       <div className="admin-form-header">
-        <h1 className="admin-title">{isEditing ? 'Edit Project' : 'New Portfolio Project'}</h1>
-        <p className="admin-subtitle">Manage project details, media, and publish status.</p>
+        <h1 className="admin-title">{isEditing ? form.title || 'Edit project' : 'New project'}</h1>
+        <p className="admin-subtitle">Fill in the basics, then add the case study and media. Only the basics are required.</p>
       </div>
 
+      <nav className="admin-profile-tabs" role="tablist" aria-label="Project sections">
+        {[['basics', 'Basics'], ['case', 'Case study'], ['media', 'Cover & media']].map(([value, label]) => (
+          <button key={value} type="button" role="tab" aria-selected={tab === value} className={tab === value ? 'is-active' : undefined} onClick={() => setTab(value)}>
+            {label}
+            {value === 'media' && <span>{(form.coverImageUrl ? 1 : 0) + form.screenshots.length + form.videos.filter((video) => video.youtubeUrl.trim()).length}</span>}
+          </button>
+        ))}
+      </nav>
+
+      {tab === 'basics' && (
       <div className="admin-form-grid">
         <label className="admin-label">
           Title *
@@ -375,7 +411,9 @@ export default function GameForm({ game }) {
           Published (visible on homepage)
         </label>
       </div>
+      )}
 
+      {tab === 'case' && (
       <section className="admin-section">
         <h2 className="admin-section-title">Case study</h2>
         <p className="admin-hint" style={{ margin: '0 0 16px' }}>Everything here is optional; sections only appear on the project page when filled. For lists, put one item per line. Start a line with “Title: …” to give it a bold heading.</p>
@@ -418,7 +456,10 @@ export default function GameForm({ game }) {
           </label>
         </div>
       </section>
+      )}
 
+      {tab === 'media' && (
+      <>
       <section className="admin-section">
         <h2 className="admin-section-title">Cover Image</h2>
         <p style={{ margin: '0 0 12px', opacity: 0.7, fontSize: '13px' }}>Use a 16:9 image, ideally 1920 × 1080 px (JPG or WebP, under ~500 KB). Every card and the project page show it at 16:9, so it is never cropped.</p>
@@ -517,15 +558,21 @@ export default function GameForm({ game }) {
         ))}
       </section>
 
-      {error && <p className="admin-error">{error}</p>}
+      </>
+      )}
 
-      <div className="admin-form-actions">
-        <button type="button" className="admin-button" onClick={() => router.push('/admin')}>
-          Cancel
-        </button>
-        <button type="submit" className="admin-button admin-button-primary" disabled={loading || uploading}>
-          {loading ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Project'}
-        </button>
+      <div className={`admin-savebar${dirty ? ' is-dirty' : ''}`} role="region" aria-label="Save project">
+        <p role="status" className={error ? 'is-error' : undefined}>
+          {error || (uploading ? 'Uploading…' : dirty ? 'You have unsaved changes.' : isEditing ? 'All changes saved.' : 'Fill in the basics to create the project.')}
+        </p>
+        <div>
+          <button type="button" className="admin-button admin-button-small" onClick={() => { if (!dirty || window.confirm('Leave without saving your changes?')) { setLeaving(true); router.push('/admin'); } }}>
+            {dirty ? 'Cancel' : 'Back to library'}
+          </button>
+          <button type="submit" className="admin-button admin-button-primary" disabled={loading || uploading || (isEditing && !dirty)}>
+            {loading ? 'Saving…' : isEditing ? 'Save changes' : 'Create project'}
+          </button>
+        </div>
       </div>
     </form>
   );

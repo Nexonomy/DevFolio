@@ -75,6 +75,35 @@ export async function PUT(request, { params }) {
   }
 }
 
+// Quick library actions (publish toggle) without resending the whole project.
+export async function PATCH(request, { params }) {
+  try {
+    const session = await requireAuth();
+    if (!session) return NextResponse.json({ error:'Unauthorized' }, { status:401 });
+    const { id } = await params;
+    const body = await request.json().catch(() => ({}));
+    if (typeof body.published !== 'boolean') return NextResponse.json({ error:'Nothing to update' }, { status:400 });
+    const patch = { published: body.published };
+
+    if (isDemo) {
+      const existing = (await readDemoProjects()).find((project) => project.id === id);
+      const game = await updateDemoProject(id, patch);
+      if (!game) return NextResponse.json({ error:'Project not found' }, { status:404 });
+      revalidatePortfolio(existing, game);
+      return NextResponse.json(game);
+    }
+
+    const existing = await prisma.game.findUnique({ where:{ id } });
+    if (!existing) return NextResponse.json({ error:'Project not found' }, { status:404 });
+    const game = await prisma.game.update({ where:{ id }, data:patch });
+    revalidatePortfolio(existing, game);
+    return NextResponse.json(game);
+  } catch (error) {
+    console.error('PATCH /api/games/[id] error:', error);
+    return NextResponse.json({ error:'Failed to update project' }, { status:500 });
+  }
+}
+
 export async function DELETE(request, { params }) {
   try {
     const session = await requireAuth();

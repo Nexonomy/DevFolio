@@ -19,6 +19,17 @@ const TABS = [
 
 const blankExperience = (track = 'PROFESSIONAL') => ({ period: '', role: '', organization: '', type: TRACKS.find((item) => item.value === track)?.type || 'Full-time', track, icon: '✦', logoImageUrl: null, certificateImages: [], description: '', current: false });
 const blankTool = () => ({ name: '', icon: '◇' });
+const LINK_PRESETS = [
+  { label: 'Instagram', url: 'https://instagram.com/' },
+  { label: 'Discord', url: 'https://discord.com/users/' },
+  { label: 'X', url: 'https://x.com/' },
+  { label: 'YouTube', url: 'https://youtube.com/@' },
+  { label: 'itch.io', url: 'https://.itch.io' },
+  { label: 'ArtStation', url: 'https://artstation.com/' },
+  { label: 'Behance', url: 'https://behance.net/' },
+  { label: 'Steam', url: 'https://store.steampowered.com/' },
+  { label: 'Website', url: 'https://' },
+];
 const trackOf = (item) => item.track || 'ACADEMIC';
 const trackLabel = (value) => TRACKS.find((item) => item.value === value)?.label || 'Leadership & community';
 
@@ -370,6 +381,33 @@ export default function ProfileForm({ initialProfile }) {
           <label className="admin-label">Résumé path or URL<input className="admin-input" value={form.resumeUrl || ''} onChange={(e) => setField('resumeUrl', e.target.value)} /></label>
           <label className="admin-label">GitHub URL<input className="admin-input" type="url" value={form.githubUrl || ''} onChange={(e) => setField('githubUrl', e.target.value)} /></label>
           <label className="admin-label">LinkedIn URL<input className="admin-input" type="url" value={form.linkedinUrl || ''} onChange={(e) => setField('linkedinUrl', e.target.value)} /></label>
+        </div>
+
+        <div className="admin-copy-group">
+          <h3>Other links</h3>
+          <p className="admin-hint" style={{ margin: '0 0 12px' }}>Shown after LinkedIn, GitHub, and Résumé in the intro and contact sections, in this order. Links must start with https:// (or mailto: for email).</p>
+          <div className="admin-link-presets">
+            {LINK_PRESETS.map((preset) => (
+              <button key={preset.label} type="button" onClick={() => setField('links', [...(form.links || []), { label: preset.label, url: preset.url }])}>+ {preset.label}</button>
+            ))}
+          </div>
+          {(form.links || []).length === 0 && <p className="admin-hint">No extra links yet. Pick one above or add a custom link.</p>}
+          <div className="admin-link-list">
+            {(form.links || []).map((link, index) => {
+              const valid = /^(https:\/\/|mailto:)/i.test(link.url || '') && link.label?.trim();
+              return (
+                <div className="admin-link-row" key={index}>
+                  <input className="admin-input" aria-label="Link label" value={link.label} onChange={(e) => updateItem('links', index, { label: e.target.value })} placeholder="Label" />
+                  <input className="admin-input" aria-label="Link URL" value={link.url} onChange={(e) => updateItem('links', index, { url: e.target.value })} placeholder="https://…" />
+                  <button type="button" aria-label="Move link earlier" disabled={index === 0} onClick={() => moveItem('links', index, -1)}>↑</button>
+                  <button type="button" aria-label="Move link later" disabled={index === form.links.length - 1} onClick={() => moveItem('links', index, 1)}>↓</button>
+                  <button type="button" aria-label={`Remove ${link.label || 'link'}`} onClick={() => removeItem('links', index)}>×</button>
+                  {!valid && <small>Needs a label and a URL starting with https:// or mailto:, or it won’t be saved.</small>}
+                </div>
+              );
+            })}
+          </div>
+          <button type="button" className="admin-button admin-button-small" onClick={() => setField('links', [...(form.links || []), { label: '', url: 'https://' }])}>+ Custom link</button>
         </div>
       </section>
     )}

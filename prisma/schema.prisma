@@ -86,6 +86,7 @@ model Profile {
   githubUrl    String?
   linkedinUrl  String?
   resumeUrl    String?
+  links        Json         @default("[]")
   profileImageUrl String?
   updatedAt    DateTime @updatedAt
 }

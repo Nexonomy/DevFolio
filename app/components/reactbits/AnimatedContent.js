@@ -33,7 +33,9 @@ export default function AnimatedContent({
     element.style.opacity = String(initialOpacity);
     element.style.transform = `translate${axis}(${offset}px) scale(${scale})`;
 
+    let reported = false;
     const observer = new IntersectionObserver((entries) => {
+      reported = true;
       if (!entries.some((entry) => entry.isIntersecting)) return;
       observer.disconnect();
       element.style.transition = `opacity ${duration}s ${EASE} ${delay}s, transform ${duration}s ${EASE} ${delay}s`;
@@ -43,7 +45,17 @@ export default function AnimatedContent({
     }, { rootMargin: `0px 0px -${Math.round(threshold * 100)}% 0px` });
     observer.observe(element);
 
+    // Browsers that render frames report on the first observe immediately. Environments that never do
+    // (crawlers, screenshot tools, paused tabs) would leave content invisible, so show it instead.
+    const fallback = window.setTimeout(() => {
+      if (reported) return;
+      observer.disconnect();
+      element.style.opacity = '';
+      element.style.transform = '';
+    }, 1500);
+
     return () => {
+      window.clearTimeout(fallback);
       observer.disconnect();
       element.style.opacity = '';
       element.style.transform = '';

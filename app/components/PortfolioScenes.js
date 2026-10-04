@@ -83,13 +83,14 @@ function CertificateThumb({ item }) {
   const dialogRef = useRef(null);
   const [failed, setFailed] = useState(false);
   const [active, setActive] = useState(0);
+  const [opened, setOpened] = useState(false);
   const images = [...new Set([...(item.certificateImages || []), item.certificateImageUrl].filter(Boolean))];
   if (!images.length || failed) return null;
   const label = `${item.role}${item.organization ? ` — ${item.organization}` : ''}`;
   const count = images.length;
   const close = () => dialogRef.current?.close();
   const step = (delta) => setActive((current) => (current + delta + count) % count);
-  const open = () => { setActive(0); dialogRef.current?.showModal(); };
+  const open = () => { setActive(0); setOpened(true); dialogRef.current?.showModal(); };
   const onKeyDown = (event) => {
     if (count < 2) return;
     if (event.key === 'ArrowRight') { event.preventDefault(); step(1); }
@@ -105,7 +106,8 @@ function CertificateThumb({ item }) {
       <dialog ref={dialogRef} className="saad-certificate-dialog" aria-label={label} onKeyDown={onKeyDown} onClick={(event) => { if (event.target === event.currentTarget) close(); }}>
         <figure>
           <div className="saad-certificate-stage">
-            <img src={images[active]} alt={`${label} — image ${active + 1} of ${count}`} />
+            {/* Rendered only after the first open, so closed viewers never trigger full-size downloads or preloads. */}
+            {opened && <img src={images[active]} alt={`${label} — image ${active + 1} of ${count}`} />}
             {count > 1 && (
               <>
                 <button type="button" className="saad-certificate-nav is-prev" onClick={() => step(-1)} aria-label="Previous image">‹</button>
@@ -263,7 +265,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
 
         <figure className="saad-portrait">
           <div className="saad-portrait-frame">
-            {profile.profileImageUrl ? <Image src={profile.profileImageUrl} alt={profile.name} fill priority sizes="(max-width: 700px) 68vw, 34vw" /> : <span>{initials}<small>portrait</small></span>}
+            {profile.profileImageUrl ? <Image src={profile.profileImageUrl} alt={profile.name} fill priority fetchPriority="high" loading="eager" sizes="(max-width: 700px) 58vw, (max-width: 1250px) 27vw, 380px" /> : <span>{initials}<small>portrait</small></span>}
             <span className="saad-portrait-player" aria-hidden="true">PLAYER 01</span>
             <i className="saad-portrait-scan" aria-hidden="true" />
           </div>
@@ -305,7 +307,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
                   src={game.coverImageUrl || projectPlaceholders[index % projectPlaceholders.length]}
                   alt={`${game.title} project cover`}
                   fill
-                  loading={index === 0 ? 'eager' : 'lazy'}
+                  loading="lazy"
                   sizes="(max-width: 700px) 100vw, (max-width: 1250px) 50vw, 33vw"
                 />
               </GlareHover>

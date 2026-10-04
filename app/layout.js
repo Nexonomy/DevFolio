@@ -1,10 +1,11 @@
 import './globals.css';
 import './portfolio.css';
-import localFont from 'next/font/local';
+import { Space_Grotesk } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import MotionLayer from './components/MotionLayer';
 import { ProjectTransitionProvider } from './components/ProjectTransition';
-const space = localFont({ src: './fonts/SpaceGrotesk.ttf', variable: '--font-space', display: 'swap', weight: '300 700' });
+// Google-hosted Space Grotesk is self-hosted by Next as a Latin-subset WOFF2 (~5x smaller than the bundled TTF).
+const space = Space_Grotesk({ subsets: ['latin'], variable: '--font-space', display: 'swap' });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ahsanhere.me';
 const siteTitle = 'Ahsan Tariq — Game Developer';

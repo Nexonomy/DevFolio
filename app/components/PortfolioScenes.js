@@ -14,6 +14,7 @@ import ClickSpark from './reactbits/ClickSpark';
 import GlareHover from './reactbits/GlareHover';
 import FilterRail from './FilterRail';
 
+const FEATURED_GAME_COUNT = 6;
 const projectPlaceholders = [
   '/project-placeholders/magic-student.png',
   '/project-placeholders/luggage-character.png',
@@ -111,7 +112,10 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
   const [gameFilter, setGameFilter] = useState('All');
   const [experienceFilter, setExperienceFilter] = useState('All');
   const gameGenres = ['All', ...new Set(games.map((game) => game.tag).filter(Boolean))];
-  const visibleGames = gameFilter === 'All' ? games : games.filter((game) => game.tag === gameFilter);
+  const [showAllGames, setShowAllGames] = useState(false);
+  const filteredGames = gameFilter === 'All' ? games : games.filter((game) => game.tag === gameFilter);
+  const hiddenGameCount = Math.max(filteredGames.length - FEATURED_GAME_COUNT, 0);
+  const visibleGames = showAllGames ? filteredGames : filteredGames.slice(0, FEATURED_GAME_COUNT);
 
   const [contactSending, setContactSending] = useState(false);
 
@@ -234,6 +238,14 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
           })}
         </div>
         </AnimatedContent>
+        {hiddenGameCount > 0 && (
+          <div className="saad-see-more">
+            <button type="button" onClick={() => setShowAllGames((value) => !value)} aria-expanded={showAllGames}>
+              <span>{showAllGames ? 'Show fewer projects' : `See ${hiddenGameCount} more project${hiddenGameCount === 1 ? '' : 's'}`}</span>
+              <b aria-hidden="true">{showAllGames ? '↑' : '↓'}</b>
+            </button>
+          </div>
+        )}
         <GameEasterEgg kind="pacman" />
       </section>
 

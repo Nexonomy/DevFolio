@@ -709,6 +709,16 @@ body:has(.saad-site) .scroll-rail { display:block; }
 .saad-experience-group .saad-timeline li:hover .saad-experience-index.has-logo { border-color:var(--saad-orange); transform:translateY(-2px); }
 .saad-experience-group .saad-timeline li:hover .saad-experience-index.has-logo img { transform:scale(1.08); }
 .saad-experience-card { min-width:0; }
+.saad-experience-group .saad-timeline li.is-grouped { grid-column:1 / -1; border-right:0; }
+.saad-role-tree { position:relative; margin:18px 0 0; padding:0 0 0 22px; list-style:none; }
+.saad-role-tree::before { content:""; position:absolute; top:6px; bottom:10px; left:5px; width:1px; background:#3a3a3a; }
+.saad-experience-group .saad-timeline .saad-role-tree li { position:relative; display:block; min-height:0; padding:0 0 20px; border:0; background:none; }
+.saad-experience-group .saad-timeline .saad-role-tree li:last-child { padding-bottom:0; }
+.saad-role-tree li::before { content:""; position:absolute; top:4px; left:-21px; width:9px; height:9px; border:1px solid var(--saad-orange); border-radius:50%; background:#0a0a0a; }
+.saad-role-tree li:first-child::before { background:var(--saad-orange); }
+.saad-role-tree .saad-experience-meta { margin:0 0 6px; }
+.saad-role-tree h5 { margin:0; color:var(--saad-cream); font-size:17px; line-height:1.15; letter-spacing:-.02em; }
+.saad-role-tree p { margin:7px 0 0; color:var(--saad-muted); font-size:13px; line-height:1.55; }
 .saad-experience-meta { display:flex; justify-content:space-between; gap:15px; margin:3px 0 20px; }
 .saad-experience-meta time { color:#d6d1c7; font-size:11px; }
 .saad-experience-meta small { color:var(--saad-orange); font-size:9px; font-weight:750; text-transform:uppercase; letter-spacing:.13em; }

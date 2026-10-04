@@ -76,6 +76,16 @@ function ExperienceMark({ item, index }) {
   );
 }
 
+function groupByOrganization(items) {
+  const groups = [];
+  for (const item of items) {
+    const last = groups.at(-1);
+    if (last && item.organization && last.organization === item.organization) last.roles.push(item);
+    else groups.push({ organization: item.organization, roles: [item] });
+  }
+  return groups;
+}
+
 function ExperienceGroup({ title, note, number, label, items }) {
   return (
     <section className="saad-experience-group" aria-labelledby={`${title.toLowerCase().replaceAll(' ', '-')}-title`}>
@@ -85,15 +95,31 @@ function ExperienceGroup({ title, note, number, label, items }) {
         <b>{label}</b>
       </header>
       <ol className="saad-timeline">
-        {items.map((item, index) => (
-          <li key={`${item.role}-${index}`}>
-            <ExperienceMark item={item} index={index} />
-            <div className="saad-experience-card">
-              <div className="saad-experience-meta"><time>{item.period}</time><small>{item.type}</small></div>
-              <h4>{item.role}</h4>
-              <b>{item.organization}</b>
-              <p>{item.description}</p>
-            </div>
+        {groupByOrganization(items).map((group, index) => (
+          <li key={`${group.organization}-${index}`} className={group.roles.length > 1 ? 'is-grouped' : undefined}>
+            <ExperienceMark item={group.roles[0]} index={index} />
+            {group.roles.length === 1 ? (
+              <div className="saad-experience-card">
+                <div className="saad-experience-meta"><time>{group.roles[0].period}</time><small>{group.roles[0].type}</small></div>
+                <h4>{group.roles[0].role}</h4>
+                <b>{group.organization}</b>
+                <p>{group.roles[0].description}</p>
+              </div>
+            ) : (
+              <div className="saad-experience-card">
+                <div className="saad-experience-meta"><time>{group.roles.length} roles</time><small>{group.roles.some((role) => role.current) ? 'Current' : 'Company'}</small></div>
+                <h4>{group.organization}</h4>
+                <ol className="saad-role-tree">
+                  {group.roles.map((role, roleIndex) => (
+                    <li key={`${role.role}-${roleIndex}`}>
+                      <div className="saad-experience-meta"><time>{role.period}</time><small>{role.type}</small></div>
+                      <h5>{role.role}</h5>
+                      <p>{role.description}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
           </li>
         ))}
       </ol>

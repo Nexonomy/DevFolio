@@ -15,6 +15,14 @@ export default function ProfileForm({ initialProfile }) {
   const setField = (name, value) => setForm((current) => ({ ...current, [name]: value }));
   const updateItem = (field, index, patch) => setForm((current) => ({ ...current, [field]: current[field].map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item) }));
   const removeItem = (field, index) => setForm((current) => ({ ...current, [field]: current[field].filter((_, itemIndex) => itemIndex !== index) }));
+  const [draggedTool, setDraggedTool] = useState(null);
+  const reorderItem = (field, from, to) => setForm((current) => {
+    if (from === to || from == null || to == null) return current;
+    const next = [...current[field]];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    return { ...current, [field]: next };
+  });
   const moveItem = (field, index, direction) => setForm((current) => {
     const next = [...current[field]];
     const destination = index + direction;
@@ -194,8 +202,25 @@ export default function ProfileForm({ initialProfile }) {
     </section>
 
     <section className="admin-profile-panel">
-      <div className="admin-profile-panel-title"><span>04</span><div><h2>Creative toolkit</h2><p>Add each tool separately with a short icon or monogram.</p></div><button type="button" className="admin-button admin-button-small" onClick={() => setField('tools', [...form.tools, blankTool()])}>+ Add tool</button></div>
-      <div className="admin-tool-editor-grid">{form.tools.map((tool, index) => <div className="admin-tool-editor" key={index}><input aria-label="Tool icon" value={tool.icon} onChange={(e) => updateItem('tools', index, { icon: e.target.value })} /><input aria-label="Tool name" value={tool.name} onChange={(e) => updateItem('tools', index, { name: e.target.value })} /><button type="button" aria-label={'Remove ' + tool.name} onClick={() => removeItem('tools', index)}>×</button></div>)}</div>
+      <div className="admin-profile-panel-title"><span>04</span><div><h2>Creative toolkit</h2><p>Add each tool with a short icon or monogram. Drag tools, or use ← →, to set the order shown on the site.</p></div><button type="button" className="admin-button admin-button-small" onClick={() => setField('tools', [...form.tools, blankTool()])}>+ Add tool</button></div>
+      <div className="admin-tool-editor-grid">{form.tools.map((tool, index) => (
+        <div
+          className={`admin-tool-editor is-sortable${draggedTool === index ? ' is-dragging' : ''}`}
+          key={index}
+          draggable
+          onDragStart={(event) => { setDraggedTool(index); event.dataTransfer.effectAllowed = 'move'; }}
+          onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move'; }}
+          onDrop={(event) => { event.preventDefault(); reorderItem('tools', draggedTool, index); setDraggedTool(null); }}
+          onDragEnd={() => setDraggedTool(null)}
+        >
+          <span className="admin-tool-handle" title="Drag to reorder" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+          <input aria-label="Tool icon" value={tool.icon} onChange={(e) => updateItem('tools', index, { icon: e.target.value })} />
+          <input aria-label="Tool name" value={tool.name} onChange={(e) => updateItem('tools', index, { name: e.target.value })} />
+          <button type="button" aria-label={`Move ${tool.name || 'tool'} earlier`} disabled={index === 0} onClick={() => moveItem('tools', index, -1)}>←</button>
+          <button type="button" aria-label={`Move ${tool.name || 'tool'} later`} disabled={index === form.tools.length - 1} onClick={() => moveItem('tools', index, 1)}>→</button>
+          <button type="button" aria-label={'Remove ' + tool.name} onClick={() => removeItem('tools', index)}>×</button>
+        </div>
+      ))}</div>
     </section>
 
     <section className="admin-profile-panel">

@@ -256,7 +256,6 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
     <AnimatedContent delay={0.08}>
     <div ref={track} className={'other-track' + (isDragging ? ' is-dragging' : '') + (activeType === 'All' ? '' : ' is-filtered')} aria-label="Other projects carousel" onScroll={updateProgress} onPointerDown={startDrag} onPointerMove={dragTrack} onPointerUp={stopDrag} onPointerLeave={stopDrag} onPointerCancel={stopDrag} onClickCapture={protectLinks}>
       {visibleProjects.map((project) => {
-        const index = projects.indexOf(project);
         return (
         <ProjectTransitionLink draggable="false" key={project.id || project.slug} href={'/projects/' + project.slug} className="other-card other-cover-card">
           {project.inDevelopment && <span className="saad-status-badge"><i aria-hidden="true" />In development</span>}
@@ -271,10 +270,9 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
             />
           </GlareHover>
           <div className="other-card-overlay">
-            <small>{String(index + 1).padStart(2, '0')} / {project.tag} · {project.year}</small>
-            <strong>{project.title}</strong>
+            <small>{[project.tag, project.year].filter(Boolean).join(' · ')}</small>
+            <strong title={project.title}>{project.title.split(':')[0].trim()}</strong>
             <p>{project.description}</p>
-            <b>{project.tech}</b>
             <i aria-hidden="true">↗</i>
           </div>
         </ProjectTransitionLink>

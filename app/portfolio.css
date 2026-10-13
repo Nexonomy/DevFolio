@@ -1091,3 +1091,22 @@ img.is-placeholder-cover { object-fit:contain !important; transform:none !import
 .saad-now-building a b { font-size:11px; font-weight:700; }
 .saad-now-building a:hover,.saad-now-building a:focus-visible { color:#0a0a0a; border-color:var(--saad-orange); background:var(--saad-orange); }
 @media (prefers-reduced-motion:reduce) { .saad-now-label i { animation:none; } }
+
+/* Card redesign: art leads; one meta line, a single-line name, two muted lines of description. */
+.saad-site .saad-project-grid .saad-project-card .saad-project-info,
+.saad-site .saad-project-grid .saad-project-card:not(:first-child) .saad-project-info { gap:0; padding:16px 20px 20px; }
+.saad-site .saad-project-grid .saad-project-info>span { padding-right:28px; color:var(--saad-muted); font-size:10px; font-weight:700; letter-spacing:.12em; }
+.saad-site .saad-project-grid .saad-project-info h3 { display:block; min-height:0; margin:8px 0 0; overflow:hidden; font-size:clamp(22px,1.9vw,28px); line-height:1.1; text-overflow:ellipsis; white-space:nowrap; -webkit-line-clamp:unset; }
+.saad-site .saad-project-grid .saad-project-info p { margin:8px 0 0; color:#a9a59c; font-size:13.5px; line-height:1.5; -webkit-line-clamp:2; }
+.saad-site .saad-project-grid .saad-project-info ul { display:none; }
+.saad-site .saad-project-grid .saad-project-info b { top:13px; right:18px; color:var(--saad-muted); font-size:15px; transition:color .2s,transform .2s; }
+.saad-site .saad-project-grid .saad-project-card:hover .saad-project-info b { color:var(--saad-orange); transform:translate(2px,-2px); }
+
+.saad-site .other-cover-card .other-card-overlay,
+.saad-site .other-cover-card:hover .other-card-overlay { gap:0; padding:16px 20px 20px; }
+.saad-site .other-card-overlay small { padding-right:24px; color:var(--saad-muted); font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.saad-site .other-card-overlay strong { display:block; margin-top:8px; overflow:hidden; font-size:clamp(20px,1.7vw,26px); line-height:1.1; text-overflow:ellipsis; white-space:nowrap; }
+.saad-site .other-card-overlay p { margin-top:8px; color:#a9a59c; font-size:13px; line-height:1.5; -webkit-line-clamp:2; }
+.saad-site .other-card-overlay i { top:13px; right:18px; color:var(--saad-muted); font-size:15px; transition:color .2s,transform .2s; }
+.saad-site .other-cover-card:hover .other-card-overlay i { color:var(--saad-orange); transform:translate(2px,-2px); }
+.saad-site .other-cover-card:hover .other-card-overlay strong { color:var(--saad-orange); }

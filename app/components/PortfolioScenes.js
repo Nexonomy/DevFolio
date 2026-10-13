@@ -327,10 +327,9 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
                 />
               </GlareHover>
               <div className="saad-project-info">
-                <span>{String(index + 1).padStart(2, '0')} / {game.tag}</span>
-                <h3>{game.title}</h3>
+                <span>{[game.tag, game.year].filter(Boolean).join(' · ')}</span>
+                <h3 title={game.title}>{game.title.split(':')[0].trim()}</h3>
                 <p>{game.description}</p>
-                <ul>{(game.categories || []).filter((category) => category.toLowerCase() !== String(game.tag).toLowerCase()).slice(0, 3).map((category) => <li key={category}>{category}</li>)}</ul>
                 <b aria-hidden="true">↗</b>
               </div>
             </ProjectTransitionLink>

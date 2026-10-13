@@ -187,6 +187,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
   const nameParts = profile.name.split(' ').filter(Boolean);
   const initials = `${nameParts[0]?.[0] || ''}${nameParts.at(-1)?.[0] || ''}`;
   const copy = profile.sectionCopy || {};
+  const inProgress = [...games, ...otherProjects].filter((project) => project.inDevelopment).slice(0, 3);
   const socialLinks = [
     profile.linkedinUrl && { label: 'LinkedIn', url: profile.linkedinUrl },
     profile.githubUrl && { label: 'GitHub', url: profile.githubUrl },
@@ -263,6 +264,16 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
           <div className="saad-intro-links">
             {socialLinks.map((link) => <a key={link.label + link.url} href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>)}
           </div>
+          {inProgress.length > 0 && (
+            <p className="saad-now-building">
+              <span className="saad-now-label"><i aria-hidden="true" />Currently working on</span>
+              {inProgress.map((project) => (
+                <ProjectTransitionLink key={project.id || project.slug} href={`/${project.portfolioSection === 'OTHER' ? 'projects' : 'games'}/${project.slug}`} title={project.title}>
+                  {project.title.split(':')[0].trim()}<b aria-hidden="true">↗</b>
+                </ProjectTransitionLink>
+              ))}
+            </p>
+          )}
         </div>
 
         <figure className="saad-portrait">

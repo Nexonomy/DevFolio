@@ -1082,3 +1082,12 @@ img.is-placeholder-cover { object-fit:contain !important; transform:none !import
 @media (min-width:701px) {
   .saad-site .saad-project-grid .saad-project-info h3 { min-height:1.9em; }
 }
+
+/* Hero: "Currently working on" strip, fed by projects flagged In development. */
+.saad-now-building { display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; margin:22px 0 0; }
+.saad-now-label { display:inline-flex; align-items:center; gap:8px; color:var(--saad-muted); font-size:10px; font-weight:750; letter-spacing:.12em; text-transform:uppercase; }
+.saad-now-label i { width:7px; height:7px; border-radius:50%; background:#ff7440; animation:saadStatusPulse 1.9s ease-out infinite; }
+.saad-now-building a { display:inline-flex; align-items:center; gap:7px; padding:6px 12px; border:1px solid #ff744066; border-radius:999px; color:var(--saad-cream); background:#ff744014; font-size:12px; font-weight:700; text-decoration:none; transition:color .2s,background .2s,border-color .2s; }
+.saad-now-building a b { font-size:11px; font-weight:700; }
+.saad-now-building a:hover,.saad-now-building a:focus-visible { color:#0a0a0a; border-color:var(--saad-orange); background:var(--saad-orange); }
+@media (prefers-reduced-motion:reduce) { .saad-now-label i { animation:none; } }

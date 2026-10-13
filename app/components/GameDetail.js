@@ -183,7 +183,7 @@ export default function GameDetail({ game }) {
           </div>
 
           <div className="game-detail-meta">
-            <div className="game-detail-badges"><span className="game-detail-tag">{game.tag}</span><span className="project-context-badge">{contextLabels[game.projectContext] || 'Personal project'}</span></div>
+            <div className="game-detail-badges"><span className="game-detail-tag">{game.tag}</span><span className="project-context-badge">{contextLabels[game.projectContext] || 'Personal project'}</span>{game.inDevelopment && <span className="saad-status-badge"><i aria-hidden="true" />In development</span>}</div>
             <h1 className="game-detail-title">{game.title}</h1>
             <p className="game-detail-description">{game.description}</p>
             <div className="game-detail-facts">

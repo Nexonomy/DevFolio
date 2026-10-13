@@ -35,6 +35,7 @@ function mapGameToForm(game) {
     highlights: joinLines(game?.highlights),
     platforms: game?.platforms || '',
     liveUrl: game?.liveUrl || '',
+    inDevelopment: Boolean(game?.inDevelopment),
     screenshots: game?.screenshots?.map((item) => ({
       url: item.url,
       alt: item.alt || '',
@@ -409,6 +410,15 @@ export default function GameForm({ game }) {
             onChange={(event) => updateField('published', event.target.checked)}
           />
           Published (visible on homepage)
+        </label>
+
+        <label className="admin-label admin-checkbox-label">
+          <input
+            type="checkbox"
+            checked={form.inDevelopment}
+            onChange={(event) => updateField('inDevelopment', event.target.checked)}
+          />
+          Currently working on this project (shows an “In development” badge)
         </label>
       </div>
       )}

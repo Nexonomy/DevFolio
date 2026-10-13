@@ -304,6 +304,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
             const index = games.indexOf(game);
             return (
             <ProjectTransitionLink href={`/games/${game.slug}`} className={`saad-project-card saad-project-${index + 1}`} key={game.id || game.slug}>
+              {game.inDevelopment && <span className="saad-status-badge"><i aria-hidden="true" />In development</span>}
               <GlareHover className="saad-project-art" background={game.coverImageUrl ? (game.bgColor || '#242424') : PLACEHOLDER_BG}>
                 <Image
                   src={game.coverImageUrl || PLACEHOLDER_COVER}
@@ -318,7 +319,7 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
                 <span>{String(index + 1).padStart(2, '0')} / {game.tag}</span>
                 <h3>{game.title}</h3>
                 <p>{game.description}</p>
-                <ul>{(game.categories || []).slice(0, 3).map((category) => <li key={category}>{category}</li>)}</ul>
+                <ul>{(game.categories || []).filter((category) => category.toLowerCase() !== String(game.tag).toLowerCase()).slice(0, 3).map((category) => <li key={category}>{category}</li>)}</ul>
                 <b aria-hidden="true">↗</b>
               </div>
             </ProjectTransitionLink>

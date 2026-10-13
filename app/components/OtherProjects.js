@@ -259,6 +259,7 @@ export default function OtherProjects({ projects = [], title = 'Additional Proje
         const index = projects.indexOf(project);
         return (
         <ProjectTransitionLink draggable="false" key={project.id || project.slug} href={'/projects/' + project.slug} className="other-card other-cover-card">
+          {project.inDevelopment && <span className="saad-status-badge"><i aria-hidden="true" />In development</span>}
           <GlareHover className="other-card-art" background={project.coverImageUrl ? (project.bgColor || '#121212') : PLACEHOLDER_BG}>
             <Image
               draggable="false"

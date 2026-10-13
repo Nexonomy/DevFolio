@@ -1068,3 +1068,17 @@ section:is(:hover,:focus-within)>.game-easter-egg * { animation-play-state:runni
 
 /* "Cover coming soon" placeholder: shown whole (never cropped) on its own light-grey backdrop. */
 img.is-placeholder-cover { object-fit:contain !important; transform:none !important; filter:none !important; }
+
+/* "In development" badge: floats on cards, sits inline on the project page. */
+.saad-status-badge { position:absolute; z-index:4; top:12px; left:12px; display:inline-flex; align-items:center; gap:7px; padding:6px 11px; border:1px solid #ffffff26; border-radius:999px; color:#f2eee4; background:#0a0a0aeb; backdrop-filter:blur(6px); font-size:10px; font-weight:750; letter-spacing:.09em; line-height:1; text-transform:uppercase; pointer-events:none; }
+.saad-status-badge i { width:7px; height:7px; border-radius:50%; background:#ff7440; animation:saadStatusPulse 1.9s ease-out infinite; }
+@keyframes saadStatusPulse { 0% { box-shadow:0 0 0 0 #ff744099; } 70% { box-shadow:0 0 0 7px #ff744000; } 100% { box-shadow:0 0 0 0 #ff744000; } }
+.game-detail-badges .saad-status-badge { position:static; pointer-events:auto; }
+@media (prefers-reduced-motion:reduce) { .saad-status-badge i { animation:none; } }
+
+/* Project cards: one genre style, titles capped at two lines, descriptions aligned across a row. */
+.saad-site .saad-project-grid .saad-project-info>span { text-transform:uppercase; letter-spacing:.1em; }
+.saad-site .saad-project-grid .saad-project-info h3 { display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+@media (min-width:701px) {
+  .saad-site .saad-project-grid .saad-project-info h3 { min-height:1.9em; }
+}

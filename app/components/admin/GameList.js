@@ -138,7 +138,7 @@ export default function GameList({ games, readOnly = false }) {
                   </div>
                   <div className="admin-lib-info">
                     <Link href={`/admin/games/${game.id}/edit`} className="admin-lib-title">{game.title}</Link>
-                    <p>{[game.tag, contextLabels[game.projectContext] || 'Personal', game.year].filter(Boolean).join(' · ')}</p>
+                    <p>{[game.tag, contextLabels[game.projectContext] || 'Personal', game.year, game.inDevelopment && 'In development'].filter(Boolean).join(' · ')}</p>
                     {missing.length > 0 && <p className="admin-lib-missing">Missing: {missing.join(', ')}</p>}
                   </div>
                   <label className={`admin-lib-switch${game.published ? ' is-on' : ''}`}>

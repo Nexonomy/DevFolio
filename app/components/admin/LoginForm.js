@@ -73,7 +73,7 @@ export default function LoginForm({ demo = false, configurationIssue = '' }) {
         <div className="admin-login-art-copy">
           <span>Portfolio studio</span>
           <strong>Shape the worlds<br />behind the work.</strong>
-          <p>Projects, stories, media and releases — all in one private space.</p>
+          <p>Projects, stories, media and releases, all in one private space.</p>
         </div>
       </div>
 

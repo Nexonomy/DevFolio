@@ -84,7 +84,7 @@ function CertificateThumb({ item }) {
   const [opened, setOpened] = useState(false);
   const images = [...new Set([...(item.certificateImages || []), item.certificateImageUrl].filter(Boolean))];
   if (!images.length || failed) return null;
-  const label = `${item.role}${item.organization ? ` — ${item.organization}` : ''}`;
+  const label = `${item.role}${item.organization ? `, ${item.organization}` : ''}`;
   const count = images.length;
   const close = () => dialogRef.current?.close();
   const step = (delta) => setActive((current) => (current + delta + count) % count);
@@ -105,7 +105,7 @@ function CertificateThumb({ item }) {
         <figure>
           <div className="saad-certificate-stage">
             {/* Rendered only after the first open, so closed viewers never trigger full-size downloads or preloads. */}
-            {opened && <img src={images[active]} alt={`${label} — image ${active + 1} of ${count}`} />}
+            {opened && <img src={images[active]} alt={`${label}, image ${active + 1} of ${count}`} />}
             {count > 1 && (
               <>
                 <button type="button" className="saad-certificate-nav is-prev" onClick={() => step(-1)} aria-label="Previous image">‹</button>
@@ -124,10 +124,10 @@ function CertificateThumb({ item }) {
 }
 
 function groupSpan(roles) {
-  const parts = (period) => String(period || '').split(/\s+[—–-]\s+/);
+  const parts = (period) => String(period || '').split(/\s+[\u2014\u2013-]\s+/);
   const end = parts(roles[0].period).at(-1);
   const start = parts(roles.at(-1).period)[0];
-  return start === end ? start : `${start} — ${end}`;
+  return start === end ? start : `${start} - ${end}`;
 }
 
 function groupByOrganization(items) {
@@ -232,18 +232,18 @@ export default function PortfolioScenes({ profile, games, otherProjects, demoMod
       });
       const result = await response.json().catch(() => ({}));
       if (response.ok) {
-        setContactStatus(`Message sent — ${profile.email} will reply soon.`);
+        setContactStatus(`Message sent. ${profile.email} will reply soon.`);
         form.reset();
       } else if (result.fallback) {
         const subject = payload.subject || 'Portfolio enquiry';
         const body = `Hi ${profile.name.split(' ')[0]},\n\n${payload.message}\n\nFrom: ${payload.name}\nEmail: ${payload.email}`;
-        setContactStatus('Email service is offline — opening your email app as a fallback…');
+        setContactStatus('Email service is offline. Opening your email app as a fallback…');
         window.location.href = `mailto:${profile.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       } else {
         setContactStatus(result.error || 'Could not send right now. Please try again.');
       }
     } catch {
-      setContactStatus('Network error — please try again or email directly.');
+      setContactStatus('Network error. Please try again or email directly.');
     } finally {
       setContactSending(false);
     }

@@ -246,7 +246,7 @@ a { color:inherit; }
 .game-source-link:hover { color:#09090a; background:var(--orange); border-color:var(--orange); }
 @media (max-width:620px) { .game-design-grid { grid-template-columns:1fr; } }
 
-/* Project case studies — the portfolio's visual language carried into detail pages. */
+/* Project case studies: the portfolio's visual language carried into detail pages. */
 .detail-demo-notice { width:min(1180px,calc(100% - 80px)); margin:20px auto 0; color:#777973; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
 .game-detail-page { min-height:100vh; padding:0 40px 80px; color:var(--ink); background:radial-gradient(circle at 78% 12%,rgba(111,134,255,.12),transparent 28rem),var(--cream); }
 .game-detail-topbar { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; width:min(1180px,100%); min-height:84px; margin:0 auto; border-bottom:1px solid var(--line); }
@@ -344,7 +344,7 @@ a { color:inherit; }
   .game-detail-footer a { min-width:0; }
 }
 
-/* Saad portfolio — a three-scene, game-design-only presentation. */
+/* Saad portfolio: a three-scene, game-design-only presentation. */
 .saad-site { --saad-black:#0a0a0a; --saad-panel:#121212; --saad-cream:#f2eee4; --saad-muted:#aaa69d; --saad-orange:#e65f2b; --saad-blue:#315e8b; --saad-content-max:1600px; position:relative; isolation:isolate; color:var(--saad-cream); background:var(--saad-black); }
 .saad-site * { box-sizing:border-box; }
 .saad-site ::selection { color:inherit; background:rgba(230,95,43,.3); }

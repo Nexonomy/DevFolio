@@ -34,7 +34,7 @@ export default async function AdminAnalyticsPage() {
 
         <article style={{ padding: '22px 24px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
           <h2 style={{ margin: '0 0 10px', fontSize: '15px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Speed Insights</h2>
-          <p style={{ margin: '0 0 16px', opacity: 0.75, fontSize: '14px' }}>Real-user Core Web Vitals — LCP, INP, CLS — scored per page. Enable it to see what recruiters&rsquo; devices actually experience.</p>
+          <p style={{ margin: '0 0 16px', opacity: 0.75, fontSize: '14px' }}>Real-user Core Web Vitals (LCP, INP, CLS) scored per page. Enable it to see what recruiters&rsquo; devices actually experience.</p>
           <Link href={speedUrl} target="_blank" rel="noreferrer" className="admin-button">
             Open in Vercel <span aria-hidden="true">↗</span>
           </Link>
@@ -45,7 +45,7 @@ export default async function AdminAnalyticsPage() {
         <h3 style={{ margin: '0 0 8px', fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.7 }}>One-time setup</h3>
         <ol style={{ margin: 0, paddingLeft: '20px', fontSize: '14px', lineHeight: 1.6 }}>
           <li>Open the Vercel project &rarr; <strong>Analytics</strong> tab &rarr; click <strong>Enable</strong>.</li>
-          <li>Hobby plan includes 2,500 events / month free &mdash; plenty for a portfolio.</li>
+          <li>Hobby plan includes 2,500 events / month free, which is plenty for a portfolio.</li>
           <li>Data begins appearing within a minute of the first visit after enabling.</li>
         </ol>
       </section>

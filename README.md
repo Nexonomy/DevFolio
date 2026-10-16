@@ -1,4 +1,4 @@
-# DevFolio — local redesign
+# DevFolio: local redesign
 
 A responsive portfolio for Ahsan Tariq, preserving the original Next.js 16, React 19, Prisma, NextAuth, Vercel Blob and Three.js stack.
 

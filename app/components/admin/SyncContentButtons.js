@@ -10,7 +10,7 @@ function friendly(summary) {
   if (summary?.projects?.ok) {
     const created = summary.projects.details?.filter((p) => p.action === 'created').length ?? 0;
     const updated = summary.projects.details?.filter((p) => p.action === 'updated').length ?? 0;
-    parts.push(`${summary.projects.count} projects synced — ${created} created, ${updated} updated.`);
+    parts.push(`${summary.projects.count} projects synced: ${created} created, ${updated} updated.`);
   }
   if (summary?.caseStudies?.ok) {
     parts.push(summary.caseStudies.projects

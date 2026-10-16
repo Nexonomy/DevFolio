@@ -14,7 +14,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const game = await getPublishedGame(slug);
-  return game ? { title: `${game.title} — Ahsan Tariq`, description: game.description } : { title: 'Game Not Found' };
+  return game ? { title: game.title, description: game.description } : { title: 'Game Not Found' };
 }
 export default async function GamePage({ params }) {
   const { slug } = await params;

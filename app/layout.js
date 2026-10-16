@@ -8,7 +8,7 @@ import { ProjectTransitionProvider } from './components/ProjectTransition';
 const space = Space_Grotesk({ subsets: ['latin'], variable: '--font-space', display: 'swap' });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ahsanhere.me';
-const siteTitle = 'Ahsan Tariq — Game Developer';
+const siteTitle = 'Ahsan Tariq | Game Developer';
 const siteDescription = 'Ahsan Tariq is a game developer building gameplay systems, interactive worlds, and visually thoughtful experiences.';
 
 export const metadata = {

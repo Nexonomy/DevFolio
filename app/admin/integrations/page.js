@@ -66,7 +66,7 @@ export default async function AdminIntegrationsPage() {
 
   const resendConfigured = Boolean(process.env.RESEND_API_KEY);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ahsanhere.me';
-  const contactFrom = process.env.CONTACT_FROM_EMAIL || (resendConfigured ? 'Portfolio <onboarding@resend.dev>' : '— (fallback to mailto)');
+  const contactFrom = process.env.CONTACT_FROM_EMAIL || (resendConfigured ? 'Portfolio <onboarding@resend.dev>' : 'None (falls back to mailto)');
   const databaseConfigured = Boolean(process.env.DATABASE_URL);
   const blobConfigured = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
   const authConfigured = Boolean(process.env.NEXTAUTH_SECRET) && Boolean(process.env.ADMIN_PASSWORD);
@@ -91,7 +91,7 @@ export default async function AdminIntegrationsPage() {
 
       <div style={{ display: 'grid', gap: '18px', marginTop: '24px' }}>
         <Row title="Contact email delivery (Resend)" status={statusBadge(resendConfigured, 'Live', 'Falls back to mailto')}>
-          <KeyValue label="Messages delivered to" value={profile.email || '— (set in Profile)'} mono />
+          <KeyValue label="Messages delivered to" value={profile.email || 'Not set (add it in Profile)'} mono />
           <KeyValue label="From address" value={contactFrom} mono />
           <KeyValue label="API key" value={resendConfigured ? '•••• configured' : 'RESEND_API_KEY not set'} />
           <p style={{ margin: '8px 0 0', opacity: 0.7, fontSize: '13px' }}>
@@ -115,12 +115,12 @@ export default async function AdminIntegrationsPage() {
         </Row>
 
         <Row title="Database" status={statusBadge(databaseConfigured, 'Connected', 'Demo mode')}>
-          <KeyValue label="DATABASE_URL" value={databaseConfigured ? '•••• configured' : 'Not set — using .demo-data/projects.json'} />
+          <KeyValue label="DATABASE_URL" value={databaseConfigured ? '•••• configured' : 'Not set, using .demo-data/projects.json'} />
           <KeyValue label="Mode" value={isDemo ? 'PORTFOLIO_DEMO=true' : 'Production'} mono />
         </Row>
 
         <Row title="Media storage (Vercel Blob)" status={statusBadge(blobConfigured, 'Connected', 'Local uploads')}>
-          <KeyValue label="BLOB_READ_WRITE_TOKEN" value={blobConfigured ? '•••• configured' : 'Not set — uploads go to public/demo-uploads'} />
+          <KeyValue label="BLOB_READ_WRITE_TOKEN" value={blobConfigured ? '•••• configured' : 'Not set, uploads go to public/demo-uploads'} />
         </Row>
 
         <Row title="Admin authentication" status={statusBadge(authConfigured, 'Secured', 'Preview password')}>
@@ -130,14 +130,14 @@ export default async function AdminIntegrationsPage() {
 
         <Row title="Portfolio backup" status={statusBadge(true, 'Available')}>
           <p style={{ margin: 0, opacity: 0.75, fontSize: '13px' }}>
-            Downloads a single JSON file with your profile, every game, every other project, screenshots, videos, and categories — the complete state the public site renders from.
+            Downloads a single JSON file with your profile, every game, every other project, screenshots, videos, and categories: the complete state the public site renders from.
           </p>
           <ExportButton className="admin-button" />
         </Row>
 
         <Row title="Sync from source (profile + projects)" status={statusBadge(true, 'Available')}>
           <p style={{ margin: 0, opacity: 0.75, fontSize: '13px' }}>
-            Pushes the canonical profile and the 10-project master seed from the codebase into Postgres. Use after a profile rewrite, or when adding a new project record to the seed. Idempotent — safe to re-run.
+            Pushes the canonical profile and the 10-project master seed from the codebase into Postgres. Use after a profile rewrite, or when adding a new project record to the seed. Idempotent, so it is safe to re-run.
           </p>
           <SyncContentButtons />
         </Row>

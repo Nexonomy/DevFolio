@@ -1110,3 +1110,9 @@ img.is-placeholder-cover { object-fit:contain !important; transform:none !import
 .saad-site .other-card-overlay i { top:13px; right:18px; color:var(--saad-muted); font-size:15px; transition:color .2s,transform .2s; }
 .saad-site .other-cover-card:hover .other-card-overlay i { color:var(--saad-orange); transform:translate(2px,-2px); }
 .saad-site .other-cover-card:hover .other-card-overlay strong { color:var(--saad-orange); }
+
+/* Project page cover: show the whole image (letterboxed when needed) so portrait screenshots are not cropped. */
+.game-detail-cover .game-detail-cover-image { object-fit:contain; }
+.game-detail-cover:hover .game-detail-cover-image { transform:none; filter:none; }
+/* The inner border frame would clip into any letterbox strips, so hide it when a real image shows. */
+.game-detail-cover:has(.game-detail-cover-image)::after { display:none; }

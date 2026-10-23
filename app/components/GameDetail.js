@@ -126,7 +126,15 @@ export default function GameDetail({ game }) {
                 />
               ) : current ? (
                 <button type="button" className="game-detail-cover-open" onClick={() => setLightboxOpen(true)} aria-label={`View ${current.alt} full screen`}>
-                  <Image key={current.src} src={current.src} alt={current.alt} fill className="game-detail-cover-image" priority={active === 0} sizes="(max-width: 900px) 100vw, 640px" />
+                  <Image
+                    key={current.src}
+                    src={current.src}
+                    alt={current.alt}
+                    fill
+                    className="game-detail-cover-image"
+                    priority={active === 0}
+                    sizes="(max-width: 900px) 100vw, 640px"
+                  />
                   <span className="game-detail-cover-zoom" aria-hidden="true">⤢</span>
                 </button>
               ) : (

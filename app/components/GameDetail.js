@@ -35,10 +35,13 @@ export default function GameDetail({ game }) {
   ];
 
   const [active, setActive] = useState(0);
+  const [portraitActive, setPortraitActive] = useState(false);
+  const [portraitRatio, setPortraitRatio] = useState(9 / 16);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const dialogRef = useRef(null);
   const thumbsRef = useRef(null);
   const dragRef = useRef(null);
+  const coverImageRef = useRef(null);
   const current = media[active];
 
   useEffect(() => {
@@ -58,19 +61,24 @@ export default function GameDetail({ game }) {
 
   const onThumbsPointerDown = (event) => {
     if (event.pointerType !== 'mouse' || event.button !== 0) return;
-    dragRef.current = { startX: event.clientX, startScroll: thumbsRef.current.scrollLeft, moved: false, id: event.pointerId };
+    const track = thumbsRef.current;
+    const vertical = track.scrollHeight > track.clientHeight && track.scrollWidth <= track.clientWidth;
+    dragRef.current = { vertical, start: vertical ? event.clientY : event.clientX, startScroll: vertical ? track.scrollTop : track.scrollLeft, moved: false, id: event.pointerId };
   };
   const onThumbsPointerMove = (event) => {
     const drag = dragRef.current;
     const track = thumbsRef.current;
     if (!drag || !track) return;
-    const delta = event.clientX - drag.startX;
+    const delta = (drag.vertical ? event.clientY : event.clientX) - drag.start;
     if (!drag.moved && Math.abs(delta) > 5) {
       drag.moved = true;
       track.setPointerCapture(drag.id);
       track.classList.add('is-dragging');
     }
-    if (drag.moved) track.scrollLeft = drag.startScroll - delta;
+    if (drag.moved) {
+      if (drag.vertical) track.scrollTop = drag.startScroll - delta;
+      else track.scrollLeft = drag.startScroll - delta;
+    }
   };
   const endThumbsDrag = () => {
     const drag = dragRef.current;
@@ -81,6 +89,24 @@ export default function GameDetail({ game }) {
     if (track.hasPointerCapture(drag.id)) track.releasePointerCapture(drag.id);
   };
   const step = (delta) => setActive((index) => (index + delta + media.length) % media.length);
+
+  // Shape the cover slot to match the current screenshot: default 16:9, switch to 9:16 for portrait images.
+  // The ratio check runs once per image, so there is no per-frame cost.
+  useEffect(() => {
+    if (!current || current.type === 'video') { setPortraitActive(false); return undefined; }
+    const img = coverImageRef.current;
+    if (!img) return undefined;
+    const measure = () => {
+      const { naturalWidth: w, naturalHeight: h } = img;
+      if (w > 0 && h > 0) {
+        setPortraitActive(h / w > 1.1);
+        setPortraitRatio(Math.min(Math.max(w / h, 0.4), 0.9));
+      }
+    };
+    if (img.complete && img.naturalWidth > 0) measure();
+    img.addEventListener('load', measure);
+    return () => img.removeEventListener('load', measure);
+  }, [current]);
 
   useEffect(() => {
     if (lightboxOpen) dialogRef.current?.showModal();
@@ -112,7 +138,7 @@ export default function GameDetail({ game }) {
 
       <header className="game-detail-hero">
         <div className="game-detail-hero-content">
-          <div className="game-detail-media">
+          <div className={`game-detail-media${portraitActive ? ' is-portrait' : ''}`} style={portraitActive ? { '--cover-ratio': portraitRatio } : undefined}>
             <div className="game-detail-cover" style={{ background: current ? game.bgColor : '#e8e8e8' }}>
               {current?.type !== 'video' && <span className="game-detail-cover-label">Project {projectNumber}</span>}
               {current?.type === 'video' ? (
@@ -128,6 +154,7 @@ export default function GameDetail({ game }) {
                 <button type="button" className="game-detail-cover-open" onClick={() => setLightboxOpen(true)} aria-label={`View ${current.alt} full screen`}>
                   <Image
                     key={current.src}
+                    ref={coverImageRef}
                     src={current.src}
                     alt={current.alt}
                     fill
@@ -155,7 +182,7 @@ export default function GameDetail({ game }) {
                 onDragStart={(event) => event.preventDefault()}
               >
                 {media.map((item, index) => (
-                  <li key={item.src}>
+                  <li key={`${item.src}-${index}`}>
                     <button type="button" className={index === active ? 'is-active' : undefined} aria-pressed={index === active} aria-label={`Show ${item.alt}`} onClick={() => setActive(index)}>
                       {item.type === 'video' ? (
                         <>

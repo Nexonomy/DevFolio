@@ -1111,8 +1111,23 @@ img.is-placeholder-cover { object-fit:contain !important; transform:none !import
 .saad-site .other-cover-card:hover .other-card-overlay i { color:var(--saad-orange); transform:translate(2px,-2px); }
 .saad-site .other-cover-card:hover .other-card-overlay strong { color:var(--saad-orange); }
 
-/* Project page cover: show the whole image (letterboxed when needed) so portrait screenshots are not cropped. */
-.game-detail-cover .game-detail-cover-image { object-fit:contain; }
-.game-detail-cover:hover .game-detail-cover-image { transform:none; filter:none; }
-/* The inner border frame would clip into any letterbox strips, so hide it when a real image shows. */
-.game-detail-cover:has(.game-detail-cover-image)::after { display:none; }
+
+/* Portrait screenshots: the cover keeps a true 9:16 frame at full height, with a slim rail of small thumbnails
+   beside it. The group shrink-wraps, and the text column takes the leftover width, so there is no dead space. */
+.game-detail-media.is-portrait { --portrait-h:clamp(460px,72vh,620px); display:flex; align-items:flex-start; gap:14px; width:max-content; max-width:100%; }
+.game-detail-media.is-portrait .game-detail-cover { flex:none; width:auto; height:var(--portrait-h); min-height:0; aspect-ratio:var(--cover-ratio,0.5625); }
+.game-detail-media.is-portrait .game-detail-cover-label,
+.game-detail-media.is-portrait .game-detail-cover-year { top:18px; }
+.game-detail-media.is-portrait .game-detail-thumbs { flex:none; flex-direction:column; width:76px; height:var(--portrait-h); gap:8px; padding:2px; overflow-x:hidden; overflow-y:auto; -webkit-mask-image:linear-gradient(180deg,#000 88%,transparent); mask-image:linear-gradient(180deg,#000 88%,transparent); scrollbar-width:none; }
+.game-detail-media.is-portrait .game-detail-thumbs::-webkit-scrollbar { display:none; }
+.game-detail-media.is-portrait .game-detail-thumbs li { flex:0 0 auto; width:100%; }
+.game-detail-media.is-portrait .game-detail-thumbs button { width:100%; aspect-ratio:9/16; border-radius:8px; }
+@media (min-width:901px) {
+  .game-detail-hero-content:has(.game-detail-media.is-portrait) { grid-template-columns:auto minmax(0,1fr); }
+}
+@media (max-width:700px) {
+  .game-detail-media.is-portrait { flex-direction:column; align-items:center; width:100%; gap:12px; }
+  .game-detail-media.is-portrait .game-detail-cover { height:auto; width:min(78vw,300px); }
+  .game-detail-media.is-portrait .game-detail-thumbs { flex-direction:row; width:100%; height:auto; overflow-y:visible; overflow-x:auto; -webkit-mask-image:none; mask-image:none; scrollbar-width:thin; }
+  .game-detail-media.is-portrait .game-detail-thumbs li { flex:0 0 clamp(58px,17vw,72px); width:auto; }
+}

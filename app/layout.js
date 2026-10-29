@@ -31,7 +31,6 @@ export const metadata = {
     card: 'summary_large_image',
     title: siteTitle,
     description: siteDescription,
-    creator: '@ahsanhere',
   },
   robots: {
     index: true,

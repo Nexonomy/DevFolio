@@ -1031,8 +1031,16 @@ section:is(:hover,:focus-within)>.game-easter-egg * { animation-play-state:runni
 .game-detail-cover:has(.game-detail-cover-video)::after { display:none; }
 .game-detail-thumbs button>img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .game-detail-thumb-play { position:absolute; inset:0; display:grid; place-items:center; color:#fff; background:#0006; font-size:14px; }
-.game-lightbox-video { width:min(1200px,calc(100vw - 140px)); aspect-ratio:16/9; max-height:calc(100vh - 120px); border:0; border-radius:var(--radius-lg); background:#000; }
+.game-lightbox-video { position:relative; width:min(1200px,calc(100vw - 140px)); aspect-ratio:16/9; max-height:calc(100vh - 120px); border:0; border-radius:var(--radius-lg); background:#000; }
 @media (max-width:680px) { .game-lightbox-video { width:calc(100vw - 32px); } }
+
+/* Click-to-load stand-in for the YouTube player: poster plus play button, no embed until asked. */
+.youtube-facade { display:block; padding:0; border:0; background:#000; cursor:pointer; overflow:hidden; appearance:none; }
+.youtube-facade>img { width:100%; height:100%; object-fit:cover; }
+.youtube-facade-play { position:absolute; top:50%; left:50%; z-index:3; display:grid; width:68px; height:48px; border-radius:14px; background:rgba(9,9,10,.74); transform:translate(-50%,-50%); place-items:center; transition:background .25s,transform .25s; }
+.youtube-facade-play::after { content:""; border-width:10px 0 10px 17px; border-style:solid; border-color:transparent transparent transparent #fff; }
+.youtube-facade:hover .youtube-facade-play,.youtube-facade:focus-visible .youtube-facade-play { background:#ff0033; transform:translate(-50%,-50%) scale(1.08); }
+@media (prefers-reduced-motion:reduce) { .youtube-facade-play { transition:none; } }
 
 /* Project page hierarchy: one case-study panel of cards; recognition and team fill the media column. */
 .game-detail-thumbs { padding-bottom:10px; cursor:grab; user-select:none; overscroll-behavior-x:contain; }

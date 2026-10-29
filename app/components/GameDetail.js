@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { extractYouTubeId } from '@/lib/youtube';
-import { getBlobDeliveryUrl } from '@/lib/blob';
+import { getBlobDeliveryUrl, getOptimizedImageUrl } from '@/lib/blob';
+import YouTubeEmbed from './YouTubeEmbed';
 
 const contextLabels = { PERSONAL: 'Personal project', COMPANY: 'Company project', ACADEMIC: 'Academic project', HACKATHON: 'Hackathon' };
 
@@ -29,7 +30,7 @@ export default function GameDetail({ game }) {
   const media = [
     ...(game.videos || []).map((video) => ({ videoId: extractYouTubeId(video.youtubeUrl), title: video.title }))
       .filter((video) => video.videoId)
-      .map(({ videoId, title }) => ({ type: 'video', videoId, src: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`, alt: title || `${game.title} video` })),
+      .map(({ videoId, title }) => ({ type: 'video', videoId, src: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`, alt: title || `${game.title} video` })),
     ...(game.coverImageUrl ? [{ src: getBlobDeliveryUrl(game.coverImageUrl), alt: `${game.title} cover` }] : []),
     ...(game.screenshots || []).map((shot, index) => ({ src: getBlobDeliveryUrl(shot.url), alt: shot.alt || `${game.title} screenshot ${index + 1}` })),
   ];
@@ -142,13 +143,12 @@ export default function GameDetail({ game }) {
             <div className="game-detail-cover" style={{ background: current ? game.bgColor : '#e8e8e8' }}>
               {current?.type !== 'video' && <span className="game-detail-cover-label">Project {projectNumber}</span>}
               {current?.type === 'video' ? (
-                <iframe
+                <YouTubeEmbed
                   key={current.videoId}
                   className="game-detail-cover-video"
-                  src={`https://www.youtube-nocookie.com/embed/${current.videoId}?rel=0`}
+                  videoId={current.videoId}
                   title={current.alt}
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+                  priority={active === 0}
                 />
               ) : current ? (
                 <button type="button" className="game-detail-cover-open" onClick={() => setLightboxOpen(true)} aria-label={`View ${current.alt} full screen`}>
@@ -289,17 +289,16 @@ export default function GameDetail({ game }) {
         >
           <button type="button" className="game-lightbox-close" aria-label="Close" onClick={() => dialogRef.current?.close()}>×</button>
           {current.type === 'video' ? (
-            <iframe
+            <YouTubeEmbed
               key={current.videoId}
               className="game-lightbox-video"
-              src={`https://www.youtube-nocookie.com/embed/${current.videoId}?rel=0`}
+              videoId={current.videoId}
               title={current.alt}
-              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
+              priority
             />
           ) : (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={current.src} alt={current.alt} className="game-lightbox-image" />
+            <img src={getOptimizedImageUrl(current.src)} alt={current.alt} className="game-lightbox-image" />
           )}
           {media.length > 1 && (
             <>
